@@ -2,6 +2,8 @@ package ua.agwebs.root.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 // Chart of accounts
 @Entity
@@ -30,6 +32,9 @@ public class BalanceAccount implements Serializable {
 
     @Column(name = "COA_DESC", length = 60)
     private String desc;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    private Set<EntryLine> entryLines = new HashSet<>();
 
     public BalanceAccount() {
     }
@@ -69,6 +74,14 @@ public class BalanceAccount implements Serializable {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public Set<EntryLine> getEntryLines() {
+        return entryLines;
+    }
+
+    public void addEntryLines(EntryLine entryLine) {
+        this.entryLines.add(entryLine);
     }
 
     @Override

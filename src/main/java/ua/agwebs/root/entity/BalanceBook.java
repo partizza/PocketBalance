@@ -29,6 +29,9 @@ public class BalanceBook implements Serializable {
     @Column(name = "BAL_BOOK_DESC", length = 60)
     private String desc;
 
+    @Column(name = "BAL_BOOK_DEL", nullable = false, columnDefinition = "tinyint(1) default 0")
+    private Boolean deleted;
+
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<BalanceAccount> accounts = new HashSet<>();
 
@@ -75,12 +78,21 @@ public class BalanceBook implements Serializable {
         this.entryHeaders.add(entryHeader);
     }
 
+    public Boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
     @Override
     public String toString() {
         return "BalanceBook{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
+                ", deleted=" + deleted +
                 '}';
     }
 
@@ -93,7 +105,8 @@ public class BalanceBook implements Serializable {
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return desc != null ? desc.equals(that.desc) : that.desc == null;
+        if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
+        return deleted != null ? deleted.equals(that.deleted) : that.deleted == null;
 
     }
 
@@ -102,6 +115,7 @@ public class BalanceBook implements Serializable {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (deleted != null ? deleted.hashCode() : 0);
         return result;
     }
 }

@@ -32,6 +32,9 @@ public class EntryHeader implements Serializable {
     @Column(name = "JRN_ENT_HDR_VAL_DT", nullable = false)
     private LocalDate valueDate;
 
+    @Column(name = "JRN_ENT_HDR_STORNO", nullable = false, columnDefinition = "tinyint(1) default 0")
+    private Boolean storno;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BAL_BOOK_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_HDR__BAL_BOOK"))
     private BalanceBook book;
@@ -76,6 +79,14 @@ public class EntryHeader implements Serializable {
         this.book = book;
     }
 
+    public Boolean isStorno() {
+        return storno;
+    }
+
+    public void setStorno(Boolean storno) {
+        this.storno = storno;
+    }
+
     @Override
     public String toString() {
         return "EntryHeader{" +
@@ -83,6 +94,7 @@ public class EntryHeader implements Serializable {
                 ", desc='" + desc + '\'' +
                 ", postedTime=" + postedTime +
                 ", valueDate=" + valueDate +
+                ", storno=" + storno +
                 ", book=" + book +
                 '}';
     }
@@ -98,6 +110,7 @@ public class EntryHeader implements Serializable {
         if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
         if (postedTime != null ? !postedTime.equals(that.postedTime) : that.postedTime != null) return false;
         if (valueDate != null ? !valueDate.equals(that.valueDate) : that.valueDate != null) return false;
+        if (storno != null ? !storno.equals(that.storno) : that.storno != null) return false;
         return book != null ? book.equals(that.book) : that.book == null;
 
     }
@@ -108,6 +121,7 @@ public class EntryHeader implements Serializable {
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
         result = 31 * result + (postedTime != null ? postedTime.hashCode() : 0);
         result = 31 * result + (valueDate != null ? valueDate.hashCode() : 0);
+        result = 31 * result + (storno != null ? storno.hashCode() : 0);
         result = 31 * result + (book != null ? book.hashCode() : 0);
         return result;
     }
