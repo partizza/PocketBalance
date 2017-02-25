@@ -1,6 +1,12 @@
 package ua.agwebs.root.entity;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.util.Assert;
+
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,20 +29,31 @@ public class BalanceBook implements Serializable {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "BalanceBookIdGen")
     private Long id;
 
-    @Column(name = "BAL_BOOK_NM", nullable = false, length = 25)
+    @NotBlank(message = "Name can't be null.")
+    @Size(max = 25, message = "Length of name should be between 1 and 25 characters.")
+    @Column(name = "BAL_BOOK_NM")
     private String name;
 
-    @Column(name = "BAL_BOOK_DESC", length = 60)
+    @Size(max = 60, message = "Max allowed length is 60 characters.")
+    @Column(name = "BAL_BOOK_DESC")
     private String desc;
 
     @Column(name = "BAL_BOOK_DEL", nullable = false, columnDefinition = "tinyint(1) default 0")
-    private Boolean deleted;
+    private Boolean deleted = false;
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<BalanceAccount> accounts = new HashSet<>();
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<EntryHeader> entryHeaders = new HashSet<>();
+
+    public BalanceBook(){
+    }
+
+    public BalanceBook(String name, String desc){
+        this.name = name;
+        this.desc = desc;
+    }
 
     public Long getId() {
         return id;

@@ -1,0 +1,22 @@
+2017-02-25 20:32:30.469  INFO 7450 --- [main] ua.agwebs.CoaServiceTests                : Starting CoaServiceTests on partiza-pk with PID 7450 (started by partiza in /home/partiza/IdeaProjects/PocketBalance)
+2017-02-25 20:32:30.490 DEBUG 7450 --- [main] ua.agwebs.CoaServiceTests                : Running with Spring Boot v1.5.1.RELEASE, Spring v4.3.6.RELEASE
+2017-02-25 20:32:30.492  INFO 7450 --- [main] ua.agwebs.CoaServiceTests                : The following profiles are active: test
+2017-02-25 20:32:44.281 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : HHH000389: Unsuccessful: alter table chart_of_acc drop constraint FK__CHART_OF_ACC__BAL_BOOK
+2017-02-25 20:32:44.285 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : Table "chart_of_acc" not found; SQL statement:
+alter table chart_of_acc drop constraint FK__CHART_OF_ACC__BAL_BOOK [42102-193]
+2017-02-25 20:32:44.287 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : HHH000389: Unsuccessful: alter table jrn_ent_hdr drop constraint FK__JRN_ENT_HDR__BAL_BOOK
+2017-02-25 20:32:44.288 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : Table "jrn_ent_hdr" not found; SQL statement:
+alter table jrn_ent_hdr drop constraint FK__JRN_ENT_HDR__BAL_BOOK [42102-193]
+2017-02-25 20:32:44.289 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : HHH000389: Unsuccessful: alter table jrn_ent_ln drop constraint FK__JRN_ENT_LN__JRN_ENT_HDR
+2017-02-25 20:32:44.289 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : Table "jrn_ent_ln" not found; SQL statement:
+alter table jrn_ent_ln drop constraint FK__JRN_ENT_LN__JRN_ENT_HDR [42102-193]
+2017-02-25 20:32:44.293 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : HHH000389: Unsuccessful: alter table jrn_ent_ln drop constraint FKbaovbaiocw82n3byrxt09tll0
+2017-02-25 20:32:44.294 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : Table "jrn_ent_ln" not found; SQL statement:
+alter table jrn_ent_ln drop constraint FKbaovbaiocw82n3byrxt09tll0 [42102-193]
+2017-02-25 20:32:44.295 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : HHH000389: Unsuccessful: alter table jrn_ent_ln drop constraint FK__JRN_ENT_LN__CURY
+2017-02-25 20:32:44.295 ERROR 7450 --- [main] org.hibernate.tool.hbm2ddl.SchemaExport  : Table "jrn_ent_ln" not found; SQL statement:
+alter table jrn_ent_ln drop constraint FK__JRN_ENT_LN__CURY [42102-193]
+2017-02-25 20:32:49.407  INFO 7450 --- [main] ua.agwebs.CoaServiceTests                : Started CoaServiceTests in 20.937 seconds (JVM running for 24.403)
+2017-02-25 20:32:49.745  INFO 7450 --- [main] ua.agwebs.root.service.CoaManager        : Creation of new balance book.
+2017-02-25 20:32:49.746 DEBUG 7450 --- [main] ua.agwebs.root.service.CoaManager        : Received params.
+2017-02-25 20:32:50.013 DEBUG 7450 --- [main] ua.agwebs.root.service.CoaManager        : Created balance book.
