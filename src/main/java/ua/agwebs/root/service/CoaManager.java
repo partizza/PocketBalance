@@ -17,10 +17,15 @@ import org.springframework.validation.annotation.Validated;
 import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.repo.BalanceBookRepository;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 
 @Service
 public class CoaManager implements CoaService {
+
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -34,8 +39,8 @@ public class CoaManager implements CoaService {
 
     @Override
     public BalanceBook createBalanceBook(BalanceBook balanceBook) {
-        logger.info("Creation of new balance book.");
-        logger.debug("Received params: {}", balanceBook);
+        logger.info("Create a new balance book.");
+        logger.debug("Passed parameters: {}", balanceBook);
 
         Assert.notNull(balanceBook);
         Assert.isNull(balanceBook.getId(), "Creation of balance book with specified Id is not allowed.");
@@ -47,8 +52,8 @@ public class CoaManager implements CoaService {
 
     @Override
     public BalanceBook updateBalanceBook(BalanceBook balanceBook) {
-        logger.info("Updating of balance book.");
-        logger.debug("Received params: {}", balanceBook);
+        logger.info("Update a balance book");
+        logger.debug("Passed parameters: {}", balanceBook);
 
         Assert.notNull(balanceBook);
         Assert.notNull(balanceBook.getId(), "Can't update. Balance book Id is required.");
@@ -60,22 +65,60 @@ public class CoaManager implements CoaService {
     }
 
     @Override
-    public BalanceBook mergeBalanceBook(BalanceBook balanceBook) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void deleteBalanceBook(long id) {
+        logger.info("Delete a balance book");
+        logger.debug("Received balance book id: {}", id);
 
+        BalanceBook balanceBook = repo.findOne(id);
+        Assert.isTrue(repo.exists(id), "Balance book doesn't exist.");
+        Assert.isTrue(!balanceBook.isDeleted(), "Balance book doesn't exist.");
+
+        balanceBook.setDeleted(true);
+        BalanceBook result = this.updateBalanceBook(balanceBook);
+
+        logger.debug("Deleted balance book: {}", result);
     }
 
     @Override
     public BalanceBook findBalanceBookById(long id) {
-        return null;
+        logger.info("Find balance book by id");
+        logger.debug("Received balance book id: {}", id);
+
+        Specification<BalanceBook> specification = new Specification<BalanceBook>() {
+            @Override
+            public Predicate toPredicate(Root<BalanceBook> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("deleted"), false);
+                predicate = cb.and(predicate, cb.equal(root.get("id"), id));
+                return predicate;
+            }
+        };
+
+        BalanceBook balanceBook = repo.findOne(specification);
+
+        logger.debug("Selected balance book: {}", balanceBook);
+        return balanceBook;
     }
 
     @Override
-    public Page<BalanceBook> findAllBalanceBook(Specification<BalanceBook> specification, Pageable pageable) {
-        return null;
+    public Page<BalanceBook> findAllBalanceBook(Pageable pageable) {
+        logger.info("Find all balance book");
+        logger.debug("Passed parameters: {}", pageable);
+
+        Assert.notNull(pageable, "Pageable can't be null.");
+
+        Specification<BalanceBook> specification = new Specification<BalanceBook>() {
+            @Override
+            public Predicate toPredicate(Root<BalanceBook> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("deleted"), false);
+                return predicate;
+            }
+        };
+
+        Page<BalanceBook> page = repo.findAll(specification, pageable);
+
+        logger.debug("Balance books selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
+                page.getNumber(), page.getTotalPages(), page.getNumberOfElements(), page.getTotalElements());
+
+        return page;
     }
 }

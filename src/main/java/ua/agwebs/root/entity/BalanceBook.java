@@ -38,7 +38,8 @@ public class BalanceBook implements Serializable {
     @Column(name = "BAL_BOOK_DESC")
     private String desc;
 
-    @Column(name = "BAL_BOOK_DEL", nullable = false, columnDefinition = "tinyint(1) default 0")
+    @NotNull
+    @Column(name = "BAL_BOOK_DEL", columnDefinition = "tinyint(1) default 0")
     private Boolean deleted = false;
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)

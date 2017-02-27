@@ -16,11 +16,9 @@ public interface CoaService {
 
     public BalanceBook updateBalanceBook(@Valid BalanceBook balanceBook);
 
-    public BalanceBook mergeBalanceBook(@Valid BalanceBook balanceBook);
-
     public void deleteBalanceBook(long id);
 
     public BalanceBook findBalanceBookById(long id);
 
-    public Page<BalanceBook> findAllBalanceBook(Specification<BalanceBook> specification, Pageable pageable);
+    public Page<BalanceBook> findAllBalanceBook(Pageable pageable);
 }
