@@ -57,7 +57,10 @@ public class CoaManager implements CoaService {
 
         Assert.notNull(balanceBook);
         Assert.notNull(balanceBook.getId(), "Can't update. Balance book Id is required.");
-        Assert.isTrue(repo.exists(balanceBook.getId()), "Can't update. Balance book doesn't exist.");
+
+        BalanceBook selectedBook = repo.findOne(balanceBook.getId());
+        Assert.notNull(selectedBook, "Can't update. Balance book doesn't exist.");
+        Assert.isTrue(!selectedBook.isDeleted(), "Can't update. Balance book doesn't exist.");
         BalanceBook updatedBalanceBook = repo.save(balanceBook);
 
         logger.debug("Created balance book: {}", updatedBalanceBook);
@@ -70,11 +73,11 @@ public class CoaManager implements CoaService {
         logger.debug("Received balance book id: {}", id);
 
         BalanceBook balanceBook = repo.findOne(id);
-        Assert.isTrue(repo.exists(id), "Balance book doesn't exist.");
+        Assert.notNull(balanceBook, "Balance book doesn't exist.");
         Assert.isTrue(!balanceBook.isDeleted(), "Balance book doesn't exist.");
 
         balanceBook.setDeleted(true);
-        BalanceBook result = this.updateBalanceBook(balanceBook);
+        BalanceBook result = repo.save(balanceBook);
 
         logger.debug("Deleted balance book: {}", result);
     }
