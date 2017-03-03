@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.validation.annotation.Validated;
+import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
 
 import javax.validation.Valid;
@@ -21,4 +22,6 @@ public interface CoaService {
     public BalanceBook findBalanceBookById(long id);
 
     public Page<BalanceBook> findAllBalanceBook(Pageable pageable);
+
+    public BalanceAccount createBalanceAccount(@Valid BalanceAccount balanceAccount);
 }

@@ -1,6 +1,10 @@
 package ua.agwebs.root.entity;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,12 +30,18 @@ public class BalanceAccount implements Serializable {
     @JoinColumn(name = "BAL_BOOK_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK__CHART_OF_ACC__BAL_BOOK"))
     private BalanceBook book;
 
-
-    @Column(name = "COA_NM", nullable = false, length = 25)
+    @NotBlank(message = "Name can't be null.")
+    @Size(max = 25, message = "Length of name should be between 1 and 25 characters.")
+    @Column(name = "COA_NM")
     private String name;
 
-    @Column(name = "COA_DESC", length = 60)
+    @Size(max = 60, message = "Max allowed length is 60 characters.")
+    @Column(name = "COA_DESC")
     private String desc;
+
+    @NotNull
+    @Column(name = "CHART_OF_ACC_ENBL", columnDefinition = "tinyint(1) default 1")
+    private Boolean enable = true;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
     private Set<EntryLine> entryLines = new HashSet<>();
@@ -84,14 +94,22 @@ public class BalanceAccount implements Serializable {
         this.entryLines.add(entryLine);
     }
 
+    public Boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
+    }
+
     @Override
     public String toString() {
         return "BalanceAccount{" +
                 "accId=" + accId +
-                ", bookId=" + bookId +
                 ", book=" + book +
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
+                ", enable=" + enable +
                 '}';
     }
 
@@ -106,7 +124,8 @@ public class BalanceAccount implements Serializable {
         if (bookId != null ? !bookId.equals(that.bookId) : that.bookId != null) return false;
         if (book != null ? !book.equals(that.book) : that.book != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return desc != null ? desc.equals(that.desc) : that.desc == null;
+        if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
+        return enable != null ? enable.equals(that.enable) : that.enable == null;
 
     }
 
@@ -117,6 +136,7 @@ public class BalanceAccount implements Serializable {
         result = 31 * result + (book != null ? book.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (enable != null ? enable.hashCode() : 0);
         return result;
     }
 }

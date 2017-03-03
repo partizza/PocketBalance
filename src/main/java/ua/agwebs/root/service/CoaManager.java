@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.repo.BalanceBookRepository;
 
@@ -44,6 +45,7 @@ public class CoaManager implements CoaService {
 
         Assert.notNull(balanceBook);
         Assert.isNull(balanceBook.getId(), "Creation of balance book with specified Id is not allowed.");
+        Assert.isTrue(!balanceBook.isDeleted(), "Can't create balance book with deleted status.");
         BalanceBook createdBalanceBook = repo.save(balanceBook);
 
         logger.debug("Created balance book: {}", createdBalanceBook);
@@ -60,7 +62,7 @@ public class CoaManager implements CoaService {
 
         BalanceBook selectedBook = repo.findOne(balanceBook.getId());
         Assert.notNull(selectedBook, "Can't update. Balance book doesn't exist.");
-        Assert.isTrue(!selectedBook.isDeleted(), "Can't update. Balance book doesn't exist.");
+        Assert.isTrue(!selectedBook.isDeleted(), "Can't update deleted balance book.");
         BalanceBook updatedBalanceBook = repo.save(balanceBook);
 
         logger.debug("Created balance book: {}", updatedBalanceBook);
@@ -123,5 +125,10 @@ public class CoaManager implements CoaService {
                 page.getNumber(), page.getTotalPages(), page.getNumberOfElements(), page.getTotalElements());
 
         return page;
+    }
+
+    @Override
+    public BalanceAccount createBalanceAccount(@Valid BalanceAccount balanceAccount) {
+        return null;
     }
 }
