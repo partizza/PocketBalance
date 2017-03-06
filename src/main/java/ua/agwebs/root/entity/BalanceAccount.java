@@ -1,6 +1,7 @@
 package ua.agwebs.root.entity;
 
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -49,9 +50,18 @@ public class BalanceAccount implements Serializable {
     public BalanceAccount() {
     }
 
-    public BalanceAccount(Long accId, BalanceBook book) {
+    public BalanceAccount(Long accId, BalanceBook book, String name) {
+
         this.accId = accId;
+        this.bookId = book.getId();
         this.book = book;
+        this.name = name;
+    }
+
+    public BalanceAccount(Long accId, BalanceBook book, String name, String desc) {
+
+        this(accId, book, name);
+        this.desc = desc;
     }
 
     public Long getAccId() {
@@ -68,6 +78,7 @@ public class BalanceAccount implements Serializable {
 
     public void setBook(BalanceBook book) {
         this.book = book;
+        this.bookId = book.getId();
     }
 
     public String getName() {

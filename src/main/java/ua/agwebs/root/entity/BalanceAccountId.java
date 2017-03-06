@@ -13,10 +13,9 @@ public class BalanceAccountId implements Serializable {
 
     private Long accId;
 
-    public BalanceAccountId(Long bookId, Long accId) {
-        Assert.notNull(bookId, "Balance book Id can't be null.");
-        Assert.notNull(bookId, "Balance account Id can't be null.");
+    public BalanceAccountId(){}
 
+    public BalanceAccountId(Long bookId, Long accId) {
         this.bookId = bookId;
         this.accId = accId;
     }
@@ -26,7 +25,6 @@ public class BalanceAccountId implements Serializable {
     }
 
     public void setBookId(Long bookId) {
-        Assert.notNull(bookId, "Balance book Id can't be null.");
         this.bookId = bookId;
     }
 
@@ -35,7 +33,6 @@ public class BalanceAccountId implements Serializable {
     }
 
     public void setAccId(Long accId) {
-        Assert.notNull(bookId, "Balance account Id can't be null.");
         this.accId = accId;
     }
 
