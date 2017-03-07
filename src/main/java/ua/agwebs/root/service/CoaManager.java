@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ua.agwebs.root.entity.BalanceAccount;
+import ua.agwebs.root.entity.BalanceAccountId;
 import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.repo.BalanceAccountRepository;
 import ua.agwebs.root.repo.BalanceBookRepository;
@@ -40,7 +41,6 @@ public class CoaManager implements CoaService {
         this.accountRepo = balanceAccountRepository;
     }
 
-    @Override
     public BalanceBook createBalanceBook(BalanceBook balanceBook) {
         logger.info("Create a new balance book.");
         logger.debug("Passed parameters: {}", balanceBook);
@@ -67,7 +67,7 @@ public class CoaManager implements CoaService {
         Assert.isTrue(!selectedBook.isDeleted(), "Can't update deleted balance book.");
         BalanceBook updatedBalanceBook = bookRepo.save(balanceBook);
 
-        logger.debug("Created balance book: {}", updatedBalanceBook);
+        logger.debug("Updated balance book: {}", updatedBalanceBook);
         return updatedBalanceBook;
     }
 
@@ -141,14 +141,62 @@ public class CoaManager implements CoaService {
         Assert.notNull(balanceAccount.getBook(), "Balance book required.");
         Long bookId = balanceAccount.getBook().getId();
         Assert.notNull(bookId, "Balance book id required.");
-        Assert.isTrue(this.checkBalanceBookExists(bookId), "Balance book doesn't exist.");
+        Assert.isTrue(this.checkBalanceBookAvailable(bookId), "Balance book doesn't exist or deleted.");
 
         BalanceAccount account = accountRepo.save(balanceAccount);
         logger.debug("Created balance account: {}", account);
         return account;
     }
 
-    private boolean checkBalanceBookExists(long id) {
+    @Override
+    public BalanceAccount updateBalanceAccount(@Valid BalanceAccount balanceAccount) {
+        logger.info("Update a balance account.");
+        logger.debug("Passed parameters: {}", balanceAccount);
+
+        Assert.notNull(balanceAccount);
+        Assert.notNull(balanceAccount.getAccId(), "Balance account id required.");
+
+        Assert.notNull(balanceAccount.getBook(), "Balance book required.");
+        Long bookId = balanceAccount.getBook().getId();
+        Assert.notNull(bookId, "Balance book id required.");
+        Assert.isTrue(this.checkBalanceBookAvailable(bookId), "Balance book doesn't exist or deleted.");
+
+        BalanceAccountId balanceAccountId = new BalanceAccountId(balanceAccount.getBook().getId(), balanceAccount.getAccId());
+        boolean accountExists = accountRepo.exists(balanceAccountId);
+        Assert.isTrue(accountExists, "Balance account doesn't exist.");
+
+        BalanceAccount updatedBalanceAccount = accountRepo.save(balanceAccount);
+        logger.debug("Updated balance account: {}", updatedBalanceAccount);
+        return updatedBalanceAccount;
+    }
+
+    @Override
+    public Page<BalanceAccount> findAllBalanceAccount(Pageable pageable) {
+        logger.info("Find all balance account");
+        logger.debug("Passed parameters: {}", pageable);
+
+        Assert.notNull(pageable, "Pageable can't be null.");
+
+        Page<BalanceAccount> page = accountRepo.findAll(pageable);
+
+        logger.debug("Balance accounts selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
+                page.getNumber(), page.getTotalPages(), page.getNumberOfElements(), page.getTotalElements());
+
+        return page;
+    }
+
+    @Override
+    public BalanceAccount findBalanceAccountById(long bookId, long accId) {
+        logger.info("Find balance account by id");
+        logger.debug("Received balance book id: bookId = {}, accId = {}", bookId, accId);
+
+        BalanceAccount account = accountRepo.findOne(new BalanceAccountId(bookId, accId));
+
+        logger.debug("Selected balance account: {}", account);
+        return account;
+    }
+
+    private boolean checkBalanceBookAvailable(long id) {
         logger.info("Check whether balance book exists.");
         logger.debug("Received balance book id: {}", id);
 

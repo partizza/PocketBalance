@@ -260,7 +260,7 @@ public class CoaServiceTests {
     @Test
     public void rejectCreate_BalanceAccount_NonExistedBalanceBook() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Balance book doesn't exist.");
+        thrown.expectMessage("Balance book doesn't exist or deleted.");
 
         BalanceBook balanceBook = new BalanceBook("my book", "for testing");
         balanceBook.setId(-1L);
@@ -316,12 +316,149 @@ public class CoaServiceTests {
         BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "1234567890123456789012345", "123456789012345678901234567890123456789012345678901234567890");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
 
-        assertEquals("Incorrect created balance account.",balanceAccount.getAccId(), resultedAccount.getAccId());
-        assertEquals("Incorrect created balance account.",balanceAccount.getBook().getId(), resultedAccount.getBook().getId());
-        assertEquals("Incorrect created balance account.",balanceAccount.getName(), resultedAccount.getName());
-        assertEquals("Incorrect created balance account.",balanceAccount.getDesc(), resultedAccount.getDesc());
-        assertEquals("Incorrect created balance account.",balanceAccount.isEnable(), resultedAccount.isEnable());
+        assertEquals("Incorrect created balance account.", balanceAccount.getAccId(), resultedAccount.getAccId());
+        assertEquals("Incorrect created balance account.", balanceAccount.getBook().getId(), resultedAccount.getBook().getId());
+        assertEquals("Incorrect created balance account.", balanceAccount.getName(), resultedAccount.getName());
+        assertEquals("Incorrect created balance account.", balanceAccount.getDesc(), resultedAccount.getDesc());
+        assertEquals("Incorrect created balance account.", balanceAccount.isEnable(), resultedAccount.isEnable());
 
+    }
+
+    // Update balance account
+    // ** reject
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectUpdate_BalanceAccount_Null() {
+        coaService.updateBalanceAccount(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectUpdate_BalanceAccount_NullAccId() {
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setAccId(null);
+        coaService.updateBalanceAccount(testedAccount);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectUpdate_BalanceAccount_NonExistentBook(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        coaService.deleteBalanceBook(testedAccount.getBook().getId());
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectUpdate_BalanceAccount_IncorrectAccId(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setAccId(-1L);
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectUpdate_BalanceAccount_NullName(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setName(null);
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectUpdate_BalanceAccount_BlankName(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setName("");
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectUpdate_BalanceAccount_MaxNameLength(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setName("12345678901234567890123456");
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectUpdate_BalanceAccount_MaxDescLength(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setDesc("1234567890123456789012345678901234567890123456789012345678901");
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectUpdate_BalanceAccount_NullEnable(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setEnable(null);
+        coaService.updateBalanceAccount(testedAccount);
+
+    }
+
+    // Update balance account
+    // ** successfully
+    @Test
+    public void update_BalanceAccout(){
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        testedAccount.setName("updated name");
+        testedAccount.setDesc("updated desc");
+        testedAccount.setEnable(false);
+        BalanceAccount updatedAccount = coaService.updateBalanceAccount(testedAccount);
+
+        assertEquals("Incorrect balance account update.", testedAccount.getAccId(), updatedAccount.getAccId());
+        assertEquals("Incorrect balance account update.", testedAccount.getBook().getId(), updatedAccount.getBook().getId());
+        assertEquals("Incorrect balance account update.", testedAccount.getName(), updatedAccount.getName());
+        assertEquals("Incorrect balance account update.", testedAccount.getDesc(), updatedAccount.getDesc());
+        assertEquals("Incorrect balance account update.", testedAccount.isEnable(), updatedAccount.isEnable());
+    }
+
+    // Find balance account
+    @Test
+    public void findBalanceAccountById() {
+        BalanceAccount searchResult = coaService.findBalanceAccountById(-1, -1);
+        assertNull("Incorrect returned object for nonexistent id.", searchResult);
+
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+
+        searchResult = coaService.findBalanceAccountById(testedAccount.getBook().getId(), testedAccount.getAccId());
+        assertEquals("Incorrect returned balance book.", testedAccount, searchResult);
+    }
+
+    @Test
+    public void findBalanceAccountPage() {
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash", "testing");
+        BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
+        Page<BalanceAccount> page = coaService.findAllBalanceAccount(new PageRequest(0, 100000000));
+        assertTrue("Incorrect result - balance book missed.", page.getContent().contains(testedAccount));
     }
 
 }

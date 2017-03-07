@@ -24,4 +24,10 @@ public interface CoaService {
     public Page<BalanceBook> findAllBalanceBook(Pageable pageable);
 
     public BalanceAccount createBalanceAccount(@Valid BalanceAccount balanceAccount);
+
+    public BalanceAccount updateBalanceAccount(@Valid BalanceAccount balanceAccount);
+
+    public Page<BalanceAccount> findAllBalanceAccount(Pageable pageable);
+
+    public BalanceAccount findBalanceAccountById(long bookId, long accId);
 }

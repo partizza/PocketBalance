@@ -129,14 +129,13 @@ public class BalanceAccount implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BalanceAccount that = (BalanceAccount) o;
+        BalanceAccount account = (BalanceAccount) o;
 
-        if (accId != null ? !accId.equals(that.accId) : that.accId != null) return false;
-        if (bookId != null ? !bookId.equals(that.bookId) : that.bookId != null) return false;
-        if (book != null ? !book.equals(that.book) : that.book != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
-        return enable != null ? enable.equals(that.enable) : that.enable == null;
+        if (accId != null ? !accId.equals(account.accId) : account.accId != null) return false;
+        if (bookId != null ? !bookId.equals(account.bookId) : account.bookId != null) return false;
+        if (name != null ? !name.equals(account.name) : account.name != null) return false;
+        if (desc != null ? !desc.equals(account.desc) : account.desc != null) return false;
+        return enable != null ? enable.equals(account.enable) : account.enable == null;
 
     }
 
@@ -144,7 +143,6 @@ public class BalanceAccount implements Serializable {
     public int hashCode() {
         int result = accId != null ? accId.hashCode() : 0;
         result = 31 * result + (bookId != null ? bookId.hashCode() : 0);
-        result = 31 * result + (book != null ? book.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
         result = 31 * result + (enable != null ? enable.hashCode() : 0);
