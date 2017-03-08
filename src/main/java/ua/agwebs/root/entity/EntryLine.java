@@ -1,6 +1,7 @@
 package ua.agwebs.root.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity
@@ -23,6 +24,7 @@ public class EntryLine implements Serializable {
     @JoinColumn(name = "JRN_ENT_HDR_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__JRN_ENT_HDR"))
     private EntryHeader header;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = {
             @JoinColumn(name = "COA_ID"),
@@ -30,16 +32,33 @@ public class EntryLine implements Serializable {
     }, foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__CHART_OF_ACC"))
     private BalanceAccount account;
 
-    @Column(name = "JRN_ENT_LN_TRN_AMT", nullable = false)
+    @NotNull
+    @Column(name = "JRN_ENT_LN_TRN_AMT")
     private Long trnAmount;
 
+    @NotNull
     @Column(name = "JRN_ENT_LN_SIDE", length = 1)
     @Enumerated(EnumType.STRING)
     private EntrySide side;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURY_ID", nullable = false, foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__CURY"))
+    @JoinColumn(name = "CURY_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__CURY"))
     private Currency currency;
+
+    public EntryLine() {
+    }
+
+    public EntryLine(Long lineId, EntryHeader header, BalanceAccount account, Long trnAmount, EntrySide side, Currency currency) {
+        this.lineId = lineId;
+        this.header = header;
+        this.account = account;
+        this.trnAmount = trnAmount;
+        this.side = side;
+        this.currency = currency;
+
+        this.headerId = header.getId();
+    }
 
     public Long getLineId() {
         return lineId;
@@ -55,6 +74,7 @@ public class EntryLine implements Serializable {
 
     public void setHeader(EntryHeader header) {
         this.header = header;
+        this.headerId = header.getId();
     }
 
     public BalanceAccount getAccount() {

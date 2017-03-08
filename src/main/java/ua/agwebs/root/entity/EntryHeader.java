@@ -1,9 +1,13 @@
 package ua.agwebs.root.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "JRN_ENT_HDR")
@@ -23,21 +27,29 @@ public class EntryHeader implements Serializable {
     @GeneratedValue(strategy = GenerationType.TABLE, generator = "JournalEntryHeaderIdGen")
     private Long id;
 
-    @Column(name = "JRN_ENT_HDR_DESC", nullable = false, length = 60)
+    @Size(max = 60, message = "Description of entry could be not more than 60 characters.")
+    @Column(name = "JRN_ENT_HDR_DESC")
     private String desc;
 
-    @Column(name = "JRN_ENT_HDR_POST_DTTM", nullable = false)
+    @NotNull
+    @Column(name = "JRN_ENT_HDR_POST_DTTM")
     private LocalDateTime postedTime;
 
-    @Column(name = "JRN_ENT_HDR_VAL_DT", nullable = false)
+    @NotNull
+    @Column(name = "JRN_ENT_HDR_VAL_DT")
     private LocalDate valueDate;
 
-    @Column(name = "JRN_ENT_HDR_STORNO", nullable = false, columnDefinition = "tinyint(1) default 0")
-    private Boolean storno;
+    @NotNull
+    @Column(name = "JRN_ENT_HDR_STORNO", columnDefinition = "tinyint(1) default 0")
+    private Boolean storno = false;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BAL_BOOK_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_HDR__BAL_BOOK"))
     private BalanceBook book;
+
+    @OneToMany(mappedBy = "header")
+    private Set<EntryLine> lines = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -85,6 +97,14 @@ public class EntryHeader implements Serializable {
 
     public void setStorno(Boolean storno) {
         this.storno = storno;
+    }
+
+    public Set<EntryLine> getLines() {
+        return lines;
+    }
+
+    public void addLines(EntryLine line) {
+        this.lines.add(line);
     }
 
     @Override
