@@ -2,6 +2,7 @@ package ua.agwebs.root.entity;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.Assert;
+import ua.agwebs.root.validator.EnabledBalanceBook;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class BalanceAccount implements Serializable {
     @Column(name = "BAL_BOOK_ID")
     private Long bookId;
 
+    @EnabledBalanceBook
     @ManyToOne(fetch = FetchType.LAZY)
     @Id
     @JoinColumn(name = "BAL_BOOK_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK__CHART_OF_ACC__BAL_BOOK"))

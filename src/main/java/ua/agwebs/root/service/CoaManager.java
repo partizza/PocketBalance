@@ -141,7 +141,6 @@ public class CoaManager implements CoaService {
         Assert.notNull(balanceAccount.getBook(), "Balance book required.");
         Long bookId = balanceAccount.getBook().getId();
         Assert.notNull(bookId, "Balance book id required.");
-        Assert.isTrue(this.checkBalanceBookAvailable(bookId), "Balance book doesn't exist or deleted.");
 
         BalanceAccount account = accountRepo.save(balanceAccount);
         logger.debug("Created balance account: {}", account);
@@ -159,7 +158,6 @@ public class CoaManager implements CoaService {
         Assert.notNull(balanceAccount.getBook(), "Balance book required.");
         Long bookId = balanceAccount.getBook().getId();
         Assert.notNull(bookId, "Balance book id required.");
-        Assert.isTrue(this.checkBalanceBookAvailable(bookId), "Balance book doesn't exist or deleted.");
 
         BalanceAccountId balanceAccountId = new BalanceAccountId(balanceAccount.getBook().getId(), balanceAccount.getAccId());
         boolean accountExists = accountRepo.exists(balanceAccountId);
