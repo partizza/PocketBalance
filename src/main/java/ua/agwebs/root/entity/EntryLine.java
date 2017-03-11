@@ -1,17 +1,23 @@
 package ua.agwebs.root.entity;
 
+import ua.agwebs.root.validator.EntryLineAmountSide;
+
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "JRN_ENT_LN")
 @IdClass(EntryLineId.class)
+@EntryLineAmountSide
 public class EntryLine implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    @NotNull
+    @Min(1)
     @Column(name = "JRN_ENT_LN_ID")
     private Long lineId;
 
@@ -49,15 +55,12 @@ public class EntryLine implements Serializable {
     public EntryLine() {
     }
 
-    public EntryLine(Long lineId, EntryHeader header, BalanceAccount account, Long trnAmount, EntrySide side, Currency currency) {
+    public EntryLine(long lineId, BalanceAccount account, Long trnAmount, EntrySide side, Currency currency) {
         this.lineId = lineId;
-        this.header = header;
         this.account = account;
         this.trnAmount = trnAmount;
         this.side = side;
         this.currency = currency;
-
-        this.headerId = header.getId();
     }
 
     public Long getLineId() {

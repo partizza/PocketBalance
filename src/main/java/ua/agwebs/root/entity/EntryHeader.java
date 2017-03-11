@@ -1,6 +1,11 @@
 package ua.agwebs.root.entity;
 
+import org.hibernate.validator.constraints.NotEmpty;
+import ua.agwebs.root.validator.EnabledBalanceBook;
+import ua.agwebs.root.validator.EntryAmountBalancing;
+
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -33,23 +38,34 @@ public class EntryHeader implements Serializable {
 
     @NotNull
     @Column(name = "JRN_ENT_HDR_POST_DTTM")
-    private LocalDateTime postedTime;
+    private LocalDateTime postedTime = LocalDateTime.now();
 
     @NotNull
     @Column(name = "JRN_ENT_HDR_VAL_DT")
-    private LocalDate valueDate;
+    private LocalDate valueDate = LocalDate.now();
 
     @NotNull
     @Column(name = "JRN_ENT_HDR_STORNO", columnDefinition = "tinyint(1) default 0")
     private Boolean storno = false;
 
     @NotNull
+    @EnabledBalanceBook
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BAL_BOOK_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_HDR__BAL_BOOK"))
     private BalanceBook book;
 
-    @OneToMany(mappedBy = "header")
+    @NotEmpty
+    @EntryAmountBalancing
+    @Valid
+    @OneToMany(mappedBy = "header", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<EntryLine> lines = new HashSet<>();
+
+    public EntryHeader() {
+    }
+
+    public EntryHeader(BalanceBook book) {
+        this.book = book;
+    }
 
     public Long getId() {
         return id;

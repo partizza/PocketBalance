@@ -194,27 +194,4 @@ public class CoaManager implements CoaService {
         return account;
     }
 
-    private boolean checkBalanceBookAvailable(long id) {
-        logger.info("Check whether balance book exists.");
-        logger.debug("Received balance book id: {}", id);
-
-        Specification<BalanceBook> specification = new Specification<BalanceBook>() {
-            @Override
-            public Predicate toPredicate(Root<BalanceBook> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
-                Predicate predicate = cb.equal(root.get("deleted"), false);
-                predicate = cb.and(predicate, cb.equal(root.get("id"), id));
-                return predicate;
-            }
-        };
-
-        BalanceBook resultedBook = bookRepo.findOne(specification);
-
-        if (resultedBook == null) {
-            logger.debug("Check result: balance book doesn't exist.");
-            return false;
-        } else {
-            logger.debug("Check result: balance book exists, {}", resultedBook);
-            return true;
-        }
-    }
 }

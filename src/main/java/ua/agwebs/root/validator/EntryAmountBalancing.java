@@ -11,11 +11,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ FIELD, PARAMETER })
 @Retention(RUNTIME)
-@Constraint(validatedBy = CheckBalanceBookEnable.class)
+@Constraint(validatedBy = CheckEntryAmountBalancing.class)
 @Documented
-public @interface EnabledBalanceBook {
+public @interface EntryAmountBalancing {
 
-    String message() default "Balance book doesn't exist or has been deleted.";
+    String message() default "Amount is not correct. Debit and credit should be equal in each currency.";
 
     Class<?>[] groups() default { };
 
