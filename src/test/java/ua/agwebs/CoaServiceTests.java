@@ -301,6 +301,16 @@ public class CoaServiceTests {
 
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectCreate_BalanceAccount_ExistingAccount() {
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+
+        BalanceAccount balanceAccount = new BalanceAccount(1002L, balanceBook, "cash");
+        BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
+        coaService.createBalanceAccount(balanceAccount);
+
+    }
+
     // Create balance account
     // ** successfully
     @Test

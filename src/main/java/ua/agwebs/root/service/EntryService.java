@@ -18,7 +18,7 @@ public interface EntryService {
     public EntryHeader createEntry(@EnabledBalanceBook @Valid BalanceBook book,
                                    @EntryAmountBalancing @Valid Set<EntryLine> entryLines);
 
-    public void setStorno(long entryHeaderId, boolean value);
+    public EntryHeader setStorno(long entryHeaderId, boolean value);
 
     public EntryHeader findEntryHeaderById(long id);
 

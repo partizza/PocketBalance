@@ -23,7 +23,7 @@ public class CheckBalanceBookEnable implements ConstraintValidator<EnabledBalanc
 
     @Override
     public boolean isValid(BalanceBook book, ConstraintValidatorContext constraintContext) {
-        logger.debug("Check if balance book enable: ", book);
+        logger.debug("Check if balance book enable: {}", book);
 
         if (book == null || book.getId() == null) {
             logger.debug("False. No balance book id provided.");

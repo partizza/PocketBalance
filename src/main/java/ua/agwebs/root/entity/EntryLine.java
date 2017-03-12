@@ -1,5 +1,6 @@
 package ua.agwebs.root.entity;
 
+import ua.agwebs.root.validator.EnableBalanceAccount;
 import ua.agwebs.root.validator.EntryLineAmountSide;
 
 import javax.persistence.*;
@@ -31,6 +32,7 @@ public class EntryLine implements Serializable {
     private EntryHeader header;
 
     @NotNull
+    @EnableBalanceAccount
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = {
             @JoinColumn(name = "COA_ID"),
@@ -55,7 +57,7 @@ public class EntryLine implements Serializable {
     public EntryLine() {
     }
 
-    public EntryLine(long lineId, BalanceAccount account, Long trnAmount, EntrySide side, Currency currency) {
+    public EntryLine(long lineId, BalanceAccount account, long trnAmount, EntrySide side, Currency currency) {
         this.lineId = lineId;
         this.account = account;
         this.trnAmount = trnAmount;
@@ -92,7 +94,7 @@ public class EntryLine implements Serializable {
         return trnAmount;
     }
 
-    public void setTrnAmount(Long trnAmount) {
+    public void setTrnAmount(long trnAmount) {
         this.trnAmount = trnAmount;
     }
 

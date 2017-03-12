@@ -142,6 +142,9 @@ public class CoaManager implements CoaService {
         Long bookId = balanceAccount.getBook().getId();
         Assert.notNull(bookId, "Balance book id required.");
 
+        boolean isExisting = accountRepo.exists(new BalanceAccountId(balanceAccount.getBook().getId(), balanceAccount.getAccId()));
+        Assert.isTrue(!isExisting);
+
         BalanceAccount account = accountRepo.save(balanceAccount);
         logger.debug("Created balance account: {}", account);
         return account;

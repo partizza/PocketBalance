@@ -45,12 +45,12 @@ public class EntryManger implements EntryService {
         Assert.notNull(entryLines, "Entry lines can't be null.");
         Assert.notEmpty(entryLines, "Can't create entry without lines.");
 
-        for (EntryLine e : entryLines ) {
+        for (EntryLine e : entryLines) {
             Assert.isTrue(e.getAccount().getBook().getId() == book.getId(), "Accounts is not in the balance book.");
         }
 
         EntryHeader entryHeader = headerRepo.save(new EntryHeader(book));
-        for (EntryLine e : entryLines ) {
+        for (EntryLine e : entryLines) {
             e.setHeader(entryHeader);
             entryHeader.addLines(e);
         }
@@ -61,8 +61,18 @@ public class EntryManger implements EntryService {
     }
 
     @Override
-    public void setStorno(long entryHeaderId, boolean value) {
+    public EntryHeader setStorno(long entryHeaderId, boolean value) {
+        logger.info("Change storno flag.");
+        logger.debug("Passed parameters: entry header id = {}, new storno flag = {}", entryHeaderId, value);
 
+        EntryHeader header = headerRepo.findOne(entryHeaderId);
+        Assert.notNull(header, "Entry doesn't exist.");
+
+        header.setStorno(value);
+        EntryHeader updatedEntry = headerRepo.save(header);
+
+        logger.debug("Changed storno flag: {}", updatedEntry);
+        return updatedEntry;
     }
 
     @Override
