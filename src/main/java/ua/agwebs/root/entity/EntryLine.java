@@ -1,5 +1,6 @@
 package ua.agwebs.root.entity;
 
+import org.hibernate.annotations.Check;
 import ua.agwebs.root.validator.EnableBalanceAccount;
 import ua.agwebs.root.validator.EntryLineAmountSide;
 
@@ -41,11 +42,11 @@ public class EntryLine implements Serializable {
     private BalanceAccount account;
 
     @NotNull
-    @Column(name = "JRN_ENT_LN_TRN_AMT")
+    @Column(name = "JRN_ENT_LN_TRN_AMT", nullable = false)
     private Long trnAmount;
 
     @NotNull
-    @Column(name = "JRN_ENT_LN_SIDE", length = 1)
+    @Column(name = "JRN_ENT_LN_SIDE", length = 1, nullable = false)
     @Enumerated(EnumType.STRING)
     private EntrySide side;
 

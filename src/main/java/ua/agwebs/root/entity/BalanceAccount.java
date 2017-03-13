@@ -43,6 +43,11 @@ public class BalanceAccount implements Serializable {
     private String desc;
 
     @NotNull
+    @Column(name = "COA_CATEG", length = 9, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BSCategory bsCategory;
+
+    @NotNull
     @Column(name = "CHART_OF_ACC_ENBL", columnDefinition = "tinyint(1) default 1")
     private Boolean enable = true;
 
@@ -52,17 +57,18 @@ public class BalanceAccount implements Serializable {
     public BalanceAccount() {
     }
 
-    public BalanceAccount(Long accId, BalanceBook book, String name) {
+    public BalanceAccount(BSCategory bsCategory, Long accId, BalanceBook book, String name) {
 
         this.accId = accId;
         this.bookId = book.getId();
         this.book = book;
         this.name = name;
+        this.bsCategory = bsCategory;
     }
 
-    public BalanceAccount(Long accId, BalanceBook book, String name, String desc) {
+    public BalanceAccount(BSCategory bsCategory, Long accId, BalanceBook book, String name, String desc) {
 
-        this(accId, book, name);
+        this(bsCategory, accId, book, name);
         this.desc = desc;
     }
 
@@ -115,6 +121,14 @@ public class BalanceAccount implements Serializable {
         this.enable = enable;
     }
 
+    public BSCategory getBsCategory() {
+        return bsCategory;
+    }
+
+    public void setBsCategory(BSCategory bsCategory) {
+        this.bsCategory = bsCategory;
+    }
+
     @Override
     public String toString() {
         return "BalanceAccount{" +
@@ -123,6 +137,7 @@ public class BalanceAccount implements Serializable {
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
                 ", enable=" + enable +
+                ", bsCategory=" + bsCategory +
                 '}';
     }
 
@@ -137,6 +152,7 @@ public class BalanceAccount implements Serializable {
         if (bookId != null ? !bookId.equals(account.bookId) : account.bookId != null) return false;
         if (name != null ? !name.equals(account.name) : account.name != null) return false;
         if (desc != null ? !desc.equals(account.desc) : account.desc != null) return false;
+        if (bsCategory != account.bsCategory) return false;
         return enable != null ? enable.equals(account.enable) : account.enable == null;
 
     }
@@ -147,6 +163,7 @@ public class BalanceAccount implements Serializable {
         result = 31 * result + (bookId != null ? bookId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (bsCategory != null ? bsCategory.hashCode() : 0);
         result = 31 * result + (enable != null ? enable.hashCode() : 0);
         return result;
     }

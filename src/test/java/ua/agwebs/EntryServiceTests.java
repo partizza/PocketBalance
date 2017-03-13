@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.transaction.BeforeTransaction;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.root.repo.EntryLineRepository;
 import ua.agwebs.root.service.CoaService;
@@ -50,8 +49,8 @@ public class EntryServiceTests {
     public void init() {
         if (!setUpIsDone) {
             book = coaService.createBalanceBook(new BalanceBook("t-book", "for testing"));
-            dt = coaService.createBalanceAccount(new BalanceAccount(1002L, book, "Cash"));
-            ct = coaService.createBalanceAccount(new BalanceAccount(6000L, book, "Income"));
+            dt = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book, "Cash"));
+            ct = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book, "Income"));
             uah = entryService.findCurrencyById(980);
             usd = entryService.findCurrencyById(840);
 
@@ -172,7 +171,7 @@ public class EntryServiceTests {
     public void rejectCreate_Entry_WrongAccount() {
 
         BalanceBook wBook = coaService.createBalanceBook(new BalanceBook("w-book", "for testing"));
-        BalanceAccount wAcc = coaService.createBalanceAccount(new BalanceAccount(1002L, wBook, "wrong acc"));
+        BalanceAccount wAcc = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, wBook, "wrong acc"));
 
         Set<EntryLine> lines = new HashSet<>();
         lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
@@ -191,7 +190,7 @@ public class EntryServiceTests {
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Entry_DisabledAccount() {
 
-        BalanceAccount wAcc = new BalanceAccount(8002L, book, "wrong acc");
+        BalanceAccount wAcc = new BalanceAccount(BSCategory.ASSET, 8002L, book, "wrong acc");
         wAcc.setEnable(false);
         wAcc = coaService.createBalanceAccount(wAcc);
 
