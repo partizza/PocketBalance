@@ -36,8 +36,8 @@ public class EntryLine implements Serializable {
     @EnableBalanceAccount
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = {
-            @JoinColumn(name = "COA_ID"),
-            @JoinColumn(name = "BAL_BOOK_ID")
+            @JoinColumn(name = "COA_ID", nullable = false),
+            @JoinColumn(name = "BAL_BOOK_ID", nullable = false)
     }, foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__CHART_OF_ACC"))
     private BalanceAccount account;
 
@@ -52,7 +52,7 @@ public class EntryLine implements Serializable {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "CURY_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__CURY"))
+    @JoinColumn(name = "CURY_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_LN__CURY"), nullable = false)
     private Currency currency;
 
     public EntryLine() {

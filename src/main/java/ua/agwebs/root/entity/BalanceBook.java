@@ -31,15 +31,15 @@ public class BalanceBook implements Serializable {
 
     @NotBlank(message = "Name can't be null.")
     @Size(max = 25, message = "Length of name should be between 1 and 25 characters.")
-    @Column(name = "BAL_BOOK_NM")
+    @Column(name = "BAL_BOOK_NM", nullable = false, length = 25)
     private String name;
 
     @Size(max = 60, message = "Max allowed length is 60 characters.")
-    @Column(name = "BAL_BOOK_DESC")
+    @Column(name = "BAL_BOOK_DESC", length = 60)
     private String desc;
 
     @NotNull
-    @Column(name = "BAL_BOOK_DEL", columnDefinition = "tinyint(1) default 0")
+    @Column(name = "BAL_BOOK_DEL", columnDefinition = "tinyint(1) default 0", nullable = false)
     private Boolean deleted = false;
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
@@ -48,10 +48,13 @@ public class BalanceBook implements Serializable {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<EntryHeader> entryHeaders = new HashSet<>();
 
-    public BalanceBook(){
+    @OneToMany(mappedBy = "book")
+    private Set<Transaction> transactions = new HashSet<>();
+
+    public BalanceBook() {
     }
 
-    public BalanceBook(String name, String desc){
+    public BalanceBook(String name, String desc) {
         this.name = name;
         this.desc = desc;
     }
@@ -102,6 +105,14 @@ public class BalanceBook implements Serializable {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Set<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void addTransaction(Transaction transaction) {
+        this.transactions.add(transaction);
     }
 
     @Override

@@ -1,6 +1,10 @@
 package ua.agwebs.root.entity;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,9 +19,13 @@ public class Currency implements Serializable {
     @Column(name = "CURY_ID")
     private Long id;
 
+    @NotBlank
+    @Size(max = 3, message = "Max allowed length is 3 characters.")
     @Column(name = "CURY_CD", nullable = false, unique = true, length = 3)
     private String code;
 
+    @NotBlank
+    @Size(max = 60, message = "Max allowed length is 60 characters.")
     @Column(name = "CURY_NM", nullable = false, length = 60)
     private String name;
 

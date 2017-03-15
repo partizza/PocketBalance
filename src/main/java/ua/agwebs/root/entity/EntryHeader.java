@@ -33,25 +33,25 @@ public class EntryHeader implements Serializable {
     private Long id;
 
     @Size(max = 60, message = "Description of entry could be not more than 60 characters.")
-    @Column(name = "JRN_ENT_HDR_DESC")
+    @Column(name = "JRN_ENT_HDR_DESC", length = 60)
     private String desc;
 
     @NotNull
-    @Column(name = "JRN_ENT_HDR_POST_DTTM")
+    @Column(name = "JRN_ENT_HDR_POST_DTTM", nullable = false)
     private LocalDateTime postedTime = LocalDateTime.now();
 
     @NotNull
-    @Column(name = "JRN_ENT_HDR_VAL_DT")
+    @Column(name = "JRN_ENT_HDR_VAL_DT", nullable = false)
     private LocalDate valueDate = LocalDate.now();
 
     @NotNull
-    @Column(name = "JRN_ENT_HDR_STORNO", columnDefinition = "tinyint(1) default 0")
+    @Column(name = "JRN_ENT_HDR_STORNO", columnDefinition = "tinyint(1) default 0", nullable = false)
     private Boolean storno = false;
 
     @NotNull
     @EnabledBalanceBook
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BAL_BOOK_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_HDR__BAL_BOOK"))
+    @JoinColumn(name = "BAL_BOOK_ID", foreignKey = @ForeignKey(name = "FK__JRN_ENT_HDR__BAL_BOOK"), nullable = false)
     private BalanceBook book;
 
     @NotEmpty

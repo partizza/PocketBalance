@@ -35,11 +35,11 @@ public class BalanceAccount implements Serializable {
 
     @NotBlank(message = "Name can't be null.")
     @Size(max = 25, message = "Length of name should be between 1 and 25 characters.")
-    @Column(name = "COA_NM")
+    @Column(name = "COA_NM", nullable = false, length = 25)
     private String name;
 
     @Size(max = 60, message = "Max allowed length is 60 characters.")
-    @Column(name = "COA_DESC")
+    @Column(name = "COA_DESC", length = 60)
     private String desc;
 
     @NotNull
@@ -48,7 +48,7 @@ public class BalanceAccount implements Serializable {
     private BSCategory bsCategory;
 
     @NotNull
-    @Column(name = "CHART_OF_ACC_ENBL", columnDefinition = "tinyint(1) default 1")
+    @Column(name = "CHART_OF_ACC_ENBL", columnDefinition = "tinyint(1) default 1", nullable = false)
     private Boolean enable = true;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
