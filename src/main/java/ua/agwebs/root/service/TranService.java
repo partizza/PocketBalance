@@ -1,0 +1,19 @@
+package ua.agwebs.root.service;
+
+import org.springframework.validation.annotation.Validated;
+import ua.agwebs.root.entity.Transaction;
+import ua.agwebs.root.entity.TransactionDetail;
+
+import javax.validation.Valid;
+
+@Validated
+public interface TranService {
+
+    public Transaction createTransaction(@Valid Transaction transaction);
+
+    public Transaction updateTransaction(@Valid Transaction transaction);
+
+    public void deleteTransaction(long id);
+
+    public TransactionDetail setTransactionDetail(@Valid TransactionDetail transactionDetail);
+}
