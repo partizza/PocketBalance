@@ -54,6 +54,9 @@ public class BalanceAccount implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
     private Set<EntryLine> entryLines = new HashSet<>();
 
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private Set<TransactionDetail> transactionDetails = new HashSet<>();
+
     public BalanceAccount() {
     }
 
@@ -127,6 +130,14 @@ public class BalanceAccount implements Serializable {
 
     public void setBsCategory(BSCategory bsCategory) {
         this.bsCategory = bsCategory;
+    }
+
+    public Set<TransactionDetail> getTransactionDetails() {
+        return transactionDetails;
+    }
+
+    public void addTransactionDetail(TransactionDetail transactionDetail) {
+        this.transactionDetails.add(transactionDetail);
     }
 
     @Override

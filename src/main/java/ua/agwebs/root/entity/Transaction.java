@@ -7,6 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "TRAN")
@@ -43,6 +45,9 @@ public class Transaction implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BAL_BOOK_ID", nullable = false, foreignKey = @ForeignKey(name = "FR__TRAN__BAL_BOOK"))
     private BalanceBook book;
+
+    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    private Set<TransactionDetail> details = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -82,5 +87,13 @@ public class Transaction implements Serializable {
 
     public void setBook(BalanceBook book) {
         this.book = book;
+    }
+
+    public Set<TransactionDetail> getDetails() {
+        return details;
+    }
+
+    public void addDetails(TransactionDetail detail) {
+        this.details.add(detail);
     }
 }

@@ -48,7 +48,7 @@ public class BalanceBook implements Serializable {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<EntryHeader> entryHeaders = new HashSet<>();
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<Transaction> transactions = new HashSet<>();
 
     public BalanceBook() {
