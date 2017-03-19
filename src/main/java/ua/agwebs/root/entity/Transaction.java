@@ -49,6 +49,14 @@ public class Transaction implements Serializable {
     @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
     private Set<TransactionDetail> details = new HashSet<>();
 
+    public Transaction() {
+    }
+
+    public Transaction(String name, BalanceBook book) {
+        this.name = name;
+        this.book = book;
+    }
+
     public Long getId() {
         return id;
     }
