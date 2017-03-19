@@ -3,6 +3,9 @@ package ua.agwebs.root.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ua.agwebs.root.entity.Transaction;
@@ -10,6 +13,10 @@ import ua.agwebs.root.entity.TransactionDetail;
 import ua.agwebs.root.repo.TransactionDetailRepository;
 import ua.agwebs.root.repo.TransactionRepository;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 
 @Service
@@ -76,5 +83,45 @@ public class TranManager implements TranService {
     @Override
     public TransactionDetail setTransactionDetail(@Valid TransactionDetail transactionDetail) {
         return null;
+    }
+
+    @Override
+    public Transaction findTransactionById(long id) {
+        logger.info("Select transaction.");
+        logger.debug("Passed parameters: {}", id);
+
+        Specification<Transaction> specification = new Specification<Transaction>() {
+            @Override
+            public Predicate toPredicate(Root<Transaction> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("id"), id);
+                predicate = cb.and(predicate, cb.equal(root.get("deleted"), false));
+                return predicate;
+            }
+        };
+
+        Transaction transaction = tranRepo.findOne(specification);
+
+        logger.debug("Selected transaction: {}", transaction);
+        return transaction;
+    }
+
+    @Override
+    public Page<Transaction> findAllTransaction(Pageable pageable) {
+        logger.info("Select transaction.");
+        logger.debug("Passed parameters: {}", pageable);
+
+        Specification<Transaction> specification = new Specification<Transaction>() {
+            @Override
+            public Predicate toPredicate(Root<Transaction> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("deleted"), false);
+                return predicate;
+            }
+        };
+
+        Page<Transaction> page = tranRepo.findAll(specification, pageable);
+
+        logger.debug("Balance accounts selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
+                page.getNumber(), page.getTotalPages(), page.getNumberOfElements(), page.getTotalElements());
+        return page;
     }
 }

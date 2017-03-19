@@ -1,5 +1,7 @@
 package ua.agwebs.root.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import ua.agwebs.root.entity.Transaction;
 import ua.agwebs.root.entity.TransactionDetail;
@@ -16,4 +18,8 @@ public interface TranService {
     public void deleteTransaction(long id);
 
     public TransactionDetail setTransactionDetail(@Valid TransactionDetail transactionDetail);
+
+    public Transaction findTransactionById(long id);
+
+    public Page<Transaction> findAllTransaction(Pageable pageable);
 }

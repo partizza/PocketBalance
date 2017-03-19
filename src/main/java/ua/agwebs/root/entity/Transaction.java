@@ -104,4 +104,39 @@ public class Transaction implements Serializable {
     public void addDetails(TransactionDetail detail) {
         this.details.add(detail);
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", desc='" + desc + '\'' +
+                ", deleted=" + deleted +
+                ", book=" + book +
+                ", details=" + details +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Transaction that = (Transaction) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
+        return deleted != null ? deleted.equals(that.deleted) : that.deleted == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (deleted != null ? deleted.hashCode() : 0);
+        return result;
+    }
 }
