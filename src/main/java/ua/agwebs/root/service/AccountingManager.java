@@ -20,16 +20,16 @@ import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 
 @Service
-public class TranManager implements TranService {
+public class AccountingManager implements AccountingService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TranManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccountingManager.class);
 
     private TransactionRepository tranRepo;
 
     private TransactionDetailRepository detRepo;
 
     @Autowired
-    public TranManager(TransactionRepository tranRepo, TransactionDetailRepository detRepo) {
+    public AccountingManager(TransactionRepository tranRepo, TransactionDetailRepository detRepo) {
         this.tranRepo = tranRepo;
         this.detRepo = detRepo;
     }

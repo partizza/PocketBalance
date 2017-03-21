@@ -9,7 +9,7 @@ import ua.agwebs.root.entity.TransactionDetail;
 import javax.validation.Valid;
 
 @Validated
-public interface TranService {
+public interface AccountingService {
 
     public Transaction createTransaction(@Valid Transaction transaction);
 
