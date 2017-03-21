@@ -1,5 +1,8 @@
 package ua.agwebs.root.entity;
 
+import ua.agwebs.root.validator.EnableBalanceAccount;
+import ua.agwebs.root.validator.EnabledTransaction;
+
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,6 +20,7 @@ public class TransactionDetail implements Serializable {
     private Long tranId;
 
     @Valid
+    @EnabledTransaction
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TRAN_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK__TRAN_DET__TRAN"))
     private Transaction transaction;
@@ -30,6 +34,7 @@ public class TransactionDetail implements Serializable {
     private Long bookId;
 
     @Valid
+    @EnableBalanceAccount
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = {@JoinColumn(name = "COA_ID", insertable = false, updatable = false),
             @JoinColumn(name = "BAL_BOOK_ID", insertable = false, updatable = false)},
@@ -43,18 +48,20 @@ public class TransactionDetail implements Serializable {
 
     @NotNull
     @Column(name = "TRAN_DET_ENBL", nullable = false, columnDefinition = "tinyint(1) default 1")
-    private Boolean enable;
+    private Boolean enable = true;
 
     public TransactionDetail() {
     }
 
-    public TransactionDetail(Transaction transaction, BalanceAccount account) {
+    public TransactionDetail(Transaction transaction, BalanceAccount account, EntrySide side) {
         this.transaction = transaction;
         this.tranId = transaction.getId();
 
         this.account = account;
         this.coaId = account.getAccId();
         this.bookId = account.getBook().getId();
+
+        this.entrySide = side;
     }
 
     public Transaction getTransaction() {

@@ -7,6 +7,7 @@ import ua.agwebs.root.entity.Transaction;
 import ua.agwebs.root.entity.TransactionDetail;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @Validated
 public interface AccountingService {
@@ -22,4 +23,6 @@ public interface AccountingService {
     public Transaction findTransactionById(long id);
 
     public Page<Transaction> findAllTransaction(Pageable pageable);
+
+    public Set<TransactionDetail> findAllTransactionDetail(long transactionId);
 }

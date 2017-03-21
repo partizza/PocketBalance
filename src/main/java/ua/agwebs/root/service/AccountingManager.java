@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import ua.agwebs.root.entity.BalanceAccount;
+import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.entity.Transaction;
 import ua.agwebs.root.entity.TransactionDetail;
 import ua.agwebs.root.repo.TransactionDetailRepository;
@@ -18,6 +20,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.Valid;
+import java.util.Set;
 
 @Service
 public class AccountingManager implements AccountingService {
@@ -82,7 +85,19 @@ public class AccountingManager implements AccountingService {
 
     @Override
     public TransactionDetail setTransactionDetail(@Valid TransactionDetail transactionDetail) {
-        return null;
+        logger.info("Set transaction detail.");
+        logger.debug("Passed parameters: {}", transactionDetail);
+
+        Assert.notNull(transactionDetail);
+
+        BalanceBook book = transactionDetail.getTransaction().getBook();
+        BalanceAccount account = transactionDetail.getAccount();
+        Assert.isTrue(book.getId().equals(account.getBook().getId()), "Transaction and balance account from different balance book.");
+
+        TransactionDetail savedDetail = detRepo.save(transactionDetail);
+
+        logger.debug("Saved transaction detail: {}", savedDetail);
+        return savedDetail;
     }
 
     @Override
@@ -123,5 +138,10 @@ public class AccountingManager implements AccountingService {
         logger.debug("Balance accounts selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
                 page.getNumber(), page.getTotalPages(), page.getNumberOfElements(), page.getTotalElements());
         return page;
+    }
+
+    @Override
+    public Set<TransactionDetail> findAllTransactionDetail(long transactionId) {
+        return null;
     }
 }

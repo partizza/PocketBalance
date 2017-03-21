@@ -9,10 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import ua.agwebs.root.entity.BSCategory;
-import ua.agwebs.root.entity.BalanceAccount;
-import ua.agwebs.root.entity.BalanceBook;
-import ua.agwebs.root.entity.Transaction;
+import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.AccountingService;
 
@@ -46,12 +43,13 @@ public class AccountingServiceTests {
         if (!setUpIsDone) {
             book = coaService.createBalanceBook(new BalanceBook("t-book", "for testing"));
 
+            dt = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book, "Cash"));
+            ct = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book, "Income"));
+
             delBook = coaService.createBalanceBook(new BalanceBook("del-book", "disabled book"));
             delBook.setDeleted(true);
             coaService.deleteBalanceBook(delBook.getId());
 
-            dt = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book, "Cash"));
-            ct = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book, "Income"));
 
             setUpIsDone = true;
         }
@@ -255,7 +253,7 @@ public class AccountingServiceTests {
     }
 
     @Test
-    public void select_Transaction_All(){
+    public void select_Transaction_All() {
         Transaction first = accountingService.createTransaction(new Transaction("first", book));
         Transaction second = accountingService.createTransaction(new Transaction("second", book));
 
@@ -268,4 +266,83 @@ public class AccountingServiceTests {
         assertFalse("Incorrect select.", page.getContent().contains(second));
 
     }
+
+    // Set transaction detail
+    // ** successfully
+    @Test
+    public void test_setTransactionDetail() {
+        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+
+        assertEquals("Incorrect saved transaction detail.", detail.getTransaction().getId(), result.getTransaction().getId());
+        assertEquals("Incorrect saved transaction detail.", detail.getAccount().getAccId(), result.getAccount().getAccId());
+        assertEquals("Incorrect saved transaction detail.", detail.getEntrySide(), result.getEntrySide());
+        assertEquals("Incorrect saved transaction detail.", detail.isEnable(), result.isEnable());
+    }
+
+    // Set transaction detail
+    // ** reject
+    @Test(expected = IllegalArgumentException.class)
+    public void test_setTransactionDetail_null(){
+        TransactionDetail result = accountingService.setTransactionDetail(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_setTransactionDetail_DiffBooks(){
+        BalanceBook dBook = coaService.createBalanceBook(new BalanceBook("d-book", "testing"));
+        Transaction transaction = accountingService.createTransaction(new Transaction("test", dBook));
+
+        TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void test_setTransactionDetail_disabledAccount(){
+        BalanceAccount acc = new BalanceAccount(BSCategory.PROFIT, 123456789L, book, "Income");
+        acc.setEnable(false);
+        BalanceAccount disabledAccount = coaService.createBalanceAccount(acc);
+
+        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail detail = new TransactionDetail(transaction, disabledAccount, EntrySide.D);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void test_setTransactionDetail_NonExistingAccount(){
+        BalanceAccount nonExistingAccount = new BalanceAccount(BSCategory.PROFIT, 123456789L, book, "Income");
+
+        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail detail = new TransactionDetail(transaction, nonExistingAccount, EntrySide.D);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void test_setTransactionDetail_NonExistingTransaction(){
+        Transaction nonExistingTransaction = new Transaction("test", book);
+
+        TransactionDetail detail = new TransactionDetail(nonExistingTransaction, ct, EntrySide.D);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void test_setTransactionDetail_NullEntrySide(){
+        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail detail = new TransactionDetail(transaction, ct, null);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void test_setTransactionDetail_NullEnable(){
+        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
+        detail.setEnable(null);
+        TransactionDetail result = accountingService.setTransactionDetail(detail);
+    }
+
 }
