@@ -20,19 +20,20 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @Service
-public class AccountingManager implements AccountingService {
+public class BusinessTransactionManager implements BusinessTransactionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccountingManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(BusinessTransactionManager.class);
 
     private TransactionRepository tranRepo;
 
     private TransactionDetailRepository detRepo;
 
     @Autowired
-    public AccountingManager(TransactionRepository tranRepo, TransactionDetailRepository detRepo) {
+    public BusinessTransactionManager(TransactionRepository tranRepo, TransactionDetailRepository detRepo) {
         this.tranRepo = tranRepo;
         this.detRepo = detRepo;
     }
@@ -141,7 +142,21 @@ public class AccountingManager implements AccountingService {
     }
 
     @Override
-    public Set<TransactionDetail> findAllTransactionDetail(long transactionId) {
-        return null;
+    public List<TransactionDetail> findAllTransactionDetail(long transactionId) {
+        logger.info("Select transaction details.");
+        logger.debug("Passed parameters: transaction id = {}", transactionId);
+
+        Specification<TransactionDetail> specification = new Specification<TransactionDetail>() {
+            @Override
+            public Predicate toPredicate(Root<TransactionDetail> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("enable"), true);
+                predicate = cb.and(predicate, cb.equal(root.get("tranId"), transactionId));
+                return predicate;
+            }
+        };
+
+        List<TransactionDetail> details = detRepo.findAll(specification);
+        logger.debug("Selected transaction details: {}", details);
+        return details;
     }
 }

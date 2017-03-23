@@ -7,10 +7,11 @@ import ua.agwebs.root.entity.Transaction;
 import ua.agwebs.root.entity.TransactionDetail;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @Validated
-public interface AccountingService {
+public interface BusinessTransactionService {
 
     public Transaction createTransaction(@Valid Transaction transaction);
 
@@ -24,5 +25,5 @@ public interface AccountingService {
 
     public Page<Transaction> findAllTransaction(Pageable pageable);
 
-    public Set<TransactionDetail> findAllTransactionDetail(long transactionId);
+    public List<TransactionDetail> findAllTransactionDetail(long transactionId);
 }

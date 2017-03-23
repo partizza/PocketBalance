@@ -11,19 +11,21 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.CoaService;
-import ua.agwebs.root.service.AccountingService;
+import ua.agwebs.root.service.BusinessTransactionService;
 
 import javax.validation.ConstraintViolationException;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class AccountingServiceTests {
+public class BusinessTransactionServiceTests {
 
     @Autowired
-    private AccountingService accountingService;
+    private BusinessTransactionService businessTransactionService;
 
     @Autowired
     private CoaService coaService;
@@ -62,7 +64,7 @@ public class AccountingServiceTests {
         Transaction transaction = new Transaction("1234567890123456789012345", book);
         transaction.setDesc("123456789012345678901234567890123456789012345678901234567890");
 
-        Transaction createdTransaction = accountingService.createTransaction(transaction);
+        Transaction createdTransaction = businessTransactionService.createTransaction(transaction);
 
         assertEquals("Incorrect created transaction", transaction.getName(), createdTransaction.getName());
         assertEquals("Incorrect created transaction", transaction.getDesc(), createdTransaction.getDesc());
@@ -73,65 +75,65 @@ public class AccountingServiceTests {
     // ** reject
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Transaction_NullName() {
-        accountingService.createTransaction(new Transaction(null, book));
+        businessTransactionService.createTransaction(new Transaction(null, book));
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Transaction_BlankName() {
-        accountingService.createTransaction(new Transaction("", book));
+        businessTransactionService.createTransaction(new Transaction("", book));
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Transaction_DescLength() {
         Transaction transaction = new Transaction("a tran", book);
         transaction.setDesc("1234567890123456789012345678901234567890123456789012345678901");
-        accountingService.createTransaction(transaction);
+        businessTransactionService.createTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Transaction_NullDeletedFlag() {
         Transaction transaction = new Transaction("a tran", book);
         transaction.setDeleted(null);
-        accountingService.createTransaction(transaction);
+        businessTransactionService.createTransaction(transaction);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_Transaction_IsDeleted() {
         Transaction transaction = new Transaction("a tran", book);
         transaction.setDeleted(true);
-        accountingService.createTransaction(transaction);
+        businessTransactionService.createTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Transaction_DisabledBook() {
         Transaction transaction = new Transaction("a tran", delBook);
-        accountingService.createTransaction(transaction);
+        businessTransactionService.createTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Transaction_NullBook() {
         Transaction transaction = new Transaction("a tran", null);
-        accountingService.createTransaction(transaction);
+        businessTransactionService.createTransaction(transaction);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_Transaction_WithId() {
         Transaction transaction = new Transaction("a tran", book);
         transaction.setId(1L);
-        accountingService.createTransaction(transaction);
+        businessTransactionService.createTransaction(transaction);
     }
 
     // Update transaction
     // ** successfully
     @Test
     public void update_Transaction() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
 
         transaction.setName("1234567890123456789012345");
         transaction.setDesc("123456789012345678901234567890123456789012345678901234567890");
         transaction.setDeleted(true);
 
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
 
         assertEquals("Incorrect created transaction", transaction.getName(), updatedTran.getName());
         assertEquals("Incorrect created transaction", transaction.getDesc(), updatedTran.getDesc());
@@ -142,82 +144,82 @@ public class AccountingServiceTests {
     // ** reject
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_Transaction_NullName() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setName(null);
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_Transaction_BlankName() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setName("");
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_Transaction_NameLength() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setName("12345678901234567890123456");
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_Transaction_DescLength() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setDesc("1234567890123456789012345678901234567890123456789012345678901");
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_Transaction_NullDeletedFlag() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setDeleted(null);
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_Transaction_DisabledBook() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setBook(delBook);
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_Transaction_NullId() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setId(null);
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_Transaction_NonExistingId() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setId(-1L);
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_Transaction_Deleted() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
         transaction.setDeleted(true);
-        transaction = accountingService.updateTransaction(transaction);
+        transaction = businessTransactionService.updateTransaction(transaction);
 
         transaction.setName("new name");
-        Transaction updatedTran = accountingService.updateTransaction(transaction);
+        Transaction updatedTran = businessTransactionService.updateTransaction(transaction);
     }
 
     // Delete transaction
     // ** successfully
     @Test
     public void delete_Transaction() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
 
-        Transaction result = accountingService.findTransactionById(transaction.getId());
+        Transaction result = businessTransactionService.findTransactionById(transaction.getId());
         assertNotNull("Doesn't saved transaction before delete.", result);
 
-        accountingService.deleteTransaction(transaction.getId());
+        businessTransactionService.deleteTransaction(transaction.getId());
 
-        result = accountingService.findTransactionById(transaction.getId());
+        result = businessTransactionService.findTransactionById(transaction.getId());
         assertNull("Doesn't deleted transaction.", result);
 
     }
@@ -226,40 +228,40 @@ public class AccountingServiceTests {
     // ** reject
     @Test(expected = IllegalArgumentException.class)
     public void rejectDelete_Transaction_AlreadyDeleted() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("a tran", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("a tran", book));
 
-        accountingService.deleteTransaction(transaction.getId());
-        accountingService.deleteTransaction(transaction.getId());
+        businessTransactionService.deleteTransaction(transaction.getId());
+        businessTransactionService.deleteTransaction(transaction.getId());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectDelete_Transaction_NonExisting() {
-        accountingService.deleteTransaction(-1L);
+        businessTransactionService.deleteTransaction(-1L);
     }
 
     // Select transaction
     @Test
     public void select_Transaction_ById() {
-        Transaction first = accountingService.createTransaction(new Transaction("first", book));
-        Transaction second = accountingService.createTransaction(new Transaction("second", book));
+        Transaction first = businessTransactionService.createTransaction(new Transaction("first", book));
+        Transaction second = businessTransactionService.createTransaction(new Transaction("second", book));
 
-        accountingService.deleteTransaction(second.getId());
+        businessTransactionService.deleteTransaction(second.getId());
 
-        Transaction result = accountingService.findTransactionById(first.getId());
+        Transaction result = businessTransactionService.findTransactionById(first.getId());
         assertEquals("Incorrect select.", first.getId(), result.getId());
 
-        result = accountingService.findTransactionById(second.getId());
+        result = businessTransactionService.findTransactionById(second.getId());
         assertNull("Incorrect select for deleted transaction.", result);
     }
 
     @Test
     public void select_Transaction_All() {
-        Transaction first = accountingService.createTransaction(new Transaction("first", book));
-        Transaction second = accountingService.createTransaction(new Transaction("second", book));
+        Transaction first = businessTransactionService.createTransaction(new Transaction("first", book));
+        Transaction second = businessTransactionService.createTransaction(new Transaction("second", book));
 
-        accountingService.deleteTransaction(second.getId());
+        businessTransactionService.deleteTransaction(second.getId());
 
-        Page<Transaction> page = accountingService.findAllTransaction(new PageRequest(0, 1000000));
+        Page<Transaction> page = businessTransactionService.findAllTransaction(new PageRequest(0, 1000000));
         assertEquals("Incorrect select.", 0, page.getNumber());
         assertEquals("Incorrect select.", 1000000, page.getSize());
         assertTrue("Incorrect select.", page.getContent().contains(first));
@@ -271,10 +273,10 @@ public class AccountingServiceTests {
     // ** successfully
     @Test
     public void test_setTransactionDetail() {
-        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
 
         assertEquals("Incorrect saved transaction detail.", detail.getTransaction().getId(), result.getTransaction().getId());
         assertEquals("Incorrect saved transaction detail.", detail.getAccount().getAccId(), result.getAccount().getAccId());
@@ -286,16 +288,16 @@ public class AccountingServiceTests {
     // ** reject
     @Test(expected = IllegalArgumentException.class)
     public void test_setTransactionDetail_null(){
-        TransactionDetail result = accountingService.setTransactionDetail(null);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void test_setTransactionDetail_DiffBooks(){
         BalanceBook dBook = coaService.createBalanceBook(new BalanceBook("d-book", "testing"));
-        Transaction transaction = accountingService.createTransaction(new Transaction("test", dBook));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", dBook));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
     }
 
     @Test(expected = ConstraintViolationException.class)
@@ -304,20 +306,20 @@ public class AccountingServiceTests {
         acc.setEnable(false);
         BalanceAccount disabledAccount = coaService.createBalanceAccount(acc);
 
-        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, disabledAccount, EntrySide.D);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void test_setTransactionDetail_NonExistingAccount(){
         BalanceAccount nonExistingAccount = new BalanceAccount(BSCategory.PROFIT, 123456789L, book, "Income");
 
-        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, nonExistingAccount, EntrySide.D);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
     }
 
     @Test(expected = ConstraintViolationException.class)
@@ -325,24 +327,42 @@ public class AccountingServiceTests {
         Transaction nonExistingTransaction = new Transaction("test", book);
 
         TransactionDetail detail = new TransactionDetail(nonExistingTransaction, ct, EntrySide.D);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void test_setTransactionDetail_NullEntrySide(){
-        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, null);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void test_setTransactionDetail_NullEnable(){
-        Transaction transaction = accountingService.createTransaction(new Transaction("test", book));
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
         detail.setEnable(null);
-        TransactionDetail result = accountingService.setTransactionDetail(detail);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
+    }
+
+    // Select transaction details
+    @Test
+    public void test_selectTransactionDetails(){
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail first = businessTransactionService.setTransactionDetail(new TransactionDetail(transaction, ct, EntrySide.D));
+        TransactionDetail second = businessTransactionService.setTransactionDetail(new TransactionDetail(transaction, dt, EntrySide.D));
+
+        second.setEnable(false);
+        businessTransactionService.setTransactionDetail(second);
+
+        List<TransactionDetail> result = businessTransactionService.findAllTransactionDetail(transaction.getId());
+
+        assertTrue("Missed transaction detail.", result.contains(first));
+        assertFalse("Unexpected transaction detail.", result.contains(second));
+
     }
 
 }
