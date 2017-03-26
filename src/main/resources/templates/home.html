@@ -16,61 +16,24 @@
     <![endif]-->
 </head>
 <body>
-<div class="header">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-5">
-                <!-- Logo -->
-                <div class="logo">
-                    <h1><a href="/home">Pocket Balance</a></h1>
-                </div>
-            </div>
+
+    <div data-th-include="header :: content"></div>
+
+    <div class="page-content">
+        <div class="row" data-th-include="menu :: content">
         </div>
     </div>
-</div>
 
-<div class="page-content">
-    <div class="row">
-        <div class="col-md-2">
-            <div class="sidebar content-box" style="display: block;">
-                <ul class="nav">
-                    <!-- Main menu -->
-                    <li><a href="#"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
-                    <li><a href="#"><i class="glyphicon glyphicon-briefcase"></i> Business Transaction</a></li>
-                    <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Balance sheet</a></li>
-                    <li><a href="#"><i class="glyphicon glyphicon-usd"></i> Profit and Loss</a></li>
-                    <li><a href="#"><i class="glyphicon glyphicon-stats"></i> Statistics</a></li>
-                    <li class="submenu">
-                        <a href="#">
-                            <i class="glyphicon glyphicon-cog"></i> Settings
-                            <span class="caret pull-right"></span>
-                        </a>
-                        <!-- Sub menu -->
-                        <ul>
-                            <li><a href="#">Accounts</a></li>
-                            <li><a href="#">Business Transactions</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+    <footer data-th-include="footer :: content"></footer>
 
-<footer>
-    <div class="container">
 
-        <div class="copy text-center">
-            Copyright 2014 <a href='https://github.com/VinceG/Bootstrap-Admin-Theme-3'>Bootstrap Admin Theme v3</a>
-        </div>
 
-    </div>
-</footer>
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="/bootstrap/js/bootstrap.min.js"></script>
-<script src="/js/custom.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/js/custom.js"></script>
+
 </body>
 </html>
