@@ -4,10 +4,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping(value = {"home"})
+@RequestMapping(value = {"/","/home"})
 public class DashboardController {
 
-    @RequestMapping(value = {"home"})
+    @RequestMapping
     public String getHome() {
         return "dashboard";
     }

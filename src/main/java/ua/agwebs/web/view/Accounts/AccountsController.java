@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "/setting/account")
 public class AccountsController {
 
-    @RequestMapping(value = "/setting/account")
+    @RequestMapping
     public String getSettingAccountView(){
         return "accounts";
     }

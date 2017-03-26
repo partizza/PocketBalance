@@ -20,16 +20,20 @@
 <div data-th-include="header :: content"></div>
 
 <div class="page-content">
-    <div class="row" data-th-include="menu :: content"></div>
+    <div class="row">
+        <div data-th-include="menu :: content"></div>
 
-    <div class="col-md-10">
-        account settings page
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-md-6">
+                    settings: balance accounts
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <footer data-th-include="footer :: content"></footer>
-
-
 
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
