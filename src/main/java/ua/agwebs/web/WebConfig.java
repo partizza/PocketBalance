@@ -1,9 +1,8 @@
-package ua.agwebs.config;
+package ua.agwebs.web;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(value = "ua.agwebs.web")
 public class WebConfig {
 }
