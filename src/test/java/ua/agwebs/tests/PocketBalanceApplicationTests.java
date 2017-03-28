@@ -1,4 +1,4 @@
-package ua.agwebs;
+package ua.agwebs.tests;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

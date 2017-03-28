@@ -1,4 +1,4 @@
-package ua.agwebs;
+package ua.agwebs.tests.integration.root;
 
 import org.junit.Rule;
 import org.junit.Test;
