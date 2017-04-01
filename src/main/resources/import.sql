@@ -80,3 +80,11 @@ INSERT INTO CURY (CURY_ID, CURY_CD, CURY_NM)
     (997,'USN','US Dollar (Next day)');
 
 INSERT INTO BAL_BOOK (BAL_BOOK_ID, BAL_BOOK_NM) VALUES (999888777, 'test book');
+
+-- balance accounts
+INSERT INTO CHART_OF_ACC (COA_ID, BAL_BOOK_ID, COA_NM, COA_DESC, COA_CATEG)
+  VALUES (1002, 999888777, 'Cash', 'Cash in wallet', 'ASSET'),
+         (2630, 999888777, 'Payable', 'Some payables', 'LIABILITY'),
+         (5000, 999888777, 'EQUITY', 'Initial many', 'EQUITY'),
+         (6000, 999888777, 'Salary', 'Salary income', 'PROFIT'),
+         (7000, 999888777, 'Apartment rent', '', 'LOSS');

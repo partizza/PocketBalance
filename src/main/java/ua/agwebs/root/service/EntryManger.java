@@ -46,7 +46,7 @@ public class EntryManger implements EntryService {
         Assert.notEmpty(entryLines, "Can't create entry without lines.");
 
         for (EntryLine e : entryLines) {
-            Assert.isTrue(e.getAccount().getBook().getId() == book.getId(), "Accounts is not in the balance book.");
+            Assert.isTrue(e.getAccount().getBook().getId() == book.getId(), "accounts is not in the balance book.");
         }
 
         EntryHeader entryHeader = headerRepo.save(new EntryHeader(book));

@@ -10,7 +10,7 @@ import ua.agwebs.root.RootConfig;
 import ua.agwebs.root.entity.BSCategory;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
-import ua.agwebs.web.rest.Accounts.BalanceAccountDTO;
+import ua.agwebs.web.rest.accounts.BalanceAccountDTO;
 
 import static org.junit.Assert.assertEquals;
 

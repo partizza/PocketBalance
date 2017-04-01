@@ -3,6 +3,8 @@
 <head>
     <title>Pocket Balance</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!-- jQuery UI -->
+    <link href="https://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css" rel="stylesheet" media="screen"/>
     <!-- Bootstrap -->
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
     <!-- styles -->
@@ -24,9 +26,23 @@
         <div data-th-include="menu :: content"></div>
 
         <div class="col-md-10">
-            <div class="row">
-                <div class="col-md-6">
-                    settings: balance accounts
+            <div class="content-box-large">
+                <div class="panel-heading">
+                    <div class="panel-title">Balance accounts</div>
+                </div>
+                <div class="panel-body">
+                    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered"
+                           id="accountsTable">
+                        <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Account</th>
+                            <th>Description</th>
+                            <th>ID</th>
+                            <th>Active</th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
@@ -35,12 +51,19 @@
 
 <footer data-th-include="footer :: content"></footer>
 
-
+<link href="/vendors/datatables/dataTables.bootstrap.css" rel="stylesheet" media="screen"/>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<!-- jQuery UI -->
+<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="/bootstrap/js/bootstrap.min.js"></script>
+<!--<script src="/vendors/datatables/js/jquery.dataTables.min.js"></script>-->
+<script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src="/vendors/datatables/dataTables.bootstrap.js"></script>
+
 <script src="/js/custom.js"></script>
+<script src="/js/accounts.table.js"></script>
 
 </body>
 </html>
