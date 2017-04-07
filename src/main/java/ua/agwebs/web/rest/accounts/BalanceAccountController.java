@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ua.agwebs.web.PageDTO;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping(value = {"/data/account"})
 public class BalanceAccountController {
@@ -40,7 +42,7 @@ public class BalanceAccountController {
     }
 
     @GetMapping(value = "/book/{bookId}/all")
-    public ResponseEntity<PageDTO<BalanceAccountDTO>> findAllBalanceAccounts(Pageable pageable) {
+    public ResponseEntity<PageDTO<BalanceAccountDTO>> findAllBalanceAccounts(Principal principal,Pageable pageable) {
         return new ResponseEntity<PageDTO<BalanceAccountDTO>>(accountService.findAll(pageable), HttpStatus.OK);
     }
 }
