@@ -2,8 +2,10 @@ package ua.agwebs.root.entity;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.util.Assert;
+import ua.agwebs.root.validator.EnableAppUser;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -51,12 +53,18 @@ public class BalanceBook implements Serializable {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private Set<Transaction> transactions = new HashSet<>();
 
+    @EnableAppUser
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "APP_USER_ID", nullable = false, foreignKey = @ForeignKey(name = "FK__BAL_BOOK__APP_USER"))
+    private AppUser appUser;
+
     public BalanceBook() {
     }
 
-    public BalanceBook(String name, String desc) {
+    public BalanceBook(String name, String desc, AppUser appUser) {
         this.name = name;
         this.desc = desc;
+        this.appUser = appUser;
     }
 
     public Long getId() {
@@ -113,6 +121,14 @@ public class BalanceBook implements Serializable {
 
     public void addTransaction(Transaction transaction) {
         this.transactions.add(transaction);
+    }
+
+    public AppUser getAppUser() {
+        return appUser;
+    }
+
+    public void setAppUser(AppUser appUser) {
+        this.appUser = appUser;
     }
 
     @Override

@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.agwebs.root.entity.*;
+import ua.agwebs.root.service.AppUserService;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.BusinessTransactionService;
 
@@ -22,13 +24,8 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode= DirtiesContext.ClassMode.BEFORE_CLASS)
 public class BusinessTransactionServiceTests {
-
-    @Autowired
-    private BusinessTransactionService businessTransactionService;
-
-    @Autowired
-    private CoaService coaService;
 
     private static boolean setUpIsDone = false;
 
@@ -40,15 +37,28 @@ public class BusinessTransactionServiceTests {
 
     private static BalanceAccount ct;
 
+    private static AppUser appUser;
+
+    @Autowired
+    private BusinessTransactionService businessTransactionService;
+
+    @Autowired
+    private AppUserService userService;
+
+    @Autowired
+    private CoaService coaService;
+
     @Before
     public void init() {
         if (!setUpIsDone) {
-            book = coaService.createBalanceBook(new BalanceBook("t-book", "for testing"));
+            appUser = userService.createAppUser(new AppUser("bf@u.com", "An", "Xe"));
+
+            book = coaService.createBalanceBook(new BalanceBook("t-book", "for testing", appUser));
 
             dt = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book, "Cash"));
             ct = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book, "Income"));
 
-            delBook = coaService.createBalanceBook(new BalanceBook("del-book", "disabled book"));
+            delBook = coaService.createBalanceBook(new BalanceBook("del-book", "disabled book", appUser));
             delBook.setDeleted(true);
             coaService.deleteBalanceBook(delBook.getId());
 
@@ -287,13 +297,13 @@ public class BusinessTransactionServiceTests {
     // Set transaction detail
     // ** reject
     @Test(expected = IllegalArgumentException.class)
-    public void test_setTransactionDetail_null(){
+    public void test_setTransactionDetail_null() {
         TransactionDetail result = businessTransactionService.setTransactionDetail(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_setTransactionDetail_DiffBooks(){
-        BalanceBook dBook = coaService.createBalanceBook(new BalanceBook("d-book", "testing"));
+    public void test_setTransactionDetail_DiffBooks() {
+        BalanceBook dBook = coaService.createBalanceBook(new BalanceBook("d-book", "testing",appUser));
         Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", dBook));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
@@ -301,7 +311,7 @@ public class BusinessTransactionServiceTests {
     }
 
     @Test(expected = ConstraintViolationException.class)
-    public void test_setTransactionDetail_disabledAccount(){
+    public void test_setTransactionDetail_disabledAccount() {
         BalanceAccount acc = new BalanceAccount(BSCategory.PROFIT, 123456789L, book, "Income");
         acc.setEnable(false);
         BalanceAccount disabledAccount = coaService.createBalanceAccount(acc);
@@ -313,7 +323,7 @@ public class BusinessTransactionServiceTests {
     }
 
     @Test(expected = ConstraintViolationException.class)
-    public void test_setTransactionDetail_NonExistingAccount(){
+    public void test_setTransactionDetail_NonExistingAccount() {
         BalanceAccount nonExistingAccount = new BalanceAccount(BSCategory.PROFIT, 123456789L, book, "Income");
 
         Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
@@ -323,7 +333,7 @@ public class BusinessTransactionServiceTests {
     }
 
     @Test(expected = ConstraintViolationException.class)
-    public void test_setTransactionDetail_NonExistingTransaction(){
+    public void test_setTransactionDetail_NonExistingTransaction() {
         Transaction nonExistingTransaction = new Transaction("test", book);
 
         TransactionDetail detail = new TransactionDetail(nonExistingTransaction, ct, EntrySide.D);
@@ -331,7 +341,7 @@ public class BusinessTransactionServiceTests {
     }
 
     @Test(expected = ConstraintViolationException.class)
-    public void test_setTransactionDetail_NullEntrySide(){
+    public void test_setTransactionDetail_NullEntrySide() {
         Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, null);
@@ -339,7 +349,7 @@ public class BusinessTransactionServiceTests {
     }
 
     @Test(expected = ConstraintViolationException.class)
-    public void test_setTransactionDetail_NullEnable(){
+    public void test_setTransactionDetail_NullEnable() {
         Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
@@ -349,7 +359,7 @@ public class BusinessTransactionServiceTests {
 
     // Select transaction details
     @Test
-    public void test_selectTransactionDetails(){
+    public void test_selectTransactionDetails() {
         Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
 
         TransactionDetail first = businessTransactionService.setTransactionDetail(new TransactionDetail(transaction, ct, EntrySide.D));

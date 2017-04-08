@@ -5,10 +5,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.root.repo.EntryLineRepository;
+import ua.agwebs.root.service.AppUserService;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
 
@@ -22,16 +24,8 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode= DirtiesContext.ClassMode.BEFORE_CLASS)
 public class EntryServiceTests {
-
-    @Autowired
-    private EntryService entryService;
-
-    @Autowired
-    private CoaService coaService;
-
-    @Autowired
-    private EntryLineRepository lineRepo;
 
     private static boolean setUpIsDone = false;
 
@@ -45,10 +39,26 @@ public class EntryServiceTests {
 
     private static Currency usd;
 
+    private static AppUser appUser;
+
+    @Autowired
+    private AppUserService userService;
+
+    @Autowired
+    private EntryService entryService;
+
+    @Autowired
+    private CoaService coaService;
+
+    @Autowired
+    private EntryLineRepository lineRepo;
+
     @Before
     public void init() {
         if (!setUpIsDone) {
-            book = coaService.createBalanceBook(new BalanceBook("t-book", "for testing"));
+            appUser = userService.createAppUser(new AppUser("bf@u.com", "An", "Xe"));
+
+            book = coaService.createBalanceBook(new BalanceBook("t-book", "for testing", appUser));
             dt = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book, "Cash"));
             ct = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book, "Income"));
             uah = entryService.findCurrencyById(980);
@@ -100,7 +110,7 @@ public class EntryServiceTests {
         lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
         lines.add(new EntryLine(2, ct, -1000L, EntrySide.C, uah));
 
-        BalanceBook failedBook = new BalanceBook("f-book", "for testing");
+        BalanceBook failedBook = new BalanceBook("f-book", "for testing", appUser);
         failedBook.setId(-1L);
         EntryHeader header = entryService.createEntry(failedBook, lines);
     }
@@ -170,7 +180,7 @@ public class EntryServiceTests {
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Entry_WrongAccount() {
 
-        BalanceBook wBook = coaService.createBalanceBook(new BalanceBook("w-book", "for testing"));
+        BalanceBook wBook = coaService.createBalanceBook(new BalanceBook("w-book", "for testing", appUser));
         BalanceAccount wAcc = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, wBook, "wrong acc"));
 
         Set<EntryLine> lines = new HashSet<>();
@@ -228,7 +238,7 @@ public class EntryServiceTests {
     // Storno entry
     // ** successfully
     @Test
-    public void storno_Entry(){
+    public void storno_Entry() {
         Set<EntryLine> lines = new HashSet<>();
         lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
         lines.add(new EntryLine(2, ct, -1000L, EntrySide.C, uah));
@@ -243,7 +253,7 @@ public class EntryServiceTests {
     // Storno entry
     // ** reject
     @Test(expected = IllegalArgumentException.class)
-    public void rejectStorno_NonExistingEntry(){
+    public void rejectStorno_NonExistingEntry() {
         entryService.setStorno(-1L, true);
     }
 }

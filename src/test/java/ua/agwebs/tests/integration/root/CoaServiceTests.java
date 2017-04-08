@@ -1,5 +1,6 @@
 package ua.agwebs.tests.integration.root;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -8,11 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import ua.agwebs.root.entity.AppUser;
 import ua.agwebs.root.entity.BSCategory;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
+import ua.agwebs.root.service.AppUserService;
 import ua.agwebs.root.service.CoaService;
 
 import javax.validation.ConstraintViolationException;
@@ -21,14 +25,31 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
+@DirtiesContext(classMode= DirtiesContext.ClassMode.BEFORE_CLASS)
 public class CoaServiceTests {
+
+    private static boolean setUpIsDone = false;
+
+    private static AppUser appUser;
+
+    @Autowired
+    private AppUserService userService;
 
     @Autowired
     private CoaService coaService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Before
+    public void init() {
+        if (!setUpIsDone) {
+            appUser = userService.createAppUser(new AppUser("bf@u.com", "An", "Xe"));
+
+            setUpIsDone = true;
+        }
+    }
 
     // Create Balance book tests
     // ** reject
@@ -39,46 +60,58 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreationOf_BalanceBook_BlankName() {
-        BalanceBook balanceBook = new BalanceBook(" ", "59");
+        BalanceBook balanceBook = new BalanceBook(" ", "59", appUser);
         coaService.createBalanceBook(balanceBook);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreationOf_BalanceBook_NullName() {
-        BalanceBook balanceBook = new BalanceBook(null, "59");
+        BalanceBook balanceBook = new BalanceBook(null, "59", appUser);
         coaService.createBalanceBook(balanceBook);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreationOf_BalanceBook_NameMaxLength() {
-        BalanceBook balanceBook = new BalanceBook("12345678901234567890123456", "59");
+        BalanceBook balanceBook = new BalanceBook("12345678901234567890123456", "59", appUser);
         coaService.createBalanceBook(balanceBook);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreationOf_BalanceBook_DescMaxLength() {
-        BalanceBook balanceBook = new BalanceBook("balance book", "1234567890123456789012345123456789012345678901234512345678901");
+        BalanceBook balanceBook = new BalanceBook("balance book", "1234567890123456789012345123456789012345678901234512345678901", appUser);
         coaService.createBalanceBook(balanceBook);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreationOf_BalanceBook_WithNotNullId() {
-        BalanceBook balanceBook = new BalanceBook("my balance", "59");
+        BalanceBook balanceBook = new BalanceBook("my balance", "59", appUser);
         balanceBook.setId(10L);
         coaService.createBalanceBook(balanceBook);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreationOf_BalanceBook_NullDeleted() {
-        BalanceBook balanceBook = new BalanceBook("my balance", "59");
+        BalanceBook balanceBook = new BalanceBook("my balance", "59", appUser);
         balanceBook.setDeleted(null);
         coaService.createBalanceBook(balanceBook);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreationOf_BalanceBook_DeletedStatus() {
-        BalanceBook balanceBook = new BalanceBook("my balance", "59");
+        BalanceBook balanceBook = new BalanceBook("my balance", "59", appUser);
         balanceBook.setDeleted(true);
+        coaService.createBalanceBook(balanceBook);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectCreationOf_BalanceBook_UnexistingUser() {
+        BalanceBook balanceBook = new BalanceBook("my balance", "59", new AppUser("unexist@u.com.agwebs", "An", "Xe"));
+        coaService.createBalanceBook(balanceBook);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectCreationOf_BalanceBook_NullUser() {
+        BalanceBook balanceBook = new BalanceBook("my balance", "59", null);
         coaService.createBalanceBook(balanceBook);
     }
 
@@ -86,7 +119,7 @@ public class CoaServiceTests {
     // ** successfully
     @Test
     public void creationOf_BalanceBook() {
-        BalanceBook balanceBook = new BalanceBook("1234567890123456789012345", "123456789012345678901234512345678901234567890123451234567890");
+        BalanceBook balanceBook = new BalanceBook("1234567890123456789012345", "123456789012345678901234512345678901234567890123451234567890", appUser);
         BalanceBook savedBalanceBook = coaService.createBalanceBook(balanceBook);
 
         assertEquals("Incorrect balance book name.", balanceBook.getName(), savedBalanceBook.getName());
@@ -104,20 +137,20 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_BalanceBook_WithoutId() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         coaService.updateBalanceBook(balanceBook);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_BalanceBook_NonExistingId() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         balanceBook.setId(89L);
         coaService.updateBalanceBook(balanceBook);
     }
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceBook_NullName() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         BalanceBook savedBook = coaService.createBalanceBook(balanceBook);
         savedBook.setName(null);
         coaService.updateBalanceBook(savedBook);
@@ -125,7 +158,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceBook_BlankName() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         BalanceBook savedBook = coaService.createBalanceBook(balanceBook);
         savedBook.setName("");
         coaService.updateBalanceBook(savedBook);
@@ -133,7 +166,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceBook_NameMaxLength() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         BalanceBook savedBook = coaService.createBalanceBook(balanceBook);
         savedBook.setName("12345678901234567890123456");
         coaService.updateBalanceBook(savedBook);
@@ -141,7 +174,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceBook_DescMaxLength() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         BalanceBook savedBook = coaService.createBalanceBook(balanceBook);
         savedBook.setDesc("1234567890123456789012345123456789012345678901234512345678901");
         coaService.updateBalanceBook(savedBook);
@@ -149,7 +182,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceBook_NullDeleted() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         BalanceBook savedBook = coaService.createBalanceBook(balanceBook);
         savedBook.setDeleted(null);
         coaService.updateBalanceBook(savedBook);
@@ -159,7 +192,7 @@ public class CoaServiceTests {
     // ** successfully
     @Test
     public void update_BalanceBook() {
-        BalanceBook balanceBook = new BalanceBook("some book", "no desc");
+        BalanceBook balanceBook = new BalanceBook("some book", "no desc", appUser);
         balanceBook = coaService.createBalanceBook(balanceBook);
         balanceBook.setName("1234567890123456789012345");
         balanceBook.setDesc("123456789012345678901234512345678901234567890123451234567890");
@@ -174,7 +207,7 @@ public class CoaServiceTests {
         BalanceBook searchResult = coaService.findBalanceBookById(-1);
         assertNull("Incorrect returned object for nonexistent id.", searchResult);
 
-        BalanceBook book = new BalanceBook("my book", "tested book");
+        BalanceBook book = new BalanceBook("my book", "tested book", appUser);
         book = coaService.createBalanceBook(book);
 
         searchResult = coaService.findBalanceBookById(book.getId());
@@ -189,7 +222,7 @@ public class CoaServiceTests {
 
     @Test
     public void findBalanceBookPage() {
-        BalanceBook book = coaService.createBalanceBook(new BalanceBook("book", "tested book"));
+        BalanceBook book = coaService.createBalanceBook(new BalanceBook("book", "tested book", appUser));
         Page<BalanceBook> page = coaService.findAllBalanceBook(new PageRequest(0, 100000000));
         assertTrue("Incorrect result - balance book missed.", page.getContent().contains(book));
 
@@ -207,7 +240,7 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectDelete_BalanceBook_DeletedBookId() {
-        BalanceBook book = coaService.createBalanceBook(new BalanceBook("book", "tested book"));
+        BalanceBook book = coaService.createBalanceBook(new BalanceBook("book", "tested book", appUser));
         coaService.deleteBalanceBook(book.getId());
         coaService.deleteBalanceBook(book.getId());
     }
@@ -216,7 +249,7 @@ public class CoaServiceTests {
     // ** successfully
     @Test
     public void delete_BalanceBook() {
-        BalanceBook book = coaService.createBalanceBook(new BalanceBook("book", "tested book"));
+        BalanceBook book = coaService.createBalanceBook(new BalanceBook("book", "tested book", appUser));
         coaService.deleteBalanceBook(book.getId());
         BalanceBook result = coaService.findBalanceBookById(book.getId());
         assertNull("Book is not deleted.", result);
@@ -231,7 +264,7 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_BalanceAccount_NullId() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, null, balanceBook, "cash");
         coaService.createBalanceAccount(balanceAccount);
@@ -239,7 +272,7 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_BalanceAccount_NegativeId() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, -1L, balanceBook, "cash");
         coaService.createBalanceAccount(balanceAccount);
@@ -247,7 +280,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_NullBalanceBookId() {
-        BalanceBook balanceBook = new BalanceBook("my book", "for testing");
+        BalanceBook balanceBook = new BalanceBook("my book", "for testing", appUser);
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash");
         coaService.createBalanceAccount(balanceAccount);
@@ -255,7 +288,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_NonExistedBalanceBook() {
-        BalanceBook balanceBook = new BalanceBook("my book", "for testing");
+        BalanceBook balanceBook = new BalanceBook("my book", "for testing", appUser);
         balanceBook.setId(-1L);
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash");
@@ -265,7 +298,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_BlankName() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
@@ -274,7 +307,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_MaxSizeName() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "12345678901234567890123456");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
@@ -283,7 +316,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_MaxSizeDesc() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "1234567890123456789012345678901234567890123456789012345678901");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
@@ -292,7 +325,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_NullEnable() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash");
         balanceAccount.setEnable(null);
@@ -302,7 +335,7 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_BalanceAccount_ExistingAccount() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
@@ -312,7 +345,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_BalanceAccount_NullCategory() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(null, 1002L, balanceBook, "cash");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
@@ -324,7 +357,7 @@ public class CoaServiceTests {
     // ** successfully
     @Test
     public void Create_BalanceAccount() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
 
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "1234567890123456789012345", "123456789012345678901234567890123456789012345678901234567890");
         BalanceAccount resultedAccount = coaService.createBalanceAccount(balanceAccount);
@@ -346,7 +379,7 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_BalanceAccount_NullAccId() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -356,7 +389,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_NullCategory() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -366,7 +399,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_NonExistentBook() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -376,7 +409,7 @@ public class CoaServiceTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectUpdate_BalanceAccount_IncorrectAccId() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -387,7 +420,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_NullName() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -398,7 +431,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_BlankName() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -409,7 +442,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_MaxNameLength() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -420,7 +453,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_MaxDescLength() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -431,7 +464,7 @@ public class CoaServiceTests {
 
     @Test(expected = ConstraintViolationException.class)
     public void rejectUpdate_BalanceAccount_NullEnable() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -444,7 +477,7 @@ public class CoaServiceTests {
     // ** successfully
     @Test
     public void update_BalanceAccout() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -466,7 +499,7 @@ public class CoaServiceTests {
         BalanceAccount searchResult = coaService.findBalanceAccountById(-1, -1);
         assertNull("Incorrect returned object for nonexistent id.", searchResult);
 
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
 
@@ -476,7 +509,7 @@ public class CoaServiceTests {
 
     @Test
     public void findBalanceAccountPage() {
-        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing"));
+        BalanceBook balanceBook = coaService.createBalanceBook(new BalanceBook("my book", "for testing", appUser));
         BalanceAccount balanceAccount = new BalanceAccount(BSCategory.ASSET, 1002L, balanceBook, "cash", "testing");
         BalanceAccount testedAccount = coaService.createBalanceAccount(balanceAccount);
         Page<BalanceAccount> page = coaService.findAllBalanceAccount(new PageRequest(0, 100000000));

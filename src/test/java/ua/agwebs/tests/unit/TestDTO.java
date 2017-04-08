@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ua.agwebs.root.RootConfig;
+import ua.agwebs.root.entity.AppUser;
 import ua.agwebs.root.entity.BSCategory;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
@@ -23,7 +24,9 @@ public class TestDTO {
 
     @Test
     public void test_ModelMapper_BalanceAccountDTO() {
-        BalanceBook book = new BalanceBook("book", "some book for testing");
+        AppUser appUser = new AppUser("bf@u.com", "An", "Xe");
+        appUser.setId(999L);
+        BalanceBook book = new BalanceBook("book", "some book for testing", appUser);
         book.setId(12L);
         BalanceAccount account = new BalanceAccount(BSCategory.PROFIT, 1002L, book, "Cash", "Cash in walet");
 
