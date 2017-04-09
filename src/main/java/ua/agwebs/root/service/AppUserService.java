@@ -14,5 +14,7 @@ public interface AppUserService {
 
     public boolean existsByEmail(@Email String email);
 
+    public AppUser findByEmail(@Email String email);
+
     public AppUser createAppUser(@Valid AppUser appUser);
 }

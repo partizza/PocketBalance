@@ -32,12 +32,13 @@ public class TestDTO {
 
         BalanceAccountDTO accountDTO = mapper.map(account, BalanceAccountDTO.class);
 
-        assertEquals("Incorrect dto object.", account.getAccId(), accountDTO.getAccId());
-        assertEquals("Incorrect dto object.", account.getName(), accountDTO.getName());
-        assertEquals("Incorrect dto object.", account.getDesc(), accountDTO.getDesc());
-        assertEquals("Incorrect dto object.", account.isEnable(), accountDTO.getEnable());
-        assertEquals("Incorrect dto object.", account.getBook().getId(), accountDTO.getBookId());
-        assertEquals("Incorrect dto object.", account.getBsCategory().name(), accountDTO.getBsCategory());
+        assertEquals("Incorrect DTO object.", account.getAccId(), accountDTO.getAccId());
+        assertEquals("Incorrect DTO object.", account.getName(), accountDTO.getName());
+        assertEquals("Incorrect DTO object.", account.getDesc(), accountDTO.getDesc());
+        assertEquals("Incorrect DTO object.", account.isEnable(), accountDTO.getEnable());
+        assertEquals("Incorrect DTO object.", account.getBook().getId(), accountDTO.getBookId());
+        assertEquals("Incorrect DTO object.", account.getBsCategory().name(), accountDTO.getBsCategory());
     }
+
 
 }

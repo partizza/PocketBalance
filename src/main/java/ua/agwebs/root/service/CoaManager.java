@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceAccountId;
@@ -20,6 +21,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CoaManager implements CoaService {
@@ -148,6 +151,17 @@ public class CoaManager implements CoaService {
         BalanceAccount account = accountRepo.save(balanceAccount);
         logger.debug("Created balance account: {}", account);
         return account;
+    }
+
+    @Transactional
+    @Override
+    public List<BalanceAccount> createBalanceAccount(Iterable<BalanceAccount> balanceAccounts) {
+        Assert.notNull(balanceAccounts);
+        List<BalanceAccount> accounts = new ArrayList<>();
+        for (BalanceAccount e : balanceAccounts) {
+            accounts.add(this.createBalanceAccount(e));
+        }
+        return accounts;
     }
 
     @Override

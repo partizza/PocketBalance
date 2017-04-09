@@ -257,10 +257,6 @@ public class CoaServiceTests {
 
     // Create balance account
     // ** reject
-    @Test(expected = IllegalArgumentException.class)
-    public void rejectCreate_BalanceAccount_Null() {
-        coaService.createBalanceAccount(null);
-    }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_BalanceAccount_NullId() {

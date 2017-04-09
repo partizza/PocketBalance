@@ -9,6 +9,8 @@ import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
 
 import javax.validation.Valid;
+import java.util.Collection;
+import java.util.List;
 
 @Validated
 public interface CoaService {
@@ -24,6 +26,8 @@ public interface CoaService {
     public Page<BalanceBook> findAllBalanceBook(Pageable pageable);
 
     public BalanceAccount createBalanceAccount(@Valid BalanceAccount balanceAccount);
+
+    public List<BalanceAccount> createBalanceAccount(Iterable<BalanceAccount> balanceAccounts);
 
     public BalanceAccount updateBalanceAccount(@Valid BalanceAccount balanceAccount);
 

@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ua.agwebs.security.AppUserDetails;
 import ua.agwebs.web.PageDTO;
 
 import java.security.Principal;
@@ -42,7 +44,7 @@ public class BalanceAccountController {
     }
 
     @GetMapping(value = "/book/{bookId}/all")
-    public ResponseEntity<PageDTO<BalanceAccountDTO>> findAllBalanceAccounts(Principal principal,Pageable pageable) {
+    public ResponseEntity<PageDTO<BalanceAccountDTO>> findAllBalanceAccounts(Pageable pageable) {
         return new ResponseEntity<PageDTO<BalanceAccountDTO>>(accountService.findAll(pageable), HttpStatus.OK);
     }
 }
