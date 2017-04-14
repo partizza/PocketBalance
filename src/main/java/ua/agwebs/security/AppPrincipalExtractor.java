@@ -11,7 +11,7 @@ import ua.agwebs.root.service.AppUserService;
 import java.util.Map;
 
 @Component
-public class AppPrincipalExtractor implements PrincipalExtractor{
+public class AppPrincipalExtractor implements PrincipalExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(AppPrincipalExtractor.class);
 
@@ -26,7 +26,7 @@ public class AppPrincipalExtractor implements PrincipalExtractor{
     public Object extractPrincipal(Map<String, Object> map) {
         String email = (String) map.get("email");
         AppUser appUser = userService.findByEmail(email);
-        if(appUser == null){
+        if (appUser == null) {
             logger.info("Persist new user");
 
             appUser = new AppUser(email);
@@ -37,6 +37,6 @@ public class AppPrincipalExtractor implements PrincipalExtractor{
             appUser = userService.createAppUser(appUser);
 
         }
-        return new AppUserDetails(appUser.getEmail(), appUser.getName(), appUser.getSurname());
+        return new AppUserDetails(appUser.getId(), appUser.getEmail(), appUser.getName(), appUser.getSurname());
     }
 }

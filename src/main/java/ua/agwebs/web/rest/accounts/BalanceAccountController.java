@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.agwebs.security.AppUserDetails;
 import ua.agwebs.web.PageDTO;
 
-import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = {"/data/account"})
@@ -25,7 +25,7 @@ public class BalanceAccountController {
     @GetMapping(value = "/{accId}/book/{bookId}")
     public ResponseEntity<BalanceAccountDTO> getBalanceAccountById(@PathVariable("accId") long accId,
                                                                    @PathVariable("bookId") long bookId) {
-        BalanceAccountDTO accountDTO = accountService.findById(bookId, accId);
+        BalanceAccountDTO accountDTO = accountService.findBalanceAccountById(bookId, accId);
         ResponseEntity<BalanceAccountDTO> responseEntity;
         if (accountDTO == null) {
             responseEntity = new ResponseEntity<BalanceAccountDTO>(HttpStatus.NOT_FOUND);
@@ -44,7 +44,9 @@ public class BalanceAccountController {
     }
 
     @GetMapping(value = "/book/{bookId}/all")
-    public ResponseEntity<PageDTO<BalanceAccountDTO>> findAllBalanceAccounts(Pageable pageable) {
-        return new ResponseEntity<PageDTO<BalanceAccountDTO>>(accountService.findAll(pageable), HttpStatus.OK);
+    public ResponseEntity<List<BalanceAccountDTO>> findAllBalanceAccounts(@PathVariable("bookId") long bookId,
+                                                                          @AuthenticationPrincipal AppUserDetails appUserDetails) {
+        List<BalanceAccountDTO> dtoList = accountService.findBalanceAccountAllByBookId(bookId, appUserDetails.getId());
+        return new ResponseEntity<List<BalanceAccountDTO>>(dtoList, HttpStatus.OK);
     }
 }

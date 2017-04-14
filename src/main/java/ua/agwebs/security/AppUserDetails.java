@@ -1,10 +1,9 @@
 package ua.agwebs.security;
 
 
-import java.security.Principal;
-
 public class AppUserDetails {
 
+    private long id;
     private String email;
     private String name;
     private String surname;
@@ -12,10 +11,19 @@ public class AppUserDetails {
     public AppUserDetails() {
     }
 
-    public AppUserDetails(String email, String name, String surname) {
+    public AppUserDetails(long id, String email, String name, String surname) {
+        this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -45,7 +53,8 @@ public class AppUserDetails {
     @Override
     public String toString() {
         return "AppUserDetails{" +
-                "email='" + email + '\'' +
+                "id=" + id +
+                ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 '}';
@@ -58,6 +67,7 @@ public class AppUserDetails {
 
         AppUserDetails that = (AppUserDetails) o;
 
+        if (id != that.id) return false;
         if (email != null ? !email.equals(that.email) : that.email != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         return surname != null ? surname.equals(that.surname) : that.surname == null;
@@ -66,7 +76,8 @@ public class AppUserDetails {
 
     @Override
     public int hashCode() {
-        int result = email != null ? email.hashCode() : 0;
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (surname != null ? surname.hashCode() : 0);
         return result;
