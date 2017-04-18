@@ -7,15 +7,17 @@ public class AppUserDetails {
     private String email;
     private String name;
     private String surname;
+    private long bookId;
 
     public AppUserDetails() {
     }
 
-    public AppUserDetails(long id, String email, String name, String surname) {
+    public AppUserDetails(long id, String email, String name, String surname, long bookId ) {
         this.id = id;
         this.email = email;
         this.name = name;
         this.surname = surname;
+        this.bookId = bookId;
     }
 
     public long getId() {
@@ -50,6 +52,14 @@ public class AppUserDetails {
         this.surname = surname;
     }
 
+    public long getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(long bookId) {
+        this.bookId = bookId;
+    }
+
     @Override
     public String toString() {
         return "AppUserDetails{" +
@@ -57,6 +67,7 @@ public class AppUserDetails {
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
+                ", bookId=" + bookId +
                 '}';
     }
 
@@ -68,6 +79,7 @@ public class AppUserDetails {
         AppUserDetails that = (AppUserDetails) o;
 
         if (id != that.id) return false;
+        if (bookId != that.bookId) return false;
         if (email != null ? !email.equals(that.email) : that.email != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         return surname != null ? surname.equals(that.surname) : that.surname == null;
@@ -80,6 +92,7 @@ public class AppUserDetails {
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (surname != null ? surname.hashCode() : 0);
+        result = 31 * result + (int) (bookId ^ (bookId >>> 32));
         return result;
     }
 }

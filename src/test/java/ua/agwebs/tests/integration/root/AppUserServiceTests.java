@@ -30,6 +30,7 @@ public class AppUserServiceTests {
         AppUser createdAppUser = userService.createAppUser(appUser);
 
         assertNotNull("Incorrect created user", createdAppUser.getId());
+        assertNotNull("Incorrect created user", createdAppUser.getBooks());
         assertEquals("Incorrect created user.", appUser.getEmail(), createdAppUser.getEmail());
         assertEquals("Incorrect created user.", appUser.getName(), createdAppUser.getName());
         assertEquals("Incorrect created user.", appUser.getSurname(), createdAppUser.getSurname());

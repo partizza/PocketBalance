@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.PrincipalExtractor;
 import org.springframework.stereotype.Component;
 import ua.agwebs.root.entity.AppUser;
+import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.service.AppUserService;
 
 import java.util.Map;
@@ -37,6 +38,8 @@ public class AppPrincipalExtractor implements PrincipalExtractor {
             appUser = userService.createAppUser(appUser);
 
         }
-        return new AppUserDetails(appUser.getId(), appUser.getEmail(), appUser.getName(), appUser.getSurname());
+        // in the future user will aable to have more than one book
+        long bookId = ((BalanceBook)appUser.getBooks().toArray()[0]).getId();
+        return new AppUserDetails(appUser.getId(), appUser.getEmail(), appUser.getName(), appUser.getSurname(), bookId);
     }
 }

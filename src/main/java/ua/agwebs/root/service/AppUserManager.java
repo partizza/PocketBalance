@@ -73,6 +73,7 @@ public class AppUserManager implements AppUserService {
         List<BalanceAccount> accounts = this.getInitBalanceAccounts(book);
         coaService.createBalanceAccount(accounts);
 
+        createdAppUser.addBook(book);
         return createdAppUser;
     }
 
