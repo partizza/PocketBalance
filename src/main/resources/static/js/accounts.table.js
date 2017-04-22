@@ -13,7 +13,7 @@ function initDataTable() {
         dataType: 'json',
         success: function (data) {
 
-            table = $('#accountsTable').DataTable({
+            table = $('#accountsTable').dataTable({
                         "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
                         "ajax": {
                             "url": "/data/account/book/" + data.bookId + "/all",
