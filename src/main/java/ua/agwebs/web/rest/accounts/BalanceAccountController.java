@@ -22,7 +22,7 @@ public class BalanceAccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping(value = "/{accId}/book/{bookId}")
+    @GetMapping(value = "/book/{bookId}/{accId}")
     public ResponseEntity<BalanceAccountDTO> getBalanceAccountById(@PathVariable("accId") long accId,
                                                                    @PathVariable("bookId") long bookId) {
         BalanceAccountDTO accountDTO = accountService.findBalanceAccountById(bookId, accId);

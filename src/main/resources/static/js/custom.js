@@ -24,9 +24,13 @@ $(document).ready(function () {
         dataType: 'json',
         success: function (data) {
 
-            $('.dropdown-toggle').text(data.name + ' ' + data.surname);
-            $('.dropdown-toggle').append('<b class="caret"></b>');
+            $('#user-info').text(data.name + ' ' + data.surname);
+            $('#user-info').append('<b class="caret"></b>');
+            sessionStorage.setItem("bookId", data.bookId );
 
+        },
+        error: function () {
+            sessionStorage.setItem("bookId", -1 );
         }
     });
 
