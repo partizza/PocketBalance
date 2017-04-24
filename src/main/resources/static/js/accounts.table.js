@@ -57,10 +57,12 @@ function initAccountsDataTable() {
                     $('#accountsTable tbody').on('click', 'tr', function () {
                         if ($(this).hasClass('active')) {
                             $(this).removeClass('active');
+                            $('#btn-show-edit-modal').prop('disabled', true);
                         }
                         else {
                             table.$('tr.active').removeClass('active');
                             $(this).addClass('active');
+                            $('#btn-show-edit-modal').prop('disabled', false);
                         }
                     });
                 }
