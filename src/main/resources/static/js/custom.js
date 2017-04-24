@@ -14,9 +14,19 @@ $(document).ready(function () {
             $(".nav > li").removeClass("open");
             $ul.slideDown(350);
             $li.addClass("open");
-        }git
+        }
     });
 
+    var path = window.location.pathname;
+    if(path == '/setting/account'){
+        var $li = $('.submenu');
+        var $ul = $('.submenu').children('ul');
+
+        $(".nav > li > ul").slideUp(350);
+        $(".nav > li").removeClass("open");
+        $ul.slideDown(350);
+        $li.addClass("open");
+    }
 
     $.ajax({
         type: 'GET',
