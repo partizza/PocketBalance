@@ -24,8 +24,9 @@ public class BalanceAccountController {
 
     @GetMapping(value = "/book/{bookId}/{accId}")
     public ResponseEntity<BalanceAccountDTO> getBalanceAccountById(@PathVariable("accId") long accId,
-                                                                   @PathVariable("bookId") long bookId) {
-        BalanceAccountDTO accountDTO = accountService.findBalanceAccountById(bookId, accId);
+                                                                   @PathVariable("bookId") long bookId,
+                                                                   @AuthenticationPrincipal AppUserDetails appUserDetails) {
+        BalanceAccountDTO accountDTO = accountService.findBalanceAccountById(bookId, accId, appUserDetails.getId());
         ResponseEntity<BalanceAccountDTO> responseEntity;
         if (accountDTO == null) {
             responseEntity = new ResponseEntity<BalanceAccountDTO>(HttpStatus.NOT_FOUND);
@@ -37,9 +38,10 @@ public class BalanceAccountController {
 
     @PostMapping(value = "/book/{bookId}")
     public ResponseEntity<String> createBalanceAccount(@RequestBody BalanceAccountDTO accountDTO,
-                                                       @PathVariable("bookId") long bookId) {
+                                                       @PathVariable("bookId") long bookId,
+                                                       @AuthenticationPrincipal AppUserDetails appUserDetails) {
         accountDTO.setBookId(bookId);
-        accountService.createBalanceAccount(accountDTO);
+        accountService.createBalanceAccount(accountDTO, appUserDetails.getId());
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 

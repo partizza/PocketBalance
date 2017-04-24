@@ -8,11 +8,9 @@ import java.util.List;
 
 public interface BalanceAccountService {
 
-    public BalanceAccountDTO findBalanceAccountById(long bookId, long accountId);
+    public BalanceAccountDTO findBalanceAccountById(long bookId, long accountId, long userId);
 
-    public PageDTO<BalanceAccountDTO> findBalanceAccountAll(Pageable pageable);
-
-    public void createBalanceAccount(BalanceAccountDTO dto);
+    public void createBalanceAccount(BalanceAccountDTO dto, long userId);
 
     public List<BalanceAccountDTO> findBalanceAccountAllByBookId(long bookId, long userId);
 

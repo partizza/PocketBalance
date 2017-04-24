@@ -46,6 +46,7 @@ public class MockTestBalanceAccountProvider {
     @Before
     public void setUpMock() {
         AppUser appUser = new AppUser("b@u.cn");
+        appUser.setId(777L);
         BalanceBook book = new BalanceBook("test", "Mockito test", appUser);
         book.setId(10L);
         balanceAccount = new BalanceAccount(BSCategory.PROFIT, 700L, book, "test account");
@@ -59,15 +60,26 @@ public class MockTestBalanceAccountProvider {
 
     @Test
     public void test_findById() {
-        when(coaService.findBalanceAccountById(balanceAccount.getAccId(), balanceAccount.getBook().getId())).thenReturn(balanceAccount);
-        BalanceAccountDTO resultDto = balanceAccountService.findBalanceAccountById(balanceAccount.getAccId(), balanceAccount.getBook().getId());
+        when(coaService.findBalanceBookById(dto.getBookId())).thenReturn(balanceAccount.getBook());
+        when(coaService.findBalanceAccountById(balanceAccount.getBook().getId(), balanceAccount.getAccId())).thenReturn(balanceAccount);
+
+        BalanceAccountDTO resultDto =
+                balanceAccountService.findBalanceAccountById(balanceAccount.getBook().getId(), balanceAccount.getAccId(), balanceAccount.getBook().getAppUser().getId());
 
         assertEquals(dto, resultDto);
 
-        when(coaService.findBalanceAccountById(-10L, -700L)).thenReturn(null);
-        resultDto = balanceAccountService.findBalanceAccountById(-10L, -700L);
+        when(coaService.findBalanceAccountById(balanceAccount.getBook().getId(), -700L)).thenReturn(null);
+
+        resultDto =
+                balanceAccountService.findBalanceAccountById(balanceAccount.getBook().getId(), -700L, balanceAccount.getBook().getAppUser().getId());
 
         assertNull("Incorrect result.", resultDto);
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_findById_AccessDenied() {
+        when(coaService.findBalanceBookById(dto.getBookId())).thenReturn(balanceAccount.getBook());
+        balanceAccountService.findBalanceAccountById(balanceAccount.getBook().getId(), balanceAccount.getAccId(), balanceAccount.getBook().getAppUser().getId() + 1);
     }
 
     @Test
@@ -75,20 +87,16 @@ public class MockTestBalanceAccountProvider {
         when(coaService.findBalanceBookById(dto.getBookId())).thenReturn(balanceAccount.getBook());
         when(coaService.createBalanceAccount(any(BalanceAccount.class))).thenReturn(null);
 
-        balanceAccountService.createBalanceAccount(dto);
+        balanceAccountService.createBalanceAccount(dto, balanceAccount.getBook().getAppUser().getId());
 
-        verify(coaService, times(1)).findBalanceBookById(dto.getBookId());
+        verify(coaService, times(2)).findBalanceBookById(dto.getBookId());
         verify(coaService, times(1)).createBalanceAccount(balanceAccount);
     }
 
-    @Test
-    public void test_findAll() {
-        Pageable pageable = Mockito.mock(Pageable.class);
-        when(coaService.findAllBalanceAccount(pageable)).thenReturn(new PageImpl<BalanceAccount>(Arrays.asList(balanceAccount)));
-
-        PageDTO<BalanceAccountDTO> pageDTO = balanceAccountService.findBalanceAccountAll(pageable);
-
-        assertTrue(pageDTO.getContent().contains(dto));
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_createBalanceAccount_AccessDenied() {
+        when(coaService.findBalanceBookById(dto.getBookId())).thenReturn(balanceAccount.getBook());
+        balanceAccountService.createBalanceAccount(dto, balanceAccount.getBook().getAppUser().getId() + 1);
     }
 
     @Test

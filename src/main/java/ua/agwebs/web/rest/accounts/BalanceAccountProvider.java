@@ -35,50 +35,58 @@ public class BalanceAccountProvider implements BalanceAccountService {
     }
 
     @Override
-    public BalanceAccountDTO findBalanceAccountById(long bookId, long accountId) {
-        BalanceAccount balanceAccount = coaService.findBalanceAccountById(bookId, accountId);
-        BalanceAccountDTO dto = balanceAccount == null ? null : mapper.map(balanceAccount, BalanceAccountDTO.class);
-        return dto;
-    }
-
-    @Override
-    public void createBalanceAccount(BalanceAccountDTO dto) {
-        BalanceAccount account = new BalanceAccount();
-        account.setAccId(dto.getAccId());
-        account.setName(dto.getName());
-        account.setDesc(dto.getDesc());
-        account.setBsCategory(BSCategory.valueOf(dto.getBsCategory()));
-        BalanceBook book = coaService.findBalanceBookById(dto.getBookId());
-        account.setBook(book);
-        coaService.createBalanceAccount(account);
-    }
-
-    @Override
-    public PageDTO<BalanceAccountDTO> findBalanceAccountAll(Pageable pageable) {
-        Assert.notNull(pageable);
-        Page<BalanceAccount> page = coaService.findAllBalanceAccount(pageable);
-        PageDTO<BalanceAccountDTO> pageDTO = new PageDTO<>(page.getNumber(), page.getTotalPages());
-        for (BalanceAccount e : page.getContent()) {
-            BalanceAccountDTO dto = mapper.map(e, BalanceAccountDTO.class);
-            pageDTO.addContent(dto);
+    public BalanceAccountDTO findBalanceAccountById(long bookId, long accountId, long userId) {
+        logger.debug("Find a balance account: bookId = {}, accountId = {}", bookId, accountId);
+        if (this.checkPermission(bookId, userId)) {
+            BalanceAccount balanceAccount = coaService.findBalanceAccountById(bookId, accountId);
+            BalanceAccountDTO dto = balanceAccount == null ? null : mapper.map(balanceAccount, BalanceAccountDTO.class);
+            return dto;
+        }else {
+            throw new PocketBalanceIllegalAccessException();
         }
-        return pageDTO;
+    }
+
+    @Override
+    public void createBalanceAccount(BalanceAccountDTO dto, long userId) {
+        logger.debug("Create balance account: balanceAccountDTO = {}", dto);
+        if (this.checkPermission(dto.getBookId(), userId)) {
+            BalanceAccount account = new BalanceAccount();
+            account.setAccId(dto.getAccId());
+            account.setName(dto.getName());
+            account.setDesc(dto.getDesc());
+            account.setBsCategory(BSCategory.valueOf(dto.getBsCategory()));
+            BalanceBook book = coaService.findBalanceBookById(dto.getBookId());
+            account.setBook(book);
+            coaService.createBalanceAccount(account);
+        } else {
+            throw new PocketBalanceIllegalAccessException();
+        }
     }
 
     @Override
     public List<BalanceAccountDTO> findBalanceAccountAllByBookId(long bookId, long userId) {
-        logger.debug("Check permission: bookId = {}, userId = {}", bookId, userId);
-        BalanceBook book = coaService.findBalanceBookById(bookId);
-        if (book.getAppUser().getId() == userId) {
-            logger.debug("Access allowed: bookId = {}, userId = {}", bookId, userId);
+        logger.debug("Find all balance account by book: bookId = {}", bookId);
+        if (this.checkPermission(bookId, userId)) {
+            BalanceBook book = coaService.findBalanceBookById(bookId);
             List<BalanceAccountDTO> dtoList = new ArrayList<>();
             for (BalanceAccount e : book.getAccounts()) {
                 dtoList.add(mapper.map(e, BalanceAccountDTO.class));
             }
             return dtoList;
         } else {
-            logger.debug("Access denied: bookId = {}, userId = {}", bookId, userId);
             throw new PocketBalanceIllegalAccessException();
+        }
+    }
+
+    private boolean checkPermission(long bookId, long userId) {
+        logger.debug("Check permission: bookId = {}, userId = {}", bookId, userId);
+        BalanceBook book = coaService.findBalanceBookById(bookId);
+        if (book.getAppUser().getId() == userId) {
+            logger.debug("Access allowed: bookId = {}, userId = {}", bookId, userId);
+            return true;
+        } else {
+            logger.debug("Access denied: bookId = {}, userId = {}", bookId, userId);
+            return false;
         }
     }
 }
