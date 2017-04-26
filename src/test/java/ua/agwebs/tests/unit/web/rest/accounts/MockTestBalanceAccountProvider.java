@@ -100,6 +100,23 @@ public class MockTestBalanceAccountProvider {
     }
 
     @Test
+    public void test_updateBalanceAccount() {
+        when(coaService.findBalanceBookById(dto.getBookId())).thenReturn(balanceAccount.getBook());
+        when(coaService.updateBalanceAccount(balanceAccount)).thenReturn(null);
+
+        balanceAccountService.updateBalanceAccount(dto, balanceAccount.getBook().getAppUser().getId());
+
+        verify(coaService, times(2)).findBalanceBookById(dto.getBookId());
+        verify(coaService, times(1)).updateBalanceAccount(balanceAccount);
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_updateBalanceaccount_AccessDenied() {
+        when(coaService.findBalanceBookById(dto.getBookId())).thenReturn(balanceAccount.getBook());
+        balanceAccountService.updateBalanceAccount(dto, balanceAccount.getBook().getAppUser().getId() + 1);
+    }
+
+    @Test
     public void test_findBalanceAccountAllByBookId() {
         AppUser appUser = new AppUser("adc@rt.cv");
         appUser.setId(59L);

@@ -36,19 +36,19 @@ public class BalanceAccountProvider implements BalanceAccountService {
 
     @Override
     public BalanceAccountDTO findBalanceAccountById(long bookId, long accountId, long userId) {
-        logger.debug("Find a balance account: bookId = {}, accountId = {}", bookId, accountId);
+        logger.debug("Find a balance account: userId= {}, bookId = {}, accountId = {}", userId, bookId, accountId);
         if (this.checkPermission(bookId, userId)) {
             BalanceAccount balanceAccount = coaService.findBalanceAccountById(bookId, accountId);
             BalanceAccountDTO dto = balanceAccount == null ? null : mapper.map(balanceAccount, BalanceAccountDTO.class);
             return dto;
-        }else {
+        } else {
             throw new PocketBalanceIllegalAccessException();
         }
     }
 
     @Override
     public void createBalanceAccount(BalanceAccountDTO dto, long userId) {
-        logger.debug("Create balance account: balanceAccountDTO = {}", dto);
+        logger.debug("Create balance account: userId = {}, balanceAccountDTO = {}", userId, dto);
         if (this.checkPermission(dto.getBookId(), userId)) {
             BalanceAccount account = new BalanceAccount();
             account.setAccId(dto.getAccId());
@@ -64,8 +64,25 @@ public class BalanceAccountProvider implements BalanceAccountService {
     }
 
     @Override
+    public void updateBalanceAccount(BalanceAccountDTO dto, long userId) {
+        logger.debug("Update balance account: userId = {}, balanceAccountDTO = {}", userId, dto);
+        if (this.checkPermission(dto.getBookId(), userId)) {
+            BalanceAccount account = new BalanceAccount();
+            account.setAccId(dto.getAccId());
+            account.setName(dto.getName());
+            account.setDesc(dto.getDesc());
+            account.setBsCategory(BSCategory.valueOf(dto.getBsCategory()));
+            BalanceBook book = coaService.findBalanceBookById(dto.getBookId());
+            account.setBook(book);
+            coaService.updateBalanceAccount(account);
+        } else {
+            throw new PocketBalanceIllegalAccessException();
+        }
+    }
+
+    @Override
     public List<BalanceAccountDTO> findBalanceAccountAllByBookId(long bookId, long userId) {
-        logger.debug("Find all balance account by book: bookId = {}", bookId);
+        logger.debug("Find all balance account by book: userId = {}, bookId = {}", userId, bookId);
         if (this.checkPermission(bookId, userId)) {
             BalanceBook book = coaService.findBalanceBookById(bookId);
             List<BalanceAccountDTO> dtoList = new ArrayList<>();

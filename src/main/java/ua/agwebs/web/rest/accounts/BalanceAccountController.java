@@ -36,6 +36,13 @@ public class BalanceAccountController {
         return responseEntity;
     }
 
+    @GetMapping(value = "/book/{bookId}/all")
+    public ResponseEntity<List<BalanceAccountDTO>> findAllBalanceAccounts(@PathVariable("bookId") long bookId,
+                                                                          @AuthenticationPrincipal AppUserDetails appUserDetails) {
+        List<BalanceAccountDTO> dtoList = accountService.findBalanceAccountAllByBookId(bookId, appUserDetails.getId());
+        return new ResponseEntity<List<BalanceAccountDTO>>(dtoList, HttpStatus.OK);
+    }
+
     @PostMapping(value = "/book/{bookId}")
     public ResponseEntity<String> createBalanceAccount(@RequestBody BalanceAccountDTO accountDTO,
                                                        @PathVariable("bookId") long bookId,
@@ -45,10 +52,17 @@ public class BalanceAccountController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @GetMapping(value = "/book/{bookId}/all")
-    public ResponseEntity<List<BalanceAccountDTO>> findAllBalanceAccounts(@PathVariable("bookId") long bookId,
-                                                                          @AuthenticationPrincipal AppUserDetails appUserDetails) {
-        List<BalanceAccountDTO> dtoList = accountService.findBalanceAccountAllByBookId(bookId, appUserDetails.getId());
-        return new ResponseEntity<List<BalanceAccountDTO>>(dtoList, HttpStatus.OK);
+    @PutMapping(value = "/book/{bookId}/{accId}")
+    public ResponseEntity<String> updateBalanceAccount(@RequestBody BalanceAccountDTO accountDTO,
+                                                       @PathVariable("accId") long accId,
+                                                       @PathVariable("bookId") long bookId,
+                                                       @AuthenticationPrincipal AppUserDetails appUserDetails) {
+
+        accountDTO.setAccId(accId);
+        accountDTO.setBookId(bookId);
+        accountService.updateBalanceAccount(accountDTO, appUserDetails.getId());
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
+
+
 }
