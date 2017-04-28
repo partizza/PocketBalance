@@ -50,7 +50,9 @@
 
                     <div class="col-md-2">
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-primary"  disabled="" id="btn-show-edit-modal"><i class="glyphicon glyphicon-edit"></i> Edit</button>
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#edit-acc-modal"
+                                    disabled="" id="btn-show-edit-modal"><i class="glyphicon glyphicon-edit"></i> Edit
+                            </button>
                             <button class="btn btn-primary" data-toggle="modal" data-target="#new-acc-modal">
                                 <i class="glyphicon glyphicon-plus"></i> New
                             </button>
@@ -137,6 +139,67 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="edit-acc-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit balance account</h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="form-edit-account">
+                    <div class="form-group">
+                        <label for="edit-account-category">Category</label>
+                        <p>
+                            <select class="selectpicker" required="required" id="edit-account-category">
+                                <option value="NA" disabled="disabled" selected="selected">Choose an category</option>
+                                <option value="ASSET">Assets</option>
+                                <option value="LIABILITY">Liabilities</option>
+                                <option value="EQUITY">Equity</option>
+                                <option value="PROFIT">Incomes</option>
+                                <option value="LOSS">Expenses</option>
+                            </select>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-account-name">Account name</label>
+                        <input class="form-control" placeholder="Account name" type="text" id="edit-account-name"
+                               required="required" data-parsley-length="[1, 25]"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-account-desc">Account description</label>
+                        <textarea class="form-control" placeholder="Account description" rows="3" id="edit-account-desc"
+                                  style="resize:none"
+                                  data-parsley-length="[0, 60]"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-account-number">Account number</label>
+                        <input class="form-control" placeholder="Account number" type="text" id="edit-account-number"
+                               required="required" data-parsley-type="integer" data-parsley-range="[1, 1000000000]"
+                               data-parsley-exists-account-id=""/>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="edit-account-active"/> Active
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="btn-edit-account">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <link href="/vendors/datatables/dataTables.bootstrap.css" rel="stylesheet" media="screen"/>
 <!--<link href="/vendors/datatables/jquery.dataTables.css" rel="stylesheet" />-->
