@@ -79,11 +79,55 @@ public class AppUserManager implements AppUserService {
 
     private List<BalanceAccount> getInitBalanceAccounts(BalanceBook book) {
         List<BalanceAccount> initAccounts = new ArrayList<>();
-        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 100L, book, "Cash"));
-        initAccounts.add(new BalanceAccount(BSCategory.LIABILITY, 200L, book, "Debts"));
-        initAccounts.add(new BalanceAccount(BSCategory.PROFIT, 300L, book, "Salary"));
-        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 400L, book, "Purchases"));
+        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 110L, book, "Cash on hand"));
+        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 120L, book, "Current accounts"));
+        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 130L, book, "Saving accounts"));
+        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 140L, book, "Deposits"));
+        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 150L, book, "Loans to others"));
+        initAccounts.add(new BalanceAccount(BSCategory.ASSET, 190L, book, "Other cash"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LIABILITY, 210L, book, "Credit cards"));
+        initAccounts.add(new BalanceAccount(BSCategory.LIABILITY, 220L, book, "Loans from others"));
+        initAccounts.add(new BalanceAccount(BSCategory.LIABILITY, 290L, book, "Other debts"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.PROFIT, 310L, book, "Salary"));
+        initAccounts.add(new BalanceAccount(BSCategory.PROFIT, 320L, book, "Interest incomes"));
+        initAccounts.add(new BalanceAccount(BSCategory.PROFIT, 390L, book, "Other incomes"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 411L, book, "Rent/mortgage expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 412L, book, "Phone expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 413L, book, "Electricity expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 414L, book, "Gas expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 415L, book, "Water and sewer expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 416L, book, "Internet expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 417L, book, "Housing supplies expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 419L, book, "Other expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 421L, book, "Bus fare expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 422L, book, "Taxi fare expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 423L, book, "Fuel expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 430L, book, "Insurance expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 441L, book, "Food expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 442L, book, "Dining out expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 443L, book, "Medical expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 444L, book, "Clothing expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 445L, book, "Gym expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 446L, book, "Organization due expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 447L, book, "Events/parties expenses"));
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 448L, book, "Gifts expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 451L, book, "Loans expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 461L, book, "Pets expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 471L, book, "Children expenses"));
+
+        initAccounts.add(new BalanceAccount(BSCategory.LOSS, 490L, book, "Other expenses"));
+
         initAccounts.add(new BalanceAccount(BSCategory.EQUITY, 500L, book, "Start-up capital"));
+
         return initAccounts;
     }
 }
