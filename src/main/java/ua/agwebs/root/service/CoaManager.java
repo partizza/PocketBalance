@@ -4,6 +4,7 @@ package ua.agwebs.root.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,6 +14,7 @@ import org.springframework.util.Assert;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceAccountId;
 import ua.agwebs.root.entity.BalanceBook;
+import ua.agwebs.root.events.BookCreatedEvent;
 import ua.agwebs.root.repo.BalanceAccountRepository;
 import ua.agwebs.root.repo.BalanceBookRepository;
 
@@ -35,13 +37,16 @@ public class CoaManager implements CoaService {
 
     private BalanceAccountRepository accountRepo;
 
+    private ApplicationEventPublisher publisher;
+
     @Autowired
-    public CoaManager(BalanceBookRepository balanceBookRepository, BalanceAccountRepository balanceAccountRepository) {
-        Assert.notNull(balanceBookRepository);
-        Assert.notNull(balanceAccountRepository);
+    public CoaManager(BalanceBookRepository balanceBookRepository,
+                      BalanceAccountRepository balanceAccountRepository,
+                      ApplicationEventPublisher publisher) {
 
         this.bookRepo = balanceBookRepository;
         this.accountRepo = balanceAccountRepository;
+        this.publisher = publisher;
     }
 
     public BalanceBook createBalanceBook(BalanceBook balanceBook) {
@@ -54,6 +59,7 @@ public class CoaManager implements CoaService {
         BalanceBook createdBalanceBook = bookRepo.save(balanceBook);
 
         logger.debug("Created balance book: {}", createdBalanceBook);
+        publisher.publishEvent(new BookCreatedEvent(createdBalanceBook));
         return createdBalanceBook;
     }
 
