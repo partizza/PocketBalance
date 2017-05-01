@@ -25,5 +25,7 @@ public interface BusinessTransactionService {
 
     public Page<Transaction> findAllTransaction(Pageable pageable);
 
+    public List<Transaction> findAllTransactionByBookId(long bookId);
+
     public List<TransactionDetail> findAllTransactionDetail(long transactionId);
 }

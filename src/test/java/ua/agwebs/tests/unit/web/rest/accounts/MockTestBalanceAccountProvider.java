@@ -16,6 +16,8 @@ import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.web.PageDTO;
 import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
+import ua.agwebs.web.rest.PermissionProvider;
+import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.accounts.BalanceAccountDTO;
 import ua.agwebs.web.rest.accounts.BalanceAccountProvider;
 import ua.agwebs.web.rest.accounts.BalanceAccountService;
@@ -43,6 +45,8 @@ public class MockTestBalanceAccountProvider {
 
     private BalanceAccountDTO dto;
 
+    private PermissionService permissionService;
+
     @Before
     public void setUpMock() {
         AppUser appUser = new AppUser("b@u.cn");
@@ -55,7 +59,9 @@ public class MockTestBalanceAccountProvider {
 
         dto = mapper.map(balanceAccount, BalanceAccountDTO.class);
 
-        balanceAccountService = new BalanceAccountProvider(coaService, mapper);
+        permissionService = new PermissionProvider(coaService);
+
+        balanceAccountService = new BalanceAccountProvider(coaService, mapper, permissionService);
     }
 
     @Test

@@ -159,4 +159,24 @@ public class BusinessTransactionManager implements BusinessTransactionService {
         logger.debug("Selected transaction details: {}", details);
         return details;
     }
+
+    @Override
+    public List<Transaction> findAllTransactionByBookId(long bookId) {
+        logger.info("Select all transactions by book id.");
+        logger.debug("Passed parameters: bookId = {}", bookId);
+
+        Specification<Transaction> specification = new Specification<Transaction>() {
+            @Override
+            public Predicate toPredicate(Root<Transaction> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("deleted"), false);
+                predicate = cb.and(predicate, cb.equal(root.get("book").get("id"), bookId));
+                return predicate;
+            }
+        };
+
+        List<Transaction> transactionList = tranRepo.findAll(specification);
+
+        logger.debug("Selected transactions by book id: count = {}", transactionList.size());
+        return transactionList;
+    }
 }

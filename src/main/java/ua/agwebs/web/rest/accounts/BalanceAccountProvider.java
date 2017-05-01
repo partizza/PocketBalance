@@ -16,6 +16,7 @@ import ua.agwebs.root.service.AppUserManager;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.web.PageDTO;
 import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
+import ua.agwebs.web.rest.PermissionService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +28,19 @@ public class BalanceAccountProvider implements BalanceAccountService {
 
     private CoaService coaService;
     private ModelMapper mapper;
+    private PermissionService permissionService;
 
     @Autowired
-    public BalanceAccountProvider(CoaService coaService, ModelMapper mapper) {
+    public BalanceAccountProvider(CoaService coaService, ModelMapper mapper, PermissionService permissionService) {
         this.coaService = coaService;
         this.mapper = mapper;
+        this.permissionService = permissionService;
     }
 
     @Override
     public BalanceAccountDTO findBalanceAccountById(long bookId, long accountId, long userId) {
         logger.debug("Find a balance account: userId= {}, bookId = {}, accountId = {}", userId, bookId, accountId);
-        if (this.checkPermission(bookId, userId)) {
+        if (permissionService.checkPermission(bookId, userId)) {
             BalanceAccount balanceAccount = coaService.findBalanceAccountById(bookId, accountId);
             BalanceAccountDTO dto = balanceAccount == null ? null : mapper.map(balanceAccount, BalanceAccountDTO.class);
             return dto;
@@ -49,7 +52,7 @@ public class BalanceAccountProvider implements BalanceAccountService {
     @Override
     public void createBalanceAccount(BalanceAccountDTO dto, long userId) {
         logger.debug("Create balance account: userId = {}, balanceAccountDTO = {}", userId, dto);
-        if (this.checkPermission(dto.getBookId(), userId)) {
+        if (permissionService.checkPermission(dto.getBookId(), userId)) {
             BalanceAccount account = new BalanceAccount();
             account.setAccId(dto.getAccId());
             account.setName(dto.getName());
@@ -66,7 +69,7 @@ public class BalanceAccountProvider implements BalanceAccountService {
     @Override
     public void updateBalanceAccount(BalanceAccountDTO dto, long userId) {
         logger.debug("Update balance account: userId = {}, balanceAccountDTO = {}", userId, dto);
-        if (this.checkPermission(dto.getBookId(), userId)) {
+        if (permissionService.checkPermission(dto.getBookId(), userId)) {
             BalanceAccount account = new BalanceAccount();
             account.setAccId(dto.getAccId());
             account.setName(dto.getName());
@@ -83,7 +86,7 @@ public class BalanceAccountProvider implements BalanceAccountService {
     @Override
     public List<BalanceAccountDTO> findBalanceAccountAllByBookId(long bookId, long userId) {
         logger.debug("Find all balance account by book: userId = {}, bookId = {}", userId, bookId);
-        if (this.checkPermission(bookId, userId)) {
+        if (permissionService.checkPermission(bookId, userId)) {
             BalanceBook book = coaService.findBalanceBookById(bookId);
             List<BalanceAccountDTO> dtoList = new ArrayList<>();
             for (BalanceAccount e : book.getAccounts()) {
@@ -95,15 +98,4 @@ public class BalanceAccountProvider implements BalanceAccountService {
         }
     }
 
-    private boolean checkPermission(long bookId, long userId) {
-        logger.debug("Check permission: bookId = {}, userId = {}", bookId, userId);
-        BalanceBook book = coaService.findBalanceBookById(bookId);
-        if (book.getAppUser().getId() == userId) {
-            logger.debug("Access allowed: bookId = {}, userId = {}", bookId, userId);
-            return true;
-        } else {
-            logger.debug("Access denied: bookId = {}, userId = {}", bookId, userId);
-            return false;
-        }
-    }
 }
