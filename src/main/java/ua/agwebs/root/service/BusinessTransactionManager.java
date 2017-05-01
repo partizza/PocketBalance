@@ -149,8 +149,7 @@ public class BusinessTransactionManager implements BusinessTransactionService {
         Specification<TransactionDetail> specification = new Specification<TransactionDetail>() {
             @Override
             public Predicate toPredicate(Root<TransactionDetail> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
-                Predicate predicate = cb.equal(root.get("enable"), true);
-                predicate = cb.and(predicate, cb.equal(root.get("tranId"), transactionId));
+                Predicate predicate = cb.equal(root.get("tranId"), transactionId);
                 return predicate;
             }
         };

@@ -371,7 +371,7 @@ public class BusinessTransactionServiceTests {
         List<TransactionDetail> result = businessTransactionService.findAllTransactionDetail(transaction.getId());
 
         assertTrue("Missed transaction detail.", result.contains(first));
-        assertFalse("Unexpected transaction detail.", result.contains(second));
+        assertTrue("Missed transaction detail.", result.contains(second));
 
     }
 
