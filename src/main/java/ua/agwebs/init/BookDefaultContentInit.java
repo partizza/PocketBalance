@@ -44,11 +44,54 @@ public class BookDefaultContentInit {
 
 
         logger.debug("Initialize default business transactions settings: book = {}", event.getBook());
+
         Transaction transaction = new Transaction("Salary receipt", event.getBook());
         transaction = businessTransactionService.createTransaction(transaction);
         TransactionDetail transactionDetail = new TransactionDetail(transaction, accountMap.get(110L), EntrySide.D);
         businessTransactionService.setTransactionDetail(transactionDetail);
         transactionDetail = new TransactionDetail(transaction, accountMap.get(310L), EntrySide.C);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+
+        transaction = new Transaction("Rent payment", event.getBook());
+        transaction = businessTransactionService.createTransaction(transaction);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(411L), EntrySide.D);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(110L), EntrySide.C);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+
+        transaction = new Transaction("Payment for Internet", event.getBook());
+        transaction = businessTransactionService.createTransaction(transaction);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(416L), EntrySide.D);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(120L), EntrySide.C);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+
+        transaction = new Transaction("Buying food (card)", event.getBook());
+        transaction = businessTransactionService.createTransaction(transaction);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(441L), EntrySide.D);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(120L), EntrySide.C);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+
+        transaction = new Transaction("Buying food (cash)", event.getBook());
+        transaction = businessTransactionService.createTransaction(transaction);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(441L), EntrySide.D);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(110L), EntrySide.C);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+
+        transaction = new Transaction("Payment for lunch by cash", event.getBook());
+        transaction = businessTransactionService.createTransaction(transaction);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(442L), EntrySide.D);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(110L), EntrySide.C);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+
+        transaction = new Transaction("Buying clothes (card)", event.getBook());
+        transaction = businessTransactionService.createTransaction(transaction);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(444L), EntrySide.D);
+        businessTransactionService.setTransactionDetail(transactionDetail);
+        transactionDetail = new TransactionDetail(transaction, accountMap.get(120L), EntrySide.C);
         businessTransactionService.setTransactionDetail(transactionDetail);
     }
 
