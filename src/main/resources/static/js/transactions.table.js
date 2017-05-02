@@ -1,9 +1,10 @@
-var table;
-
+var generalTable;
+var detailTable;
 
 $(document).ready(function () {
 
     initTransactionsDataTable();
+    initDetailsDataTable();
 
 });
 
@@ -14,10 +15,10 @@ function initTransactionsDataTable() {
         dataType: 'json',
         success: function (data) {
 
-            table = $('#transactions-table').dataTable({
-                "scrollY":        "140px",
+            generalTable = $('#transactions-table').dataTable({
+                "scrollY": "140px",
                 "scrollCollapse": true,
-                "paging":         false,
+                "paging": false,
                 "ajax": {
                     "url": "/data/transaction/book/" + data.bookId + "/all",
                     "dataSrc": ""
@@ -33,10 +34,12 @@ function initTransactionsDataTable() {
                     $('#transactions-table tbody').on('click', 'tr', function () {
                         if ($(this).hasClass('active')) {
                             $(this).removeClass('active');
+                            hideTransactionDetails();
                         }
                         else {
-                            table.$('tr.active').removeClass('active');
+                            generalTable.$('tr.active').removeClass('active');
                             $(this).addClass('active');
+                            showTransactionDetails()
                         }
                     });
                 }
@@ -53,3 +56,36 @@ function initTransactionsDataTable() {
         }
     });
 };
+
+function initDetailsDataTable() {
+    detailTable = $('#transaction-details-table').dataTable({
+        "data" : [],
+        "scrollY": "140px",
+        "scrollCollapse": true,
+        "paging": false,
+        "searching": false,
+        "columns": [
+            {"data": "entrySide"},
+            {"data": "enable"},
+            {"data": "accountName"},
+            {"data": "accountDesc"},
+            {"data": "accountAccId"},
+            {"data": "accountEnable"},
+            {"data": "accountBsCategory"}
+        ]
+    });
+}
+
+function showTransactionDetails() {
+    var transaction = generalTable.api().row('.active').data();
+
+    detailTable.api().clear();
+    $('#transaction-details').show();
+    detailTable.api().rows.add(transaction.details);
+    detailTable.api().draw();
+
+}
+
+function hideTransactionDetails() {
+    $('#transaction-details').hide();
+}
