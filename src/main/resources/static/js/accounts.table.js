@@ -162,6 +162,7 @@ function createBalanceAccount(event) {
                     '</div>' +
                     '');
 
+                $('#btn-show-edit-modal').prop('disabled', true);
                 table.api().ajax.reload();
             },
             error: function () {
@@ -222,6 +223,7 @@ function updateBalanceAccount(event) {
                     '</div>' +
                     '');
 
+                $('#btn-show-edit-modal').prop('disabled', true);
                 table.api().ajax.reload();
             },
             error: function () {

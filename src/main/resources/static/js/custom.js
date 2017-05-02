@@ -18,7 +18,7 @@ $(document).ready(function () {
     });
 
     var path = window.location.pathname;
-    if(path == '/setting/account'){
+    if(path == '/setting/account' || path == '/setting/transaction'){
         var $li = $('.submenu');
         var $ul = $('.submenu').children('ul');
 

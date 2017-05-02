@@ -20,4 +20,9 @@ public class ViewController {
     public String getSettingAccountView(){
         return "accounts";
     }
+
+    @RequestMapping(value = "/setting/transaction")
+    public String getSettingTransactionView(){
+        return "transactions";
+    }
 }

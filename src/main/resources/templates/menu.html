@@ -36,7 +36,7 @@
                     <!-- Sub menu -->
                     <ul>
                         <li data-th-classappend="${#httpServletRequest.getRequestURI() == '/setting/account' ? 'current':''}"><a href="/setting/account">Accounts</a></li>
-                        <li><a href="#">Business Transactions</a></li>
+                        <li data-th-classappend="${#httpServletRequest.getRequestURI() == '/setting/transaction' ? 'current':''}"><a href="/setting/transaction">Business Transactions</a></li>
                     </ul>
                 </li>
             </ul>
