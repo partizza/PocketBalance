@@ -32,8 +32,12 @@ function initTransactionsDataTable() {
                         "searchable": false
                     },
                     {
+                        "className": "text-center",
+                        "width": "15%",
                         "data": null,
-                        "defaultContent": "<button class='btn btn-danger btn-xs'><i class='glyphicon glyphicon-remove'> Delete</button>"
+                        "defaultContent": "<button class='btn btn-primary btn-xs'><i class='glyphicon glyphicon-edit'></i> Edit</button>"
+                        + " "
+                        + "<button class='btn btn-danger btn-xs'><i class='glyphicon glyphicon-remove'></i> Delete</button>"
                     }
                 ],
                 "order": [
@@ -54,8 +58,9 @@ function initTransactionsDataTable() {
 
                     $('#transactions-table tbody').on('click', 'button', function () {
                         var data = generalTable.api().row($(this).parents('tr')).data();
-                        alert(data.name + " (id = " + data.id + ") " + " - will be deleted (not implemented yet)");
+                        alert(data.name + " (id = " + data.id + ") " + " - will be processed (not implemented yet)");
                     });
+
                 }
             });
 
