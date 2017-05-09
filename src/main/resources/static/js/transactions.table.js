@@ -25,7 +25,16 @@ function initTransactionsDataTable() {
                 },
                 "columns": [
                     {"data": "name"},
-                    {"data": "desc"}
+                    {"data": "desc"},
+                    {
+                        "data": "id",
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "data": null,
+                        "defaultContent": "<button class='btn btn-danger btn-xs'><i class='glyphicon glyphicon-remove'> Delete</button>"
+                    }
                 ],
                 "order": [
                     [0, "asc"]
@@ -41,6 +50,11 @@ function initTransactionsDataTable() {
                             $(this).addClass('active');
                             showTransactionDetails()
                         }
+                    });
+
+                    $('#transactions-table tbody').on('click', 'button', function () {
+                        var data = generalTable.api().row($(this).parents('tr')).data();
+                        alert(data.name + " (id = " + data.id + ") " + " - will be deleted (not implemented yet)");
                     });
                 }
             });
@@ -59,7 +73,7 @@ function initTransactionsDataTable() {
 
 function initDetailsDataTable() {
     detailTable = $('#transaction-details-table').dataTable({
-        "data" : [],
+        "data": [],
         "scrollY": "140px",
         "scrollCollapse": true,
         "paging": false,
@@ -84,7 +98,7 @@ function showTransactionDetails() {
     detailTable.api().rows.add(transaction.details);
     detailTable.api().draw();
 
-    $('html, body').animate({scrollTop:$(document).height()}, 'slow');
+    $('html, body').animate({scrollTop: $(document).height()}, 'slow');
 }
 
 function hideTransactionDetails() {
