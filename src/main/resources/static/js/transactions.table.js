@@ -84,6 +84,7 @@ function showTransactionDetails() {
     detailTable.api().rows.add(transaction.details);
     detailTable.api().draw();
 
+    $('html, body').animate({scrollTop:$(document).height()}, 'slow');
 }
 
 function hideTransactionDetails() {
