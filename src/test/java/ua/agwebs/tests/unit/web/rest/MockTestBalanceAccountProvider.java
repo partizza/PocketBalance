@@ -1,4 +1,4 @@
-package ua.agwebs.tests.unit.web.rest.accounts;
+package ua.agwebs.tests.unit.web.rest;
 
 import org.junit.Before;
 import org.junit.Test;

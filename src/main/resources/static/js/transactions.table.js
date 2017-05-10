@@ -24,8 +24,14 @@ function initTransactionsDataTable() {
                     "dataSrc": ""
                 },
                 "columns": [
-                    {"data": "name"},
-                    {"data": "desc"},
+                    {
+                        "className": "clickable",
+                        "data": "name"
+                    },
+                    {
+                        "className": "clickable",
+                        "data": "desc"
+                    },
                     {
                         "data": "id",
                         "visible": false,
@@ -35,30 +41,35 @@ function initTransactionsDataTable() {
                         "className": "text-center",
                         "width": "15%",
                         "data": null,
-                        "defaultContent": "<button class='btn btn-primary btn-xs'><i class='glyphicon glyphicon-edit'></i> Edit</button>"
+                        "defaultContent": "<button class='btn btn-primary btn-xs edit'><i class='glyphicon glyphicon-edit'></i> Edit</button>"
                         + " "
-                        + "<button class='btn btn-danger btn-xs'><i class='glyphicon glyphicon-remove'></i> Delete</button>"
+                        + "<button class='btn btn-danger btn-xs remove'><i class='glyphicon glyphicon-remove'></i> Delete</button>"
                     }
                 ],
                 "order": [
                     [0, "asc"]
                 ],
                 "initComplete": function (settings, json) {
-                    $('#transactions-table tbody').on('click', 'tr', function () {
-                        if ($(this).hasClass('active')) {
-                            $(this).removeClass('active');
+                    $('#transactions-table tbody').on('click', '.clickable', function () {
+                        if ($(this).parent().hasClass('active')) {
+                            $(this).parent().removeClass('active');
                             hideTransactionDetails();
                         }
                         else {
                             generalTable.$('tr.active').removeClass('active');
-                            $(this).addClass('active');
+                            $(this).parent().addClass('active');
                             showTransactionDetails()
                         }
                     });
 
-                    $('#transactions-table tbody').on('click', 'button', function () {
+                    $('#transactions-table tbody').on('click', 'button.edit', function () {
                         var data = generalTable.api().row($(this).parents('tr')).data();
                         alert(data.name + " (id = " + data.id + ") " + " - will be processed (not implemented yet)");
+                    });
+
+                    $('#transactions-table tbody').on('click', 'button.remove', function () {
+                        var data = generalTable.api().row($(this).parents('tr')).data();
+                        removeTransaction(data.id);
                     });
 
                 }
@@ -108,4 +119,32 @@ function showTransactionDetails() {
 
 function hideTransactionDetails() {
     $('#transaction-details').hide();
+}
+
+function removeTransaction(tranId) {
+
+    $.ajax({
+        url: '/data/transaction/' + tranId,
+        type: 'DELETE',
+        success: function () {
+            hideTransactionDetails();
+            generalTable.api().ajax.reload();
+
+            $('.table-message').append('' +
+                '<div class="alert alert-success alert-dismissable">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
+                '<strong>Success!</strong> Transaction has been deleted.' +
+                '</div>' +
+                '');
+
+        },
+        error: function () {
+            $('.table-message').append('' +
+                '<div class="alert alert-danger alert-dismissable">' +
+                '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
+                '<strong>Error!</strong> Can not delete the transaction.' +
+                '</div>' +
+                '');
+        }
+    })
 }

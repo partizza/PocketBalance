@@ -1,4 +1,4 @@
-package ua.agwebs.tests.unit.web.rest.accounts;
+package ua.agwebs.tests.unit.web.rest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MockTestAccountingTransactionProvider {
@@ -84,6 +84,33 @@ public class MockTestAccountingTransactionProvider {
     public void test_findTransactionAllByBookId_AccessDenied() {
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
         accountingTransactionProvider.findTransactionAllByBookId(transaction.getBook().getId(), transaction.getBook().getAppUser().getId() + 1);
+    }
+
+    @Test
+    public void test_deleteTransaction() {
+        when(transactionService.findTransactionById(transaction.getId())).thenReturn(transaction);
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
+        doNothing().when(transactionService).deleteTransaction(transaction.getId());
+
+        accountingTransactionProvider.deleteTransactionById(transaction.getId(), transaction.getBook().getAppUser().getId());
+
+        verify(transactionService, times(1)).findTransactionById(transaction.getId());
+        verify(coaService, times(1)).findBalanceBookById(transaction.getBook().getId());
+        verify(transactionService, times(1)).deleteTransaction(transaction.getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_deleteTranstaction_NonExisting() {
+        when(transactionService.findTransactionById(1)).thenReturn(null);
+        accountingTransactionProvider.deleteTransactionById(1, 2);
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_deleteTransaction_AccessDenied() {
+        when(transactionService.findTransactionById(transaction.getId())).thenReturn(transaction);
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
+
+        accountingTransactionProvider.deleteTransactionById(transaction.getId(), transaction.getBook().getAppUser().getId() + 1);
     }
 
 }

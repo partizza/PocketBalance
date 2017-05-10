@@ -33,16 +33,32 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
     @Override
     public List<TransactionDTO> findTransactionAllByBookId(long bookId, long userId) {
         logger.debug("Find existing transactions by book id: bookId = {}, userId = {}", bookId, userId);
-        if(permissionService.checkPermission(bookId, userId)){
+        if (permissionService.checkPermission(bookId, userId)) {
             List<Transaction> transactions = transactionService.findAllTransactionByBookId(bookId);
             List<TransactionDTO> transactionDTOs = new ArrayList<>();
-            for(Transaction e :  transactions){
+            for (Transaction e : transactions) {
                 TransactionDTO dto = mapper.map(e, TransactionDTO.class);
                 transactionDTOs.add(dto);
             }
             return transactionDTOs;
-        }else {
-            throw new PocketBalanceIllegalAccessException();
+        } else {
+            throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + bookId + ", userId = " + userId);
+        }
+    }
+
+    @Override
+    public void deleteTransactionById(long tranId, long userId) {
+        logger.debug("Delete transaction: tranId = {}, userId = {}", tranId, userId);
+        Transaction transaction = transactionService.findTransactionById(tranId);
+
+        if (transaction == null) {
+            throw new IllegalArgumentException("Non existing transaction ID");
+        }
+
+        if (permissionService.checkPermission(transaction.getBook().getId(), userId)) {
+            transactionService.deleteTransaction(tranId);
+        } else {
+            throw new PocketBalanceIllegalAccessException("Permission denied: transactionId = " + tranId + ", userId = " + userId);
         }
     }
 }
