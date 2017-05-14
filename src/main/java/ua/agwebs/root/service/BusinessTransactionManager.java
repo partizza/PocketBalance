@@ -8,10 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import ua.agwebs.root.entity.BalanceAccount;
-import ua.agwebs.root.entity.BalanceBook;
-import ua.agwebs.root.entity.Transaction;
-import ua.agwebs.root.entity.TransactionDetail;
+import ua.agwebs.root.entity.*;
 import ua.agwebs.root.repo.TransactionDetailRepository;
 import ua.agwebs.root.repo.TransactionRepository;
 
@@ -99,6 +96,14 @@ public class BusinessTransactionManager implements BusinessTransactionService {
 
         logger.debug("Saved transaction detail: {}", savedDetail);
         return savedDetail;
+    }
+
+    @Override
+    public void deleteTransactionDetail(long tranId, long accId, long bookId) {
+        logger.info("Delete transaction details");
+        logger.debug("Passed parameters: tranId = {}, accId = {}, bookId = {}", tranId, accId, bookId);
+
+        detRepo.delete(new TransactionDetailId(tranId, accId, bookId));
     }
 
     @Override

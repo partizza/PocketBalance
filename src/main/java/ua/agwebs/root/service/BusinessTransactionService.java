@@ -21,6 +21,8 @@ public interface BusinessTransactionService {
 
     public TransactionDetail setTransactionDetail(@Valid TransactionDetail transactionDetail);
 
+    public void deleteTransactionDetail(long tranId, long accId, long bookId);
+
     public Transaction findTransactionById(long id);
 
     public Page<Transaction> findAllTransaction(Pageable pageable);

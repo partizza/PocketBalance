@@ -294,6 +294,21 @@ public class BusinessTransactionServiceTests {
         assertEquals("Incorrect saved transaction detail.", detail.isEnable(), result.isEnable());
     }
 
+    // Delete transaction detail
+    // ** successfully
+    @Test
+    public void test_deleteTransactionDetail() {
+        Transaction transaction = businessTransactionService.createTransaction(new Transaction("test", book));
+
+        TransactionDetail detail = new TransactionDetail(transaction, ct, EntrySide.D);
+        TransactionDetail result = businessTransactionService.setTransactionDetail(detail);
+
+        businessTransactionService.deleteTransactionDetail(result.getTransaction().getId(), result.getAccount().getAccId(), result.getAccount().getBook().getId());
+
+        assertFalse("Incorrect delete", businessTransactionService.findAllTransactionDetail(transaction.getId()).contains(result));
+
+    }
+
     // Set transaction detail
     // ** reject
     @Test(expected = IllegalArgumentException.class)
