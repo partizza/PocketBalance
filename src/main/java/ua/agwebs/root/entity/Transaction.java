@@ -57,6 +57,11 @@ public class Transaction implements Serializable {
         this.book = book;
     }
 
+    public Transaction(String name, BalanceBook book, String desc) {
+        this(name, book);
+        this.desc = desc;
+    }
+
     public Long getId() {
         return id;
     }

@@ -8,4 +8,6 @@ public interface AccountingTransactionService {
     List<TransactionDTO> findTransactionAllByBookId(long bookId, long userId);
 
     void deleteTransactionById(long tranId, long userId);
+
+    void createTransaction(TransactionDTO dto, long userId);
 }

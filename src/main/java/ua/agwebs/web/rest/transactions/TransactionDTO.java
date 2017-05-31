@@ -1,6 +1,7 @@
 package ua.agwebs.web.rest.transactions;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDTO {
@@ -13,7 +14,7 @@ public class TransactionDTO {
 
     private Long bookId;
 
-    private List<TransactionDetailDTO> details;
+    private List<TransactionDetailDTO> details = new ArrayList<>();
 
     public Long getId() {
         return id;

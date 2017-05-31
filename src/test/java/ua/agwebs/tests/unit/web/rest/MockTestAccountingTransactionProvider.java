@@ -40,6 +40,10 @@ public class MockTestAccountingTransactionProvider {
 
     private Transaction transaction;
 
+    private BalanceAccount accCt;
+
+    private BalanceAccount accDt;
+
     @Before
     public void setUpMock() {
         AppUser appUser = new AppUser("b@u.cn");
@@ -47,8 +51,8 @@ public class MockTestAccountingTransactionProvider {
         BalanceBook book = new BalanceBook("test", "Mockito test", appUser);
         book.setId(10L);
 
-        BalanceAccount accCt = new BalanceAccount(BSCategory.PROFIT, 700L, book, "test account");
-        BalanceAccount accDt = new BalanceAccount(BSCategory.ASSET, 100L, book, "test account");
+        accCt = new BalanceAccount(BSCategory.PROFIT, 700L, book, "test account");
+        accDt = new BalanceAccount(BSCategory.ASSET, 100L, book, "test account");
 
         transaction = new Transaction("Testing transaction", book);
         transaction.setId(7L);
@@ -60,7 +64,7 @@ public class MockTestAccountingTransactionProvider {
 
         mapper = new ModelMapper();
         permissionService = new PermissionProvider(coaService);
-        accountingTransactionProvider = new AccountingTransactionProvider(transactionService, mapper, permissionService);
+        accountingTransactionProvider = new AccountingTransactionProvider(transactionService, mapper, permissionService, coaService);
 
     }
 
@@ -113,4 +117,66 @@ public class MockTestAccountingTransactionProvider {
         accountingTransactionProvider.deleteTransactionById(transaction.getId(), transaction.getBook().getAppUser().getId() + 1);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_NullDto() {
+        accountingTransactionProvider.createTransaction(null, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_NullBookId() {
+        TransactionDTO dto = new TransactionDTO();
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_NullDetails() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        dto.setDetails(null);
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_EmptyDetails() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_MissedDetails() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().limit(1).forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_CreateTransaction_AccessDenied() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId() + 1);
+    }
+
+    @Test
+    public void test_CreateTransaction() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setName(transaction.getName());
+        dto.setDesc("testing example");
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
+        when(transactionService.createTransaction(new Transaction(dto.getName(), transaction.getBook(), dto.getDesc()))).thenReturn(transaction);
+        when(coaService.findBalanceAccountById(transaction.getBook().getId(), accCt.getAccId())).thenReturn(accCt);
+        when(coaService.findBalanceAccountById(transaction.getBook().getId(), accDt.getAccId())).thenReturn(accDt);
+        when(transactionService.setTransactionDetail(any(TransactionDetail.class))).thenReturn(null);
+
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+        verify(transactionService, times(1)).createTransaction(any());
+        verify(transactionService, times(2)).setTransactionDetail(any());
+    }
 }

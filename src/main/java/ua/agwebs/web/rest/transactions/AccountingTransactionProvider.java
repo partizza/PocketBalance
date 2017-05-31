@@ -5,8 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.agwebs.root.entity.Transaction;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.BusinessTransactionService;
+import ua.agwebs.root.service.CoaService;
 import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
 import ua.agwebs.web.rest.PermissionService;
 
@@ -22,12 +25,17 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
     private BusinessTransactionService transactionService;
     private ModelMapper mapper;
     private PermissionService permissionService;
+    private CoaService coaService;
 
     @Autowired
-    public AccountingTransactionProvider(BusinessTransactionService businessTransactionService, ModelMapper mapper, PermissionService permissionService) {
+    public AccountingTransactionProvider(BusinessTransactionService businessTransactionService,
+                                         ModelMapper mapper,
+                                         PermissionService permissionService,
+                                         CoaService coaService) {
         this.transactionService = businessTransactionService;
         this.mapper = mapper;
         this.permissionService = permissionService;
+        this.coaService = coaService;
     }
 
     @Override
@@ -59,6 +67,30 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
             transactionService.deleteTransaction(tranId);
         } else {
             throw new PocketBalanceIllegalAccessException("Permission denied: transactionId = " + tranId + ", userId = " + userId);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void createTransaction(TransactionDTO dto, long userId) {
+        logger.debug("Create new transaction: {}", dto);
+
+        Assert.notNull(dto);
+        Assert.notNull(dto.getBookId());
+        Assert.notNull(dto.getDetails());
+        Assert.isTrue(dto.getDetails().size() == 2);
+
+        if (permissionService.checkPermission(dto.getBookId(), userId)) {
+            BalanceBook book = coaService.findBalanceBookById(dto.getBookId());
+            Transaction tran = transactionService.createTransaction(new Transaction(dto.getName(), book, dto.getDesc()));
+
+            dto.getDetails().stream().forEach(e -> {
+                BalanceAccount account = coaService.findBalanceAccountById(book.getId(), e.getAccountAccId());
+                TransactionDetail tDet = new TransactionDetail(tran, account, EntrySide.valueOf(e.getEntrySide()));
+                transactionService.setTransactionDetail(tDet);
+            });
+        } else {
+            throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + dto.getBookId() + ", userId = " + userId);
         }
     }
 }
