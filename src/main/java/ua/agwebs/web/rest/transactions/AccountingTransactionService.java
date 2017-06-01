@@ -10,4 +10,6 @@ public interface AccountingTransactionService {
     void deleteTransactionById(long tranId, long userId);
 
     void createTransaction(TransactionDTO dto, long userId);
+
+    void setTransactionDetails(TransactionDTO dto, long userId);
 }

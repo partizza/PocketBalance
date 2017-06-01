@@ -93,4 +93,28 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
             throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + dto.getBookId() + ", userId = " + userId);
         }
     }
+
+    @Transactional
+    @Override
+    public void setTransactionDetails(TransactionDTO dto, long userId) {
+        logger.debug("Set transaction details: {}", dto);
+
+        Assert.notNull(dto);
+        Assert.notNull(dto.getBookId());
+        Assert.notNull(dto.getDetails());
+        Assert.isTrue(dto.getDetails().size() == 2);
+
+        if (permissionService.checkPermission(dto.getBookId(), userId)) {
+            Transaction tran = transactionService.findTransactionById(dto.getId());
+            tran.getDetails().stream().forEach(e -> transactionService.deleteTransactionDetail(tran.getId(), e.getCoaId(), e.getBookId()));
+
+            dto.getDetails().stream().forEach(e -> {
+                BalanceAccount account = coaService.findBalanceAccountById(dto.getBookId(), e.getAccountAccId());
+                TransactionDetail tDet = new TransactionDetail(tran, account, EntrySide.valueOf(e.getEntrySide()));
+                transactionService.setTransactionDetail(tDet);
+            });
+        } else {
+            throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + dto.getBookId() + ", userId = " + userId);
+        }
+    }
 }

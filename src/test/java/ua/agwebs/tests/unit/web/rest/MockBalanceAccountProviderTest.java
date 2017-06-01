@@ -32,7 +32,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MockTestBalanceAccountProvider {
+public class MockBalanceAccountProviderTest {
 
     @Mock
     private CoaService coaService;

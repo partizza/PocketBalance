@@ -99,6 +99,18 @@ public class TransactionDetail implements Serializable {
         this.enable = enable;
     }
 
+    public Long getTranId() {
+        return tranId;
+    }
+
+    public Long getCoaId() {
+        return coaId;
+    }
+
+    public Long getBookId() {
+        return bookId;
+    }
+
     @Override
     public String toString() {
         return "TransactionDetail{" +
