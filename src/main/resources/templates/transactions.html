@@ -64,7 +64,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th hidden = "true">Id</th>
+                            <th hidden="true">Id</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -96,6 +96,103 @@
         </div>
     </div>
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="new-tran-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">New transaction</h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="form-create-tran">
+                    <div class="form-group">
+                        <label for="new-tran-name">Transaction name</label>
+                        <input class="form-control" placeholder="Transaction name" type="text" id="new-tran-name"
+                               required="required" data-parsley-length="[1, 25]"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-tran-desc">Transaction description</label>
+                        <textarea class="form-control" placeholder="Transaction description" rows="2" id="new-tran-desc"
+                                  style="resize:none"
+                                  data-parsley-length="[0, 60]"></textarea>
+                    </div>
+
+                    <fieldset>
+                        <legend>Settings</legend>
+                        <div class="form-group row">
+                            <label for="select-dr" class="col-sm-2">Debit account</label>
+                            <div class="col-sm-10">
+                                <select class="selectpicker form-control" id="select-dr" data-live-search="true"
+                                        title="Choose one of the following...">
+                                    <optgroup label="Assets">
+                                        <option>Mustard</option>
+                                        <option>Ketchup</option>
+                                        <option>Relish</option>
+                                    </optgroup>
+                                    <optgroup label="Liabilities">
+                                        <option>Tent</option>
+                                        <option>Flashlight</option>
+                                        <option>Toilet Paper</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="dr-account-desc" class="col-sm-2"></label>
+                            <div class="col-sm-10">
+                            <textarea readonly="readonly" class="form-control" placeholder="Description.." rows="2"
+                                      id="dr-account-desc"
+                                      style="resize:none"
+                                      data-parsley-length="[0, 60]"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="select-cr" class="col-sm-2">Credit account</label>
+                            <div class="col-sm-10">
+                                <select class="selectpicker form-control" id="select-cr" data-live-search="true"
+                                        title="Choose one of the following...">
+                                    <optgroup label="Assets">
+                                        <option>Mustard</option>
+                                        <option>Ketchup</option>
+                                        <option>Relish</option>
+                                    </optgroup>
+                                    <optgroup label="Liabilities">
+                                        <option>Tent</option>
+                                        <option>Flashlight</option>
+                                        <option>Toilet Paper</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="cr-account-desc" class="col-sm-2"></label>
+                            <div class="col-sm-10">
+                            <textarea readonly="readonly" class="form-control" placeholder="Description.." rows="2"
+                                      id="cr-account-desc"
+                                      style="resize:none"
+                                      data-parsley-length="[0, 60]"></textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="btn-create-tran">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!--<footer data-th-include="footer :: content"></footer>-->
 
