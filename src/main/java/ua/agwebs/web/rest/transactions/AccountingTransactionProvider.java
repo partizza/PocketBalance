@@ -16,6 +16,9 @@ import ua.agwebs.web.rest.PermissionService;
 import javax.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 public class AccountingTransactionProvider implements AccountingTransactionService {
@@ -115,6 +118,21 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
             });
         } else {
             throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + dto.getBookId() + ", userId = " + userId);
+        }
+    }
+
+    @Override
+    public Map<String, List<AccountDTO>> getGroupedBalanceAccountsByBookId(long bookId, long userId) {
+        logger.debug("Get grouped balance accounts: bookId = {}, userId = {} ", bookId, userId);
+        if (permissionService.checkPermission(bookId, userId)) {
+            BalanceBook book = coaService.findBalanceBookById(bookId);
+            Map<String, List<AccountDTO>> accountsByCategories = book.getAccounts()
+                    .stream()
+                    .collect(groupingBy(e -> e.getBsCategory().toString(),
+                            collectingAndThen(toList(), l -> l.stream().sorted((e1,e2) -> e1.getName().compareTo(e2.getName())).collect(mapping(e -> mapper.map(e,AccountDTO.class),toList())))));
+            return accountsByCategories;
+        } else {
+            throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + bookId + ", userId = " + userId);
         }
     }
 }

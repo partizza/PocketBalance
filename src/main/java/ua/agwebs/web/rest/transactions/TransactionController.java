@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.agwebs.security.AppUserDetails;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = {"/data/transaction"})
@@ -29,8 +30,16 @@ public class TransactionController {
 
     @DeleteMapping(value = "/{tranId}")
     public ResponseEntity<String> deleteTransaction(@PathVariable("tranId") long tranId,
-                                                    @AuthenticationPrincipal AppUserDetails appUserDetails){
+                                                    @AuthenticationPrincipal AppUserDetails appUserDetails) {
         transactionProvider.deleteTransactionById(tranId, appUserDetails.getId());
         return new ResponseEntity<String>(HttpStatus.OK);
     }
+
+    @GetMapping(value = "/book/{bookId}/accounts/all")
+    public ResponseEntity<Map<String, List<AccountDTO>>> getAllBalanceAccounts(@PathVariable("bookId") long bookId,
+                                                                               @AuthenticationPrincipal AppUserDetails appUserDetails) {
+        Map<String, List<AccountDTO>> accountsMap = transactionProvider.getGroupedBalanceAccountsByBookId(bookId, appUserDetails.getId());
+        return new ResponseEntity<Map<String, List<AccountDTO>>>(accountsMap, HttpStatus.OK);
+    }
+
 }

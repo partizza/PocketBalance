@@ -23,7 +23,7 @@ public class PermissionProvider implements PermissionService {
     public boolean checkPermission(long bookId, long userId) {
         logger.debug("Check permission: bookId = {}, userId = {}", bookId, userId);
         BalanceBook book = coaService.findBalanceBookById(bookId);
-        if (book.getAppUser().getId() == userId) {
+        if (book != null && book.getAppUser().getId() == userId) {
             logger.debug("Access allowed: bookId = {}, userId = {}", bookId, userId);
             return true;
         } else {

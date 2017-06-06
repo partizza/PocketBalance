@@ -5,6 +5,7 @@ $(document).ready(function () {
 
     initTransactionsDataTable();
     initDetailsDataTable();
+    initModalBalanceAccountsSelectors();
 
 });
 
@@ -104,6 +105,74 @@ function initDetailsDataTable() {
             {"data": "accountBsCategory"}
         ]
     });
+}
+
+function initModalBalanceAccountsSelectors() {
+
+    $.ajax({
+        type: 'GET',
+        url: '../data/user/details',
+        dataType: 'json',
+        success: function (data) {
+            $.ajax({
+                type: 'GET',
+                url: '/data/transaction/book/' + data.bookId + '/accounts/all',
+                dataType: 'json',
+                success: function (data) {
+
+                    if (data.hasOwnProperty('ASSET')) {
+                        var str = '<optgroup label="Assets">';
+                        for (var e in data.ASSET) {
+                            str = str + '<option val="' + data.ASSET[e].accId + '">' + data.ASSET[e].name + '</option>';
+                        }
+                        str += '</optgroup>';
+                        $(".selectpicker.new-tran").append(str);
+                    }
+
+                    if (data.hasOwnProperty('LIABILITY')) {
+                        var str = '<optgroup label="Liabilities">';
+                        for (var e in data.LIABILITY) {
+                            str = str + '<option val="' + data.LIABILITY[e].accId + '">' + data.LIABILITY[e].name + '</option>';
+                        }
+                        str += '</optgroup>';
+                        $(".selectpicker.new-tran").append(str);
+                    }
+
+                    if (data.hasOwnProperty('PROFIT')) {
+                        var str = '<optgroup label="Profit">';
+                        for (var e in data.PROFIT) {
+                            str = str + '<option val="' + data.PROFIT[e].accId + '">' + data.PROFIT[e].name + '</option>';
+                        }
+                        str += '</optgroup>';
+                        $(".selectpicker.new-tran").append(str);
+                    }
+
+                    if (data.hasOwnProperty('LOSS')) {
+                        var str = '<optgroup label="Loss">';
+                        for (var e in data.LOSS) {
+                            str = str + '<option val="' + data.LOSS[e].accId + '">' + data.LOSS[e].name + '</option>';
+                        }
+                        str += '</optgroup>';
+                        $(".selectpicker.new-tran").append(str);
+                    }
+
+                    if (data.hasOwnProperty('EQUITY')) {
+                        var str = '<optgroup label="Equity">';
+                        for (var e in data.EQUITY) {
+                            str = str + '<option val="' + data.EQUITY[e].accId + '">' + data.EQUITY[e].name + '</option>';
+                        }
+                        str += '</optgroup>';
+                        $(".selectpicker.new-tran").append(str);
+                    }
+
+                    $('.selectpicker.new-tran').selectpicker('refresh');
+
+                }
+            });
+
+        }
+    });
+
 }
 
 function showTransactionDetails() {

@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ua.agwebs.root.RootConfig;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.web.rest.accounts.BalanceAccountDTO;
+import ua.agwebs.web.rest.transactions.AccountDTO;
 import ua.agwebs.web.rest.transactions.TransactionDTO;
 import ua.agwebs.web.rest.transactions.TransactionDetailDTO;
 
@@ -38,6 +39,23 @@ public class DtoTests {
         assertEquals("Incorrect DTO object.", account.getName(), accountDTO.getName());
         assertEquals("Incorrect DTO object.", account.getDesc(), accountDTO.getDesc());
         assertEquals("Incorrect DTO object.", account.isEnable(), accountDTO.getEnable());
+        assertEquals("Incorrect DTO object.", account.getBook().getId(), accountDTO.getBookId());
+        assertEquals("Incorrect DTO object.", account.getBsCategory().name(), accountDTO.getBsCategory());
+    }
+
+    @Test
+    public void test_ModelMapper_AccountDTO() {
+        AppUser appUser = new AppUser("bf@u.com", "An", "Xe");
+        appUser.setId(999L);
+        BalanceBook book = new BalanceBook("book", "some book for testing", appUser);
+        book.setId(12L);
+        BalanceAccount account = new BalanceAccount(BSCategory.PROFIT, 1002L, book, "Cash", "Cash in walet");
+
+        AccountDTO accountDTO = mapper.map(account, AccountDTO.class);
+
+        assertEquals("Incorrect DTO object.", account.getAccId(), accountDTO.getAccId());
+        assertEquals("Incorrect DTO object.", account.getName(), accountDTO.getName());
+        assertEquals("Incorrect DTO object.", account.getDesc(), accountDTO.getDesc());
         assertEquals("Incorrect DTO object.", account.getBook().getId(), accountDTO.getBookId());
         assertEquals("Incorrect DTO object.", account.getBsCategory().name(), accountDTO.getBsCategory());
     }
