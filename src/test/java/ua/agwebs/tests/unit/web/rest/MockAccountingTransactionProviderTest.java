@@ -252,4 +252,16 @@ public class MockAccountingTransactionProviderTest {
         verify(transactionService, times(2)).deleteTransactionDetail(anyLong(), anyLong(), anyLong());
         verify(transactionService, times(2)).setTransactionDetail(any());
     }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_getGroupedBalanceAccounts_AccessDenied() {
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
+        accountingTransactionProvider.getGroupedBalanceAccountsByBookId(transaction.getBook().getId(), transaction.getBook().getAppUser().getId() + 1);
+    }
+
+    @Test
+    public void test_getGroupedBalanceAccounts() {
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
+        accountingTransactionProvider.getGroupedBalanceAccountsByBookId(transaction.getBook().getId(), transaction.getBook().getAppUser().getId());
+    }
 }
