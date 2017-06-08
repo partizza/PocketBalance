@@ -42,4 +42,13 @@ public class TransactionController {
         return new ResponseEntity<Map<String, List<AccountDTO>>>(accountsMap, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/book/{bookId}")
+    public ResponseEntity<String> createTransaction(@PathVariable("bookId") long bookId,
+                                                    @AuthenticationPrincipal AppUserDetails appUserDetails,
+                                                    @RequestBody TransactionDTO dto) {
+        dto.setBookId(bookId);
+        transactionProvider.createTransaction(dto, appUserDetails.getId());
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
 }

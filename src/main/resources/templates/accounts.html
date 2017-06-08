@@ -108,19 +108,19 @@
                     <div class="form-group">
                         <label for="new-account-name">Account name</label>
                         <input class="form-control" placeholder="Account name" type="text" id="new-account-name"
-                               required="required" data-parsley-length="[1, 25]"/>
+                               required="required" data-parsley-length="[1, 25]" maxlength="25"/>
                     </div>
                     <div class="form-group">
                         <label for="new-account-desc">Account description</label>
                         <textarea class="form-control" placeholder="Account description" rows="3" id="new-account-desc"
                                   style="resize:none"
-                                  data-parsley-length="[0, 60]"></textarea>
+                                  data-parsley-length="[0, 60]" maxlength="60"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="new-account-number">Account number</label>
                         <input class="form-control" placeholder="Account number" type="text" id="new-account-number"
                                required="required" data-parsley-type="integer" data-parsley-range="[1, 1000000000]"
-                               data-parsley-free-account-id=""/>
+                               data-parsley-free-account-id="" maxlength="10"/>
                     </div>
                     <div class="form-group">
                         <div class="checkbox">
@@ -168,19 +168,19 @@
                     <div class="form-group">
                         <label for="edit-account-name">Account name</label>
                         <input class="form-control" placeholder="Account name" type="text" id="edit-account-name"
-                               required="required" data-parsley-length="[1, 25]"/>
+                               required="required" data-parsley-length="[1, 25]" maxlength="25"/>
                     </div>
                     <div class="form-group">
                         <label for="edit-account-desc">Account description</label>
                         <textarea class="form-control" placeholder="Account description" rows="3" id="edit-account-desc"
                                   style="resize:none"
-                                  data-parsley-length="[0, 60]"></textarea>
+                                  data-parsley-length="[0, 60]" maxlength="60"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="edit-account-number">Account number</label>
                         <input class="form-control" placeholder="Account number" type="text" id="edit-account-number"
                                required="required" data-parsley-type="integer" data-parsley-range="[1, 1000000000]"
-                               data-parsley-exists-account-id=""/>
+                               data-parsley-exists-account-id="" maxlength="10"/>
                     </div>
                     <div class="form-group">
                         <div class="checkbox">

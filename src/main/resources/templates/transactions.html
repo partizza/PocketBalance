@@ -113,31 +113,31 @@
                     <div class="form-group">
                         <label for="new-tran-name">Transaction name</label>
                         <input class="form-control" placeholder="Transaction name" type="text" id="new-tran-name"
-                               required="required" data-parsley-length="[1, 25]"/>
+                               required="required" data-parsley-length="[1, 25]" maxlength="25"/>
                     </div>
                     <div class="form-group">
                         <label for="new-tran-desc">Transaction description</label>
                         <textarea class="form-control" placeholder="Transaction description" rows="3" id="new-tran-desc"
                                   style="resize:none"
-                                  data-parsley-length="[0, 60]"></textarea>
+                                  data-parsley-length="[0, 60]" maxlength="60"></textarea>
                     </div>
 
                     <fieldset>
                         <legend>Debit-Credit settings</legend>
                         <div class="form-group row">
-                            <label for="select-dr" class="col-sm-2">Debit</label>
+                            <label for="new-tran-select-dr" class="col-sm-2">Debit</label>
                             <div class="col-sm-10">
-                                <select class="selectpicker new-tran form-control" id="select-dr" data-live-search="true"
-                                        title="Choose one of the following...">
+                                <select class="selectpicker new-tran form-control" id="new-tran-select-dr" data-live-search="true"
+                                        title="Choose one of the following..." required="required">
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group row">
-                            <label for="select-cr" class="col-sm-2">Credit</label>
+                            <label for="new-tran-select-cr" class="col-sm-2">Credit</label>
                             <div class="col-sm-10">
-                                <select class="selectpicker new-tran form-control" id="select-cr" data-live-search="true"
-                                        title="Choose one of the following...">
+                                <select class="selectpicker new-tran form-control" id="new-tran-select-cr" data-live-search="true"
+                                        title="Choose one of the following..." required="required">
                                 </select>
                             </div>
                         </div>
