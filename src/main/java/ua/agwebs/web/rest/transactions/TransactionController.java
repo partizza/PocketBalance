@@ -51,4 +51,11 @@ public class TransactionController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{tranId}")
+    public ResponseEntity<String> updateTransaction(@AuthenticationPrincipal AppUserDetails appUserDetails,
+                                                    @RequestBody TransactionDTO dto) {
+        transactionProvider.updateTransaction(dto, appUserDetails.getId());
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
 }

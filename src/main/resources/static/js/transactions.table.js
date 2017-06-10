@@ -8,6 +8,16 @@ $(document).ready(function () {
     initModalBalanceAccountsSelectors();
 
     $('#btn-create-tran').click(createTransaction);
+    $('#btn-edit-tran').click(updateTransaction);
+
+    $("#new-tran-modal").on('hidden.bs.modal', function () {
+        $('#new-tran-select-dr').val('NA');
+        $('#new-tran-select-cr').val('NA');
+        $('#new-tran-select-dr').selectpicker('refresh');
+        $('#new-tran-select-cr').selectpicker('refresh');
+        $('#new-tran-name').val('');
+        $('#new-tran-desc').val('');
+    });
 
 });
 
@@ -44,7 +54,7 @@ function initTransactionsDataTable() {
                         "className": "text-center",
                         "width": "15%",
                         "data": null,
-                        "defaultContent": "<button class='btn btn-primary btn-xs edit'><i class='glyphicon glyphicon-edit'></i> Edit</button>"
+                        "defaultContent": "<button class='btn btn-primary btn-xs edit' data-toggle='modal' data-target='#edit-tran-modal'><i class='glyphicon glyphicon-edit'></i> Edit</button>"
                         + " "
                         + "<button class='btn btn-danger btn-xs remove'><i class='glyphicon glyphicon-remove'></i> Delete</button>"
                     }
@@ -67,7 +77,13 @@ function initTransactionsDataTable() {
 
                     $('#transactions-table tbody').on('click', 'button.edit', function () {
                         var data = generalTable.api().row($(this).parents('tr')).data();
-                        alert(data.name + " (id = " + data.id + ") " + " - will be processed (not implemented yet)");
+                        $('#edit-tran-id').val(data.id);
+                        $('#edit-tran-name').val(data.name);
+                        $('#edit-tran-desc').val(data.desc);
+                        $('#edit-tran-select-dr').val(data.details[0].entrySide === 'D' ? data.details[0].accountAccId : data.details[1].accountAccId);
+                        $('#edit-tran-select-cr').val(data.details[0].entrySide === 'C' ? data.details[0].accountAccId : data.details[1].accountAccId);
+                        $('#edit-tran-select-dr').selectpicker('refresh');
+                        $('#edit-tran-select-cr').selectpicker('refresh');
                     });
 
                     $('#transactions-table tbody').on('click', 'button.remove', function () {
@@ -128,7 +144,7 @@ function initModalBalanceAccountsSelectors() {
                             str = str + '<option value="' + data.ASSET[e].accId + '">' + data.ASSET[e].name + '</option>';
                         }
                         str += '</optgroup>';
-                        $(".selectpicker.new-tran").append(str);
+                        $(".selectpicker.tran").append(str);
                     }
 
                     if (data.hasOwnProperty('LIABILITY')) {
@@ -137,7 +153,7 @@ function initModalBalanceAccountsSelectors() {
                             str = str + '<option value="' + data.LIABILITY[e].accId + '">' + data.LIABILITY[e].name + '</option>';
                         }
                         str += '</optgroup>';
-                        $(".selectpicker.new-tran").append(str);
+                        $(".selectpicker.tran").append(str);
                     }
 
                     if (data.hasOwnProperty('PROFIT')) {
@@ -146,7 +162,7 @@ function initModalBalanceAccountsSelectors() {
                             str = str + '<option value="' + data.PROFIT[e].accId + '">' + data.PROFIT[e].name + '</option>';
                         }
                         str += '</optgroup>';
-                        $(".selectpicker.new-tran").append(str);
+                        $(".selectpicker.tran").append(str);
                     }
 
                     if (data.hasOwnProperty('LOSS')) {
@@ -155,7 +171,7 @@ function initModalBalanceAccountsSelectors() {
                             str = str + '<option value="' + data.LOSS[e].accId + '">' + data.LOSS[e].name + '</option>';
                         }
                         str += '</optgroup>';
-                        $(".selectpicker.new-tran").append(str);
+                        $(".selectpicker.tran").append(str);
                     }
 
                     if (data.hasOwnProperty('EQUITY')) {
@@ -164,10 +180,10 @@ function initModalBalanceAccountsSelectors() {
                             str = str + '<option value="' + data.EQUITY[e].accId + '">' + data.EQUITY[e].name + '</option>';
                         }
                         str += '</optgroup>';
-                        $(".selectpicker.new-tran").append(str);
+                        $(".selectpicker.tran").append(str);
                     }
 
-                    $('.selectpicker.new-tran').selectpicker('refresh');
+                    $('.selectpicker.tran').selectpicker('refresh');
 
                 }
             });
@@ -234,7 +250,7 @@ function createTransaction(event) {
             'desc': desc,
             'bookId': bookNumber,
             'details': [{'accountAccId': drId, 'entrySide': 'D'},
-                        {'accountAccId': crId, 'entrySide': 'C'}]
+                {'accountAccId': crId, 'entrySide': 'C'}]
         };
 
         $.ajax({
@@ -262,6 +278,54 @@ function createTransaction(event) {
                     '<div class="alert alert-danger alert-dismissable">' +
                     '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
                     '<strong>Error!</strong> Can not create a new transaction.' +
+                    '</div>' +
+                    '');
+            }
+        });
+    }
+}
+
+function updateTransaction() {
+    if ($('#form-edit-tran').parsley().validate()) {
+        var id = $("#edit-tran-id").val();
+        var name = $("#edit-tran-name").val();
+        var desc = $("#edit-tran-desc").val();
+        var drId = $("#edit-tran-select-dr").val();
+        var crId = $("#edit-tran-select-cr").val();
+
+        var dataObject = {
+              'id': id,
+            'name': name,
+            'desc': desc,
+         'details': [{'accountAccId': drId, 'entrySide': 'D'},
+                {'accountAccId': crId, 'entrySide': 'C'}]
+        };
+
+        $.ajax({
+            url: '/data/transaction/' + id,
+            type: 'PUT',
+            data: JSON.stringify(dataObject),
+            contentType: 'application/json',
+            success: function () {
+                $('#edit-tran-modal').modal('hide');
+                hideTransactionDetails();
+                generalTable.api().ajax.reload();
+
+                $('.table-message').append('' +
+                    '<div class="alert alert-success alert-dismissable">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
+                    '<strong>Success!</strong> Transaction has been updated.' +
+                    '</div>' +
+                    '');
+
+            },
+            error: function () {
+                $('#edit-tran-modal').modal('hide');
+
+                $('.table-message').append('' +
+                    '<div class="alert alert-danger alert-dismissable">' +
+                    '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
+                    '<strong>Error!</strong> Can not update a transaction.' +
                     '</div>' +
                     '');
             }

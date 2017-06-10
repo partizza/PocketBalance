@@ -6,11 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.ActiveProfiles;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.BusinessTransactionService;
 import ua.agwebs.root.service.CoaService;
@@ -186,51 +181,46 @@ public class MockAccountingTransactionProviderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_SetTransactionDetails_NullDto() {
-        accountingTransactionProvider.setTransactionDetails(null, transaction.getBook().getAppUser().getId());
+    public void test_updateTransaction_NullDto() {
+        accountingTransactionProvider.updateTransaction(null, transaction.getBook().getAppUser().getId());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_SetTransactionDetails_NullBookId() {
-        TransactionDTO dto = new TransactionDTO();
-        accountingTransactionProvider.setTransactionDetails(dto, transaction.getBook().getAppUser().getId());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_SetTransactionDetails_NullDetails() {
+    public void test_updateTransaction_NullDetails() {
         TransactionDTO dto = new TransactionDTO();
         dto.setBookId(transaction.getBook().getId());
         dto.setDetails(null);
-        accountingTransactionProvider.setTransactionDetails(dto, transaction.getBook().getAppUser().getId());
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_SetTransactionDetails_EmptyDetails() {
+    public void test_updateTransaction_EmptyDetails() {
         TransactionDTO dto = new TransactionDTO();
         dto.setBookId(transaction.getBook().getId());
-        accountingTransactionProvider.setTransactionDetails(dto, transaction.getBook().getAppUser().getId());
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void test_SetTransactionDetails_MissedDetails() {
+    public void test_updateTransaction_MissedDetails() {
         TransactionDTO dto = new TransactionDTO();
         dto.setBookId(transaction.getBook().getId());
         transaction.getDetails().stream().limit(1).forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
-        accountingTransactionProvider.setTransactionDetails(dto, transaction.getBook().getAppUser().getId());
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
     }
 
     @Test(expected = PocketBalanceIllegalAccessException.class)
-    public void test_SetTransactionDetails_AccessDenied() {
+    public void test_updateTransaction_AccessDenied() {
         TransactionDTO dto = new TransactionDTO();
-        dto.setBookId(transaction.getBook().getId());
+        dto.setId(transaction.getId());
         transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
 
+        when(transactionService.findTransactionById(dto.getId())).thenReturn(transaction);
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
-        accountingTransactionProvider.setTransactionDetails(dto, transaction.getBook().getAppUser().getId() + 1);
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId() + 1);
     }
 
     @Test
-    public void test_SetTransactionDetails() {
+    public void test_updateTransaction() {
         TransactionDTO dto = new TransactionDTO();
         dto.setId(transaction.getId());
         dto.setName(transaction.getName());
@@ -240,13 +230,14 @@ public class MockAccountingTransactionProviderTest {
 
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
         when(transactionService.findTransactionById(dto.getId())).thenReturn(transaction);
+        when(transactionService.updateTransaction(any(Transaction.class))).thenReturn(transaction);
         doNothing().when(transactionService).deleteTransactionDetail(transaction.getId(), accCt.getAccId(), transaction.getBook().getId());
         doNothing().when(transactionService).deleteTransactionDetail(transaction.getId(), accDt.getAccId(), transaction.getBook().getId());
         when(coaService.findBalanceAccountById(transaction.getBook().getId(), accCt.getAccId())).thenReturn(accCt);
         when(coaService.findBalanceAccountById(transaction.getBook().getId(), accDt.getAccId())).thenReturn(accDt);
         when(transactionService.setTransactionDetail(any(TransactionDetail.class))).thenReturn(null);
 
-        accountingTransactionProvider.setTransactionDetails(dto, transaction.getBook().getAppUser().getId());
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
 
         verify(transactionService, times(1)).findTransactionById(anyLong());
         verify(transactionService, times(2)).deleteTransactionDetail(anyLong(), anyLong(), anyLong());

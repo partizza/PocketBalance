@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     $("#new-acc-modal").on('hidden.bs.modal', function () {
         $('#new-account-category').val('NA');
-        $('#new-account-category').selectpicker('refresh')
+        $('#new-account-category').selectpicker('refresh');
         $('#new-account-name').val('');
         $('#new-account-desc').val('');
         $('#new-account-number').val('');

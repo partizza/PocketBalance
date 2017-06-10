@@ -12,7 +12,7 @@ public interface AccountingTransactionService {
 
     void createTransaction(TransactionDTO dto, long userId);
 
-    void setTransactionDetails(TransactionDTO dto, long userId);
+    void updateTransaction(TransactionDTO dto, long userId);
 
     Map<String,List<AccountDTO>> getGroupedBalanceAccountsByBookId(long bookId, long userId);
 }

@@ -19,7 +19,7 @@ public class TransactionDetail implements Serializable {
     @Column(name = "TRAN_ID")
     private Long tranId;
 
-    @Valid
+//    @Valid
     @EnabledTransaction
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TRAN_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(name = "FK__TRAN_DET__TRAN"))
@@ -33,7 +33,7 @@ public class TransactionDetail implements Serializable {
     @Column(name = "BAL_BOOK_ID")
     private Long bookId;
 
-    @Valid
+//    @Valid
     @EnableBalanceAccount
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = {@JoinColumn(name = "COA_ID", insertable = false, updatable = false),
