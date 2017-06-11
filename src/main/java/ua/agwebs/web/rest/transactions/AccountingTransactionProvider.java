@@ -15,6 +15,7 @@ import ua.agwebs.web.rest.PermissionService;
 
 import javax.persistence.ManyToOne;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -82,10 +83,16 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
         Assert.notNull(dto.getBookId());
         Assert.notNull(dto.getDetails());
         Assert.isTrue(dto.getDetails().size() == 2);
+        Assert.isTrue(this.isTransactionType(dto.getType()));
 
         if (permissionService.checkPermission(dto.getBookId(), userId)) {
             BalanceBook book = coaService.findBalanceBookById(dto.getBookId());
-            Transaction tran = transactionService.createTransaction(new Transaction(dto.getName(), book, dto.getDesc()));
+            Transaction tran = transactionService.createTransaction(
+                    new Transaction(
+                            dto.getName(),
+                            book,
+                            dto.getDesc(),
+                            TransactionType.valueOf(dto.getType())));
 
             dto.getDetails().stream().forEach(e -> {
                 BalanceAccount account = coaService.findBalanceAccountById(book.getId(), e.getAccountAccId());
@@ -105,12 +112,14 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
         Assert.notNull(dto);
         Assert.notNull(dto.getDetails());
         Assert.isTrue(dto.getDetails().size() == 2);
+        Assert.isTrue(this.isTransactionType(dto.getType()));
 
         Transaction oldTran = transactionService.findTransactionById(dto.getId());
 
         if (permissionService.checkPermission(oldTran.getBook().getId(), userId)) {
             oldTran.setName(dto.getName());
             oldTran.setDesc(dto.getDesc());
+            oldTran.setType(TransactionType.valueOf(dto.getType()));
             Transaction tran = transactionService.updateTransaction(oldTran);
             tran.getDetails().stream().forEach(e -> transactionService.deleteTransactionDetail(tran.getId(), e.getCoaId(), e.getBookId()));
 
@@ -132,10 +141,14 @@ public class AccountingTransactionProvider implements AccountingTransactionServi
             Map<String, List<AccountDTO>> accountsByCategories = book.getAccounts()
                     .stream()
                     .collect(groupingBy(e -> e.getBsCategory().toString(),
-                            collectingAndThen(toList(), l -> l.stream().sorted((e1,e2) -> e1.getName().compareTo(e2.getName())).collect(mapping(e -> mapper.map(e,AccountDTO.class),toList())))));
+                            collectingAndThen(toList(), l -> l.stream().sorted((e1, e2) -> e1.getName().compareTo(e2.getName())).collect(mapping(e -> mapper.map(e, AccountDTO.class), toList())))));
             return accountsByCategories;
         } else {
             throw new PocketBalanceIllegalAccessException("Permission denied: bookId = " + bookId + ", userId = " + userId);
         }
+    }
+
+    private boolean isTransactionType(String string) {
+        return Arrays.stream(TransactionType.values()).anyMatch(e -> e.name().equals(string));
     }
 }

@@ -63,6 +63,7 @@
                         <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Type</th>
                             <th>Description</th>
                             <th hidden="true">Id</th>
                             <th>Action</th>
@@ -114,6 +115,27 @@
                         <label for="new-tran-name">Transaction name</label>
                         <input class="form-control" placeholder="Transaction name" type="text" id="new-tran-name"
                                required="required" data-parsley-length="[1, 25]" maxlength="25"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-tran-select-type">Type</label>
+                        <p>
+                            <select class="selectpicker" required="required" id="new-tran-select-type"
+                                    title="Choose one of the following...">
+                                <option value="CHILDREN">Children</option>
+                                <option value="ENTERTAINMENT">Entertainment</option>
+                                <option value="FOOD">Food</option>
+                                <option value="GIFTS">Gifts, Donations</option>
+                                <option value="HOUSING">Housing</option>
+                                <option value="INCOME">Income</option>
+                                <option value="INSURANCE">Insurance</option>
+                                <option value="LOAN">Loans</option>
+                                <option value="OTHER">Other</option>
+                                <option value="PERSONAL_CARE">Personal care</option>
+                                <option value="SAVINGS">Savings</option>
+                                <option value="TAXES">Taxes</option>
+                                <option value="TRANSPORT">Transport</option>
+                            </select>
+                        </p>
                     </div>
                     <div class="form-group">
                         <label for="new-tran-desc">Transaction description</label>
@@ -173,6 +195,27 @@
                         <label for="edit-tran-name">Transaction name</label>
                         <input class="form-control" placeholder="Transaction name" type="text" id="edit-tran-name"
                                required="required" data-parsley-length="[1, 25]" maxlength="25"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-tran-select-type">Type</label>
+                        <p>
+                            <select class="selectpicker" required="required" id="edit-tran-select-type"
+                                    title="Choose one of the following...">
+                                <option value="CHILDREN">Children</option>
+                                <option value="ENTERTAINMENT">Entertainment</option>
+                                <option value="FOOD">Food</option>
+                                <option value="GIFTS">Gifts, Donations</option>
+                                <option value="HOUSING">Housing</option>
+                                <option value="INCOME">Income</option>
+                                <option value="INSURANCE">Insurance</option>
+                                <option value="LOAN">Loans</option>
+                                <option value="OTHER">Other</option>
+                                <option value="PERSONAL_CARE">Personal care</option>
+                                <option value="SAVINGS">Savings</option>
+                                <option value="TAXES">Taxes</option>
+                                <option value="TRANSPORT">Transport</option>
+                            </select>
+                        </p>
                     </div>
                     <div class="form-group">
                         <label for="edit-tran-desc">Transaction description</label>
@@ -247,6 +290,7 @@
 
 <script src="/parsley/parsley.min.js"></script>
 
+<script src="/js/mapings.js"></script>
 <script src="/js/custom.js"></script>
 <script src="/js/transactions.table.js"></script>
 

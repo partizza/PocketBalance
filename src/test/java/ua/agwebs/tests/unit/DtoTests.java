@@ -86,6 +86,7 @@ public class DtoTests {
         assertEquals("Incorrect DTO object.", transaction.getDesc(), transactionDTO.getDesc());
         assertEquals("Incorrect DTO object.", transaction.getBook().getId(), transactionDTO.getBookId());
         assertEquals("Incorrect DTO object.", 2, transactionDTO.getDetails().size());
+        assertEquals("Incorrect DTO object.", transaction.getType().name(), transactionDTO.getType());
 
         TransactionDetailDTO detailCrDTO = mapper.map(detailCr, TransactionDetailDTO.class);
         assertTrue("Incorrect DTO object.", transactionDTO.getDetails().contains(detailCrDTO));

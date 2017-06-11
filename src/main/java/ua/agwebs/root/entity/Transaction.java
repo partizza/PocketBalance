@@ -38,6 +38,11 @@ public class Transaction implements Serializable {
     private String desc;
 
     @NotNull
+    @Column(name = "TRAN_TYPE", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private TransactionType type = TransactionType.OTHER;
+
+    @NotNull
     @Column(name = "TRAN_DEL", columnDefinition = "tinyint(1) default 0", nullable = false)
     private Boolean deleted = false;
 
@@ -57,9 +62,19 @@ public class Transaction implements Serializable {
         this.book = book;
     }
 
+    public Transaction(String name, BalanceBook book, TransactionType type){
+        this(name, book);
+        this.type = type;
+    }
+
     public Transaction(String name, BalanceBook book, String desc) {
         this(name, book);
         this.desc = desc;
+    }
+
+    public Transaction(String name, BalanceBook book, String desc, TransactionType type) {
+        this(name, book, desc);
+        this.type = type;
     }
 
     public Long getId() {
@@ -110,12 +125,21 @@ public class Transaction implements Serializable {
         this.details.add(detail);
     }
 
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "Transaction{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
+                ", type=" + type +
                 ", deleted=" + deleted +
                 ", book=" + book +
                 ", details=" + details +
@@ -132,6 +156,7 @@ public class Transaction implements Serializable {
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
+        if (type != that.type) return false;
         return deleted != null ? deleted.equals(that.deleted) : that.deleted == null;
 
     }
@@ -141,6 +166,7 @@ public class Transaction implements Serializable {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (deleted != null ? deleted.hashCode() : 0);
         return result;
     }

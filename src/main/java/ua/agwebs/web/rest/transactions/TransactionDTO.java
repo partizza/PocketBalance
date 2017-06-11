@@ -12,6 +12,8 @@ public class TransactionDTO {
 
     private String desc;
 
+    private String type;
+
     private Long bookId;
 
     private List<TransactionDetailDTO> details = new ArrayList<>();
@@ -60,12 +62,21 @@ public class TransactionDTO {
         this.details.add(detail);
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "TransactionDTO{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
+                ", type='" + type + '\'' +
                 ", bookId=" + bookId +
                 ", details=" + details +
                 '}';
@@ -81,6 +92,7 @@ public class TransactionDTO {
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (desc != null ? !desc.equals(that.desc) : that.desc != null) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (bookId != null ? !bookId.equals(that.bookId) : that.bookId != null) return false;
         return details != null ? details.equals(that.details) : that.details == null;
 
@@ -91,6 +103,7 @@ public class TransactionDTO {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (desc != null ? desc.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (bookId != null ? bookId.hashCode() : 0);
         result = 31 * result + (details != null ? details.hashCode() : 0);
         return result;

@@ -13,8 +13,10 @@ $(document).ready(function () {
     $("#new-tran-modal").on('hidden.bs.modal', function () {
         $('#new-tran-select-dr').val('NA');
         $('#new-tran-select-cr').val('NA');
+        $('#new-tran-select-type').val('NA');
         $('#new-tran-select-dr').selectpicker('refresh');
         $('#new-tran-select-cr').selectpicker('refresh');
+        $('#new-tran-select-type').selectpicker('refresh');
         $('#new-tran-name').val('');
         $('#new-tran-desc').val('');
     });
@@ -40,6 +42,14 @@ function initTransactionsDataTable() {
                     {
                         "className": "clickable",
                         "data": "name"
+                    },
+                    {
+                        "className": "clickable",
+                        "data": "type",
+                        "render": function (data, type, row) {
+                            return getTransactionTypeText(data);
+                        }
+
                     },
                     {
                         "className": "clickable",
@@ -82,6 +92,8 @@ function initTransactionsDataTable() {
                         $('#edit-tran-desc').val(data.desc);
                         $('#edit-tran-select-dr').val(data.details[0].entrySide === 'D' ? data.details[0].accountAccId : data.details[1].accountAccId);
                         $('#edit-tran-select-cr').val(data.details[0].entrySide === 'C' ? data.details[0].accountAccId : data.details[1].accountAccId);
+                        $('#edit-tran-select-type').val(data.type);
+                        $('#edit-tran-select-type').selectpicker('refresh');
                         $('#edit-tran-select-dr').selectpicker('refresh');
                         $('#edit-tran-select-cr').selectpicker('refresh');
                     });
@@ -242,6 +254,7 @@ function createTransaction(event) {
         var desc = $("#new-tran-desc").val();
         var drId = $("#new-tran-select-dr").val();
         var crId = $("#new-tran-select-cr").val();
+        var type = $("#new-tran-select-type").val();
 
         var bookNumber = sessionStorage.getItem("bookId");
 
@@ -249,6 +262,7 @@ function createTransaction(event) {
             'name': name,
             'desc': desc,
             'bookId': bookNumber,
+            'type': type,
             'details': [{'accountAccId': drId, 'entrySide': 'D'},
                 {'accountAccId': crId, 'entrySide': 'C'}]
         };
@@ -292,12 +306,14 @@ function updateTransaction() {
         var desc = $("#edit-tran-desc").val();
         var drId = $("#edit-tran-select-dr").val();
         var crId = $("#edit-tran-select-cr").val();
+        var type = $("#edit-tran-select-type").val();
 
         var dataObject = {
-              'id': id,
+            'id': id,
             'name': name,
             'desc': desc,
-         'details': [{'accountAccId': drId, 'entrySide': 'D'},
+            'type': type,
+            'details': [{'accountAccId': drId, 'entrySide': 'D'},
                 {'accountAccId': crId, 'entrySide': 'C'}]
         };
 

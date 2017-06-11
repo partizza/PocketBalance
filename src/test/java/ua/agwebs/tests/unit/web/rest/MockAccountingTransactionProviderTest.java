@@ -151,11 +151,32 @@ public class MockAccountingTransactionProviderTest {
         accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_NullType(){
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType(null);
+
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_CreateTransaction_IncorrectType(){
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType("blabla");
+
+        accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
     @Test(expected = PocketBalanceIllegalAccessException.class)
     public void test_CreateTransaction_AccessDenied() {
         TransactionDTO dto = new TransactionDTO();
         dto.setBookId(transaction.getBook().getId());
         transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType("OTHER");
 
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
         accountingTransactionProvider.createTransaction(dto, transaction.getBook().getAppUser().getId() + 1);
@@ -168,6 +189,7 @@ public class MockAccountingTransactionProviderTest {
         dto.setDesc("testing example");
         dto.setBookId(transaction.getBook().getId());
         transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType("OTHER");
 
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
         when(transactionService.createTransaction(new Transaction(dto.getName(), transaction.getBook(), dto.getDesc()))).thenReturn(transaction);
@@ -208,11 +230,30 @@ public class MockAccountingTransactionProviderTest {
         accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_updateTransaction_MissedType() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType(null);
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_updateTransaction_IncorectType() {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setBookId(transaction.getBook().getId());
+        transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType("blabla");
+        accountingTransactionProvider.updateTransaction(dto, transaction.getBook().getAppUser().getId());
+    }
+
     @Test(expected = PocketBalanceIllegalAccessException.class)
     public void test_updateTransaction_AccessDenied() {
         TransactionDTO dto = new TransactionDTO();
         dto.setId(transaction.getId());
         transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType("OTHER");
 
         when(transactionService.findTransactionById(dto.getId())).thenReturn(transaction);
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
@@ -227,6 +268,7 @@ public class MockAccountingTransactionProviderTest {
         dto.setDesc("testing example");
         dto.setBookId(transaction.getBook().getId());
         transaction.getDetails().stream().forEach(e -> dto.addDetails(mapper.map(e, TransactionDetailDTO.class)));
+        dto.setType("OTHER");
 
         when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(transaction.getBook());
         when(transactionService.findTransactionById(dto.getId())).thenReturn(transaction);

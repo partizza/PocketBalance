@@ -133,6 +133,11 @@ public class BusinessTransactionServiceTests {
         businessTransactionService.createTransaction(transaction);
     }
 
+    @Test(expected = ConstraintViolationException.class)
+    public void rejectCreate_Transaction_NullType() {
+        Transaction transaction = new Transaction("a tran", book, "", null);
+        businessTransactionService.createTransaction(transaction);
+    }
     // Update transaction
     // ** successfully
     @Test
