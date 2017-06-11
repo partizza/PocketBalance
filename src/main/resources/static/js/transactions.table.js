@@ -127,7 +127,6 @@ function initDetailsDataTable() {
         "searching": false,
         "columns": [
             {"data": "entrySide"},
-            {"data": "enable"},
             {"data": "accountName"},
             {"data": "accountDesc"},
             {"data": "accountAccId"},
