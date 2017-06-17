@@ -16,6 +16,11 @@ public class ViewController {
         return "dashboard";
     }
 
+    @RequestMapping(value = {"/accounting"})
+    public String getAccountingPage() {
+        return "accounting";
+    }
+
     @RequestMapping(value = "/setting/account")
     public String getSettingAccountView(){
         return "accounts";

@@ -24,7 +24,7 @@
             <ul class="nav">
                 <!-- Main menu -->
                 <li data-th-classappend="${#httpServletRequest.getRequestURI() == '/home' ? 'current':''}"><a href="/home"><i class="glyphicon glyphicon-home"></i> Dashboard</a></li>
-                <li><a href="#"><i class="glyphicon glyphicon-briefcase"></i> Business Transaction</a></li>
+                <li data-th-classappend="${#httpServletRequest.getRequestURI() == '/accounting' ? 'current':''}"><a href="/accounting"><i class="glyphicon glyphicon-briefcase"></i> Business Transaction</a></li>
                 <li><a href="#"><i class="glyphicon glyphicon-list-alt"></i> Balance sheet</a></li>
                 <li><a href="#"><i class="glyphicon glyphicon-usd"></i> Profit and Loss</a></li>
                 <li><a href="#"><i class="glyphicon glyphicon-stats"></i> Statistics</a></li>
