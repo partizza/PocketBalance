@@ -18,6 +18,10 @@ public interface EntryService {
     public EntryHeader createEntry(@EnabledBalanceBook @Valid BalanceBook book,
                                    @EntryAmountBalancing @Valid Set<EntryLine> entryLines);
 
+    public EntryHeader createEntry(@EnabledBalanceBook @Valid BalanceBook book,
+                                   @EntryAmountBalancing @Valid Set<EntryLine> entryLines,
+                                   String desc);
+
     public EntryHeader setStorno(long entryHeaderId, boolean value);
 
     public EntryHeader findEntryHeaderById(long id);

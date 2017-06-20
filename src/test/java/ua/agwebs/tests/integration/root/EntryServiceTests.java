@@ -24,7 +24,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-@DirtiesContext(classMode= DirtiesContext.ClassMode.BEFORE_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class EntryServiceTests {
 
     private static boolean setUpIsDone = false;
@@ -93,8 +93,44 @@ public class EntryServiceTests {
 
     }
 
+    @Test
+    public void create_Entry_WithDesc() {
+        Set<EntryLine> lines = new HashSet<>();
+        lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
+        lines.add(new EntryLine(2, ct, -1000L, EntrySide.C, uah));
+        lines.add(new EntryLine(3, dt, 2000L, EntrySide.D, usd));
+        lines.add(new EntryLine(4, ct, -2000L, EntrySide.C, usd));
+
+        String desc = "some desc";
+        EntryHeader header = entryService.createEntry(book, lines, desc);
+
+        assertEquals("Incorrect created entry.", book.getId(), header.getBook().getId());
+        assertEquals("Incorrect created entry.", lines.size(), header.getLines().size());
+        assertEquals("Incorrect created entry.", desc, header.getDesc());
+
+        for (EntryLine e : lines) {
+            EntryLine ln = lineRepo.findOne(new EntryLineId(e.getLineId(), header.getId()));
+            assertNotNull(ln);
+            assertEquals("Incorrect created entry.", e.getCurrency().getId(), ln.getCurrency().getId());
+            assertEquals("Incorrect created entry.", e.getType(), ln.getType());
+            assertEquals("Incorrect created entry.", e.getTrnAmount(), ln.getTrnAmount());
+        }
+
+    }
+
     // Create Entry
     // ** rejected
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectCreate_Entry_DescLength() {
+        Set<EntryLine> lines = new HashSet<>();
+        lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
+        lines.add(new EntryLine(2, ct, -1000L, EntrySide.C, uah));
+        lines.add(new EntryLine(3, dt, 2000L, EntrySide.D, usd));
+        lines.add(new EntryLine(4, ct, -2000L, EntrySide.C, usd));
+
+        EntryHeader header = entryService.createEntry(book, lines, "0123456789012345678901234567890123456789012345678901234567891");
+    }
+
     @Test(expected = ConstraintViolationException.class)
     public void rejectCreate_Entry_NullBook() {
         Set<EntryLine> lines = new HashSet<>();

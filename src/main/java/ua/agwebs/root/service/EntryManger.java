@@ -14,6 +14,7 @@ import ua.agwebs.root.entity.EntryLine;
 import ua.agwebs.root.repo.CurrencyRepository;
 import ua.agwebs.root.repo.EntryHeaderRepository;
 import ua.agwebs.root.repo.EntryLineRepository;
+import ua.agwebs.root.validator.EnabledBalanceBook;
 import ua.agwebs.root.validator.EntryAmountBalancing;
 
 import javax.validation.Valid;
@@ -37,8 +38,15 @@ public class EntryManger implements EntryService {
     @Transactional
     @Override
     public EntryHeader createEntry(BalanceBook book, Set<EntryLine> entryLines) {
+        return this.createEntry(book, entryLines, "");
+    }
+
+    @Override
+    public EntryHeader createEntry(@EnabledBalanceBook @Valid BalanceBook book, @EntryAmountBalancing @Valid Set<EntryLine> entryLines, String desc) {
         logger.info("Create new entry.");
-        logger.debug("Passed parameters: book = {}, entry lines = {}", book, entryLines);
+        logger.debug("Passed parameters: book = {}, entry lines = {}, desc = {}", book, entryLines, desc);
+
+        Assert.isTrue(desc == null || desc.length() <= 60, "Entry description cannot have more than 60 characters.");
 
         Assert.notNull(book, "Balance book can't be null.");
 
@@ -49,7 +57,7 @@ public class EntryManger implements EntryService {
             Assert.isTrue(e.getAccount().getBook().getId() == book.getId(), "accounts is not in the balance book.");
         }
 
-        EntryHeader entryHeader = headerRepo.save(new EntryHeader(book));
+        EntryHeader entryHeader = headerRepo.save(new EntryHeader(book, desc));
         for (EntryLine e : entryLines) {
             e.setHeader(entryHeader);
             entryHeader.addLines(e);

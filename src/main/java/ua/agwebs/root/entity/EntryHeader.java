@@ -67,6 +67,11 @@ public class EntryHeader implements Serializable {
         this.book = book;
     }
 
+    public EntryHeader(BalanceBook book, String desc) {
+        this(book);
+        this.desc = desc;
+    }
+
     public Long getId() {
         return id;
     }
