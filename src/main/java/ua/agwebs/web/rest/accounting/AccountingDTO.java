@@ -1,12 +1,15 @@
 package ua.agwebs.web.rest.accounting;
 
 
+import java.time.LocalDate;
+
 public class AccountingDTO {
     private Long tranId;
     private Long bookId;
     private String desc;
     private Long amount;
     private Long currencyId;
+    private LocalDate valueDate;
 
     public Long getTranId() {
         return tranId;
@@ -48,5 +51,11 @@ public class AccountingDTO {
         this.currencyId = currencyId;
     }
 
+    public LocalDate getValueDate() {
+        return valueDate;
+    }
 
+    public void setValueDate(LocalDate valueDate) {
+        this.valueDate = valueDate;
+    }
 }

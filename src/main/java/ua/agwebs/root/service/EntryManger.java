@@ -42,6 +42,7 @@ public class EntryManger implements EntryService {
         return this.createEntry(book, entryLines, "", LocalDate.now());
     }
 
+    @Transactional
     @Override
     public EntryHeader createEntry(@EnabledBalanceBook @Valid BalanceBook book,
                                    @EntryAmountBalancing @Valid Set<EntryLine> entryLines,
