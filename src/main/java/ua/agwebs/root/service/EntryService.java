@@ -10,6 +10,7 @@ import ua.agwebs.root.validator.EnabledBalanceBook;
 import ua.agwebs.root.validator.EntryAmountBalancing;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Validated
@@ -20,7 +21,8 @@ public interface EntryService {
 
     public EntryHeader createEntry(@EnabledBalanceBook @Valid BalanceBook book,
                                    @EntryAmountBalancing @Valid Set<EntryLine> entryLines,
-                                   String desc);
+                                   String desc,
+                                   LocalDate valueDate);
 
     public EntryHeader setStorno(long entryHeaderId, boolean value);
 

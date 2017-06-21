@@ -15,6 +15,7 @@ import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
 
 import javax.validation.ConstraintViolationException;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -102,11 +103,13 @@ public class EntryServiceTests {
         lines.add(new EntryLine(4, ct, -2000L, EntrySide.C, usd));
 
         String desc = "some desc";
-        EntryHeader header = entryService.createEntry(book, lines, desc);
+        LocalDate valueDate = LocalDate.parse("2017-01-15");
+        EntryHeader header = entryService.createEntry(book, lines, desc, valueDate);
 
         assertEquals("Incorrect created entry.", book.getId(), header.getBook().getId());
         assertEquals("Incorrect created entry.", lines.size(), header.getLines().size());
         assertEquals("Incorrect created entry.", desc, header.getDesc());
+        assertEquals("Incorrect created entry", valueDate, header.getValueDate());
 
         for (EntryLine e : lines) {
             EntryLine ln = lineRepo.findOne(new EntryLineId(e.getLineId(), header.getId()));
@@ -121,6 +124,17 @@ public class EntryServiceTests {
     // Create Entry
     // ** rejected
     @Test(expected = IllegalArgumentException.class)
+    public void rejectCreate_Entry_NullValueDate() {
+        Set<EntryLine> lines = new HashSet<>();
+        lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
+        lines.add(new EntryLine(2, ct, -1000L, EntrySide.C, uah));
+        lines.add(new EntryLine(3, dt, 2000L, EntrySide.D, usd));
+        lines.add(new EntryLine(4, ct, -2000L, EntrySide.C, usd));
+
+        EntryHeader header = entryService.createEntry(book, lines, "some comment", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void rejectCreate_Entry_DescLength() {
         Set<EntryLine> lines = new HashSet<>();
         lines.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
@@ -128,7 +142,7 @@ public class EntryServiceTests {
         lines.add(new EntryLine(3, dt, 2000L, EntrySide.D, usd));
         lines.add(new EntryLine(4, ct, -2000L, EntrySide.C, usd));
 
-        EntryHeader header = entryService.createEntry(book, lines, "0123456789012345678901234567890123456789012345678901234567891");
+        EntryHeader header = entryService.createEntry(book, lines, "0123456789012345678901234567890123456789012345678901234567891", LocalDate.now());
     }
 
     @Test(expected = ConstraintViolationException.class)
