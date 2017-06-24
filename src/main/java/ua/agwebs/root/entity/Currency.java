@@ -32,6 +32,14 @@ public class Currency implements Serializable {
     @OneToMany(mappedBy = "currency")
     private Set<EntryLine> entryLines = new HashSet<>();
 
+    public Currency(){};
+
+    public Currency(long id, String code, String name){
+        this.id = id;
+        this.code = code;
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
