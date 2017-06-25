@@ -1,7 +1,113 @@
-class TransactionForm extends React.Component {
+class CurrencySelect extends React.Component {
+
+    componentDidMount() {
+        $('#currency-select').selectpicker();
+    }
+
+
     render() {
         return (
-            <div className="col-md-9 text-center">Under developing...</div>
+            <select className="selectpicker form-control" id="currency-select"
+                    data-live-search="true"
+                    title="Choose one of the following..." required="required">
+            </select>
+        );
+    }
+}
+
+class TransactionSelect extends React.Component {
+
+    componentDidMount() {
+        $('#tran-select').selectpicker();
+    }
+
+
+    render() {
+        return (
+            <select className="selectpicker form-control" id="tran-select"
+                    data-live-search="true"
+                    title="Choose one of the following..." required="required">
+            </select>
+        );
+    }
+}
+
+class ValueDatePicker extends React.Component {
+
+    componentDidMount() {
+        $('#value-datepicker').datetimepicker({
+            format: 'll',
+            defaultDate: new Date()
+        });
+
+        $('.open-value-datepicker').click(function (event) {
+            event.preventDefault();
+            $('#value-datepicker').click();
+        });
+    }
+
+    render() {
+        return (
+            <div className='input-group date'>
+                <input type='text' className="form-control" id='value-datepicker'/>
+                <label className="input-group-addon btn" htmlFor="value-datepicker">
+                    <span className="glyphicon glyphicon-calendar open-value-datepicker"></span>
+                </label>
+            </div>
+        );
+    }
+}
+
+class TransactionForm extends React.Component {
+    componentDidMount() {
+        $('#value-date').datetimepicker();
+    }
+
+    render() {
+        return (
+            <div className="col-md-9">
+                <div className="content-box-large col-md-6 col-md-offset-3">
+                    <div className="panel-heading">
+                        <div className="panel-title">Transaction</div>
+                    </div>
+                    <div className="panel-body">
+                        <form action="">
+                            <fieldset>
+                                <div className="form-group">
+                                    <label>Transaction</label>
+                                    <br/>
+                                    <TransactionSelect/>
+                                </div>
+                                <div className="form-group">
+                                    <label>Value date</label>
+                                    <ValueDatePicker/>
+                                </div>
+                                <div className="form-group">
+                                    <label>Currency</label>
+                                    <br/>
+                                    <CurrencySelect/>
+                                </div>
+                                <div className="form-group">
+                                    <label for="new-account-number">Amount</label>
+                                    <input className="form-control" type="text" id="tran-amount"
+                                           required="required" dmaxLength="10"/>
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label>Comment</label>
+                                    <textarea className="form-control" placeholder="Textarea" rows="3"
+                                              maxLength="60" style={{resize: 'none'}}></textarea>
+                                </div>
+                            </fieldset>
+                            <div>
+                                <div className="btn btn-primary pull-right">
+                                    Commit
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         );
     }
 }
@@ -13,7 +119,7 @@ class Category extends React.Component {
             return (
                 <a href="#" className={this.getClassMin()} role="button" onClick={this.props.onCategoryClick}>
                     <span>
-                        <img src={this.props.imgSrc} className="img-responsive" alt={this.props.txt} />
+                        <img src={this.props.imgSrc} className="img-responsive" alt={this.props.txt}/>
                     </span>
                 </a>
             );
