@@ -64,12 +64,15 @@ class TransactionForm extends React.Component {
     }
 
     render() {
+        const title = getTransactionTypeText(this.props.actCategoryKey);
         return (
             <div className="col-md-9">
                 <div className="content-box-large col-md-6 col-md-offset-3">
                     <div className="panel-heading">
-                        <div className="panel-title">Transaction</div>
+                        <div className="panel-title"><h2>{title}</h2></div>
                     </div>
+                    <br/>
+                    <hr/>
                     <div className="panel-body">
                         <form action="">
                             <fieldset>
@@ -88,9 +91,9 @@ class TransactionForm extends React.Component {
                                     <CurrencySelect/>
                                 </div>
                                 <div className="form-group">
-                                    <label for="new-account-number">Amount</label>
+                                    <label>Amount</label>
                                     <input className="form-control" type="text" id="tran-amount"
-                                           required="required" dmaxLength="10"/>
+                                           required="required" maxLength="10"/>
                                 </div>
                                 
                                 <div className="form-group">
@@ -117,7 +120,8 @@ class Category extends React.Component {
         const isMin = this.props.isMin;
         if (isMin) {
             return (
-                <a href="#" className={this.getClassMin()} role="button" onClick={this.props.onCategoryClick}>
+                <a href="#" className={this.getClassMin()} role="button" id={getTransactionTypeKey(this.props.txt)}
+                   onClick={() => this.props.onCategoryClick(getTransactionTypeKey(this.props.txt))}>
                     <span>
                         <img src={this.props.imgSrc} className="img-responsive" alt={this.props.txt}/>
                     </span>
@@ -125,7 +129,8 @@ class Category extends React.Component {
             );
         } else {
             return (
-                <a href="#" className={this.getClassMax()} role="button" onClick={this.props.onCategoryClick}>
+                <a href="#" className={this.getClassMax()} role="button" id={getTransactionTypeKey(this.props.txt)}
+                   onClick={() => this.props.onCategoryClick(getTransactionTypeKey(this.props.txt))}>
                 <span>
                     <img src={this.props.imgSrc}/>
                 </span>
@@ -217,7 +222,7 @@ class AccountingPanel extends React.Component {
         if (this.state.isActive) {
             return (
                 <div className="row">
-                    <TransactionForm/>
+                    <TransactionForm actCategoryKey={this.state.actCategoryKey}/>
                     <CategoryList isMin={this.state.isActive} onCategoryClick={this.handleCategoryClick}/>
                 </div>
             );
@@ -230,9 +235,13 @@ class AccountingPanel extends React.Component {
         }
     }
 
-    handleCategoryClick() {
+    handleCategoryClick(key) {
+        // const key = event.target.getAttribute('id');
+
         this.setState({
-            isActive: true
+            isActive: true,
+            // actCategoryKey: event.target.getAttribute('id')
+            actCategoryKey: key
         });
     }
 }
