@@ -2,6 +2,7 @@ class CurrencySelect extends React.Component {
 
     componentDidMount() {
         $('#currency-select').selectpicker();
+        this.setItems();
     }
 
 
@@ -12,6 +13,22 @@ class CurrencySelect extends React.Component {
                     title="Choose one of the following..." required="required">
             </select>
         );
+    }
+
+    setItems() {
+        $.ajax({
+            type: 'GET',
+            url: '/data/accounting/currency/all',
+            dataType: 'json',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    $("#currency-select").append('<option value="' + data[i].id + '">' + data[i].code + ' (' + data[i].name + ')' + '</option>');
+                }
+                $("#currency-select").selectpicker("refresh");
+            },
+            error: function () {
+            }
+        });
     }
 }
 
@@ -95,7 +112,7 @@ class TransactionForm extends React.Component {
                                     <input className="form-control" type="text" id="tran-amount"
                                            required="required" maxLength="10"/>
                                 </div>
-                                
+
                                 <div className="form-group">
                                     <label>Comment</label>
                                     <textarea className="form-control" placeholder="Textarea" rows="3"
