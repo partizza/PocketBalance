@@ -4,6 +4,8 @@ package ua.agwebs.root.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -100,5 +102,13 @@ public class EntryManger implements EntryService {
     public Currency findCurrencyById(long id) {
         logger.info("Select currency by id: {}", id);
         return currencyRepo.findOne(id);
+    }
+
+    @Override
+    public Page<Currency> findAllCurrency(Pageable pageable) {
+        logger.info("Select currency");
+        logger.debug("Passed parameters: pageable = {}", pageable);
+
+        return currencyRepo.findAll(pageable);
     }
 }

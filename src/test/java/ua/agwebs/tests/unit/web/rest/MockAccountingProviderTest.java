@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.BusinessTransactionService;
 import ua.agwebs.root.service.CoaService;
@@ -15,11 +17,15 @@ import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.accounting.AccountingDTO;
 import ua.agwebs.web.rest.accounting.AccountingProvider;
 import ua.agwebs.web.rest.accounting.AccountingService;
+import ua.agwebs.web.rest.accounting.CurrencyDTO;
 import ua.agwebs.web.rest.transactions.AccountDTO;
 import ua.agwebs.web.rest.transactions.AccountingTransactionProvider;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.eq;
@@ -36,6 +42,8 @@ public class MockAccountingProviderTest {
 
     @Mock
     private BusinessTransactionService transactionService;
+
+    private ModelMapper mapper = new ModelMapper();
 
     private PermissionService permissionService;
 
@@ -72,7 +80,7 @@ public class MockAccountingProviderTest {
         currency = new Currency(980, "UAH", "Hryvnya");
 
         permissionService = new PermissionProvider(coaService);
-        accountingService = new AccountingProvider(entryService, transactionService, permissionService);
+        accountingService = new AccountingProvider(entryService, transactionService, permissionService, mapper);
 
     }
 
@@ -92,5 +100,18 @@ public class MockAccountingProviderTest {
         when(entryService.createEntry(eq(book), anySetOf(EntryLine.class), eq(dto.getDesc()), eq(dto.getValueDate()))).thenReturn(null);
 
         accountingService.createEntry(dto, book.getAppUser().getId());
+    }
+
+    @Test
+    public void test_findAllCurrency(){
+        Page<Currency> pageResult = new PageImpl<Currency>(Arrays.asList(currency));
+        when(entryService.findAllCurrency(any())).thenReturn(pageResult);
+
+        List<CurrencyDTO> currencyDTOs = accountingService.findAllCurrency();
+
+        assertEquals("Incorrect result.", 1, currencyDTOs.size());
+        assertEquals("Incorrect result.", currency.getId(), currencyDTOs.get(0).getId());
+        assertEquals("Incorrect result.", currency.getName(), currencyDTOs.get(0).getName());
+        assertEquals("Incorrect result.", currency.getCode(), currencyDTOs.get(0).getCode());
     }
 }

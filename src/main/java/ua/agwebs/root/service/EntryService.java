@@ -1,6 +1,8 @@
 package ua.agwebs.root.service;
 
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.entity.Currency;
@@ -11,6 +13,7 @@ import ua.agwebs.root.validator.EntryAmountBalancing;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Validated
@@ -29,5 +32,7 @@ public interface EntryService {
     public EntryHeader findEntryHeaderById(long id);
 
     public Currency findCurrencyById(long id);
+
+    public Page<Currency> findAllCurrency(Pageable pageable);
 
 }

@@ -1,8 +1,12 @@
 package ua.agwebs.web.rest.accounting;
 
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -15,8 +19,10 @@ import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
 import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.transactions.AccountingTransactionProvider;
 
+import java.util.List;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Service
@@ -27,12 +33,17 @@ public class AccountingProvider implements AccountingService {
     private EntryService entryService;
     private BusinessTransactionService transactionService;
     private PermissionService permissionService;
+    private ModelMapper mapper;
 
     @Autowired
-    public AccountingProvider(EntryService entryService, BusinessTransactionService businessTransactionService, PermissionService permissionService) {
+    public AccountingProvider(EntryService entryService,
+                              BusinessTransactionService businessTransactionService,
+                              PermissionService permissionService,
+                              ModelMapper mapper) {
         this.entryService = entryService;
         this.transactionService = businessTransactionService;
         this.permissionService = permissionService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -63,5 +74,13 @@ public class AccountingProvider implements AccountingService {
         }else {
             throw new PocketBalanceIllegalAccessException("Creating entry - permission denied: bookId = " + dto.getBookId() + ", userId = " + userId);
         }
+    }
+
+    @Override
+    public List<CurrencyDTO> findAllCurrency() {
+        logger.info("Select all currency.");
+        Page<Currency> currencies = entryService.findAllCurrency(new PageRequest(0,9999999, Sort.Direction.DESC, "code"));
+        List<CurrencyDTO> currencyDTOs = currencies.getContent().stream().map(e -> mapper.map(e, CurrencyDTO.class)).collect(toList());
+        return currencyDTOs;
     }
 }
