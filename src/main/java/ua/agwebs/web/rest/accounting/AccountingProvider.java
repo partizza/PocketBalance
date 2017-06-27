@@ -7,18 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import ua.agwebs.root.entity.Currency;
 import ua.agwebs.root.entity.EntryLine;
 import ua.agwebs.root.entity.Transaction;
+import ua.agwebs.root.entity.TransactionType;
 import ua.agwebs.root.service.BusinessTransactionService;
 import ua.agwebs.root.service.EntryService;
 import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
 import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.transactions.AccountingTransactionProvider;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -57,7 +60,7 @@ public class AccountingProvider implements AccountingService {
         Assert.notNull(dto.getCurrencyId(), "Currency required.");
         Assert.notNull(dto.getValueDate(), "Entry value date required.");
 
-        if(permissionService.checkPermission(dto.getBookId(), userId)){
+        if (permissionService.checkPermission(dto.getBookId(), userId)) {
             Transaction tran = transactionService.findTransactionById(dto.getTranId());
             Currency currency = entryService.findCurrencyById(dto.getCurrencyId());
 
@@ -66,12 +69,12 @@ public class AccountingProvider implements AccountingService {
             }).collect(toSet());
 
             long ln = 1;
-            for(EntryLine e : entryLines){
+            for (EntryLine e : entryLines) {
                 e.setLineId(ln++);
             }
 
             entryService.createEntry(tran.getBook(), entryLines, dto.getDesc(), dto.getValueDate());
-        }else {
+        } else {
             throw new PocketBalanceIllegalAccessException("Creating entry - permission denied: bookId = " + dto.getBookId() + ", userId = " + userId);
         }
     }
@@ -79,8 +82,32 @@ public class AccountingProvider implements AccountingService {
     @Override
     public List<CurrencyDTO> findAllCurrency() {
         logger.info("Select all currency.");
-        Page<Currency> currencies = entryService.findAllCurrency(new PageRequest(0,9999999, Sort.Direction.DESC, "code"));
+        Page<Currency> currencies = entryService.findAllCurrency(new PageRequest(0, 9999999, Sort.Direction.DESC, "code"));
         List<CurrencyDTO> currencyDTOs = currencies.getContent().stream().map(e -> mapper.map(e, CurrencyDTO.class)).collect(toList());
         return currencyDTOs;
+    }
+
+    @Override
+    public List<AccountingTransactionDTO> findAllBookTransactionByType(long bookId, String type, long userId) {
+        logger.info("Select transaction by type and book.");
+
+        Assert.isTrue(isTransactionType(type));
+        if (permissionService.checkPermission(bookId, userId)) {
+            Page<Transaction> transactions
+                    = transactionService.findAllBookTransactionByType(bookId, TransactionType.valueOf(type), new PageRequest(0, 10_000, Sort.Direction.ASC, "name"));
+
+            List<AccountingTransactionDTO> transactionDTOs
+                    = transactions.getContent()
+                                    .stream()
+                                    .map(e -> mapper.map(e, AccountingTransactionDTO.class))
+                                    .collect(toList());
+            return transactionDTOs;
+        } else {
+            throw new PocketBalanceIllegalAccessException("Creating entry - permission denied: bookId = " + bookId + ", userId = " + userId);
+        }
+    }
+
+    private boolean isTransactionType(String string) {
+        return Arrays.stream(TransactionType.values()).anyMatch(e -> e.name().equals(string));
     }
 }

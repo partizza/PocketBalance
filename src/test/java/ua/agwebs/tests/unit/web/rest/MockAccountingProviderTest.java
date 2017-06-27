@@ -12,12 +12,10 @@ import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.BusinessTransactionService;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
+import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
 import ua.agwebs.web.rest.PermissionProvider;
 import ua.agwebs.web.rest.PermissionService;
-import ua.agwebs.web.rest.accounting.AccountingDTO;
-import ua.agwebs.web.rest.accounting.AccountingProvider;
-import ua.agwebs.web.rest.accounting.AccountingService;
-import ua.agwebs.web.rest.accounting.CurrencyDTO;
+import ua.agwebs.web.rest.accounting.*;
 import ua.agwebs.web.rest.transactions.AccountDTO;
 import ua.agwebs.web.rest.transactions.AccountingTransactionProvider;
 
@@ -26,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.eq;
@@ -103,7 +102,7 @@ public class MockAccountingProviderTest {
     }
 
     @Test
-    public void test_findAllCurrency(){
+    public void test_findAllCurrency() {
         Page<Currency> pageResult = new PageImpl<Currency>(Arrays.asList(currency));
         when(entryService.findAllCurrency(any())).thenReturn(pageResult);
 
@@ -113,5 +112,35 @@ public class MockAccountingProviderTest {
         assertEquals("Incorrect result.", currency.getId(), currencyDTOs.get(0).getId());
         assertEquals("Incorrect result.", currency.getName(), currencyDTOs.get(0).getName());
         assertEquals("Incorrect result.", currency.getCode(), currencyDTOs.get(0).getCode());
+    }
+
+    @Test
+    public void test_findAllBookTransactionByType() {
+        Page<Transaction> pageResult = new PageImpl<Transaction>(Arrays.asList(transaction));
+
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(book);
+        when(transactionService.findAllBookTransactionByType(
+                eq(transaction.getBook().getId()),
+                eq(transaction.getType()),
+                any())).thenReturn(pageResult);
+
+        List<AccountingTransactionDTO> result = accountingService.findAllBookTransactionByType(
+                transaction.getBook().getId(),
+                transaction.getType().toString(),
+                transaction.getBook().getAppUser().getId());
+        AccountingTransactionDTO expectedDTO = mapper.map(transaction, AccountingTransactionDTO.class);
+        assertTrue("Incorrect result.", result.contains(expectedDTO));
+
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_findAllBookTransactionByType_AccessDenied() {
+
+        when(coaService.findBalanceBookById(transaction.getBook().getId())).thenReturn(book);
+        List<AccountingTransactionDTO> result = accountingService.findAllBookTransactionByType(
+                transaction.getBook().getId(),
+                transaction.getType().toString(),
+                transaction.getBook().getAppUser().getId() + 1);
+
     }
 }

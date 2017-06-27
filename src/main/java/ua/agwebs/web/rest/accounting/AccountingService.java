@@ -9,4 +9,6 @@ public interface AccountingService {
 
     List<CurrencyDTO> findAllCurrency();
 
+    List<AccountingTransactionDTO> findAllBookTransactionByType(long bookId, String type, long userId);
+
 }
