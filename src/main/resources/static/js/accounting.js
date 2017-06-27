@@ -2,7 +2,7 @@ class CurrencySelect extends React.Component {
 
     componentDidMount() {
         $('#currency-select').selectpicker();
-        this.setItems();
+        this.setOptions();
     }
 
 
@@ -15,12 +15,13 @@ class CurrencySelect extends React.Component {
         );
     }
 
-    setItems() {
+    setOptions() {
         $.ajax({
             type: 'GET',
             url: '/data/accounting/currency/all',
             dataType: 'json',
             success: function (data) {
+                $("#currency-select").find('option').remove();
                 for (var i = 0; i < data.length; i++) {
                     $("#currency-select").append('<option value="' + data[i].id + '">' + data[i].code + ' (' + data[i].name + ')' + '</option>');
                 }
@@ -47,6 +48,8 @@ class TransactionSelect extends React.Component {
             </select>
         );
     }
+
+
 }
 
 class ValueDatePicker extends React.Component {
@@ -235,6 +238,10 @@ class AccountingPanel extends React.Component {
         this.handleCategoryClick = this.handleCategoryClick.bind(this);
     }
 
+    componentDidMount() {
+        alert("yep");
+    }
+
     render() {
         if (this.state.isActive) {
             return (
@@ -253,14 +260,32 @@ class AccountingPanel extends React.Component {
     }
 
     handleCategoryClick(key) {
-        // const key = event.target.getAttribute('id');
 
         this.setState({
             isActive: true,
-            // actCategoryKey: event.target.getAttribute('id')
             actCategoryKey: key
         });
+
+        setTransactionSelectOptions(key);
     }
+}
+
+function setTransactionSelectOptions(transactionTypeName) {
+    var bookId = sessionStorage.getItem("bookId");
+    $.ajax({
+        type: 'GET',
+        url: '/data/accounting/book/' + bookId + '/transaction/type/' + transactionTypeName,
+        dataType: 'json',
+        success: function (data) {
+            $("#tran-select").find('option').remove();
+            for (var i = 0; i < data.length; i++) {
+                $("#tran-select").append('<option value="' + data[i].id + '">' + data[i].name + '</option>');
+            }
+            $("#tran-select").selectpicker("refresh");
+        },
+        error: function () {
+        }
+    });
 }
 
 // ====================================================================

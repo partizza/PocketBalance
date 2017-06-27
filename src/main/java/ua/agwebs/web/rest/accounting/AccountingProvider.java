@@ -82,7 +82,7 @@ public class AccountingProvider implements AccountingService {
     @Override
     public List<CurrencyDTO> findAllCurrency() {
         logger.info("Select all currency.");
-        Page<Currency> currencies = entryService.findAllCurrency(new PageRequest(0, 9999999, Sort.Direction.DESC, "code"));
+        Page<Currency> currencies = entryService.findAllCurrency(new PageRequest(0, 9999999, Sort.Direction.ASC, "code"));
         List<CurrencyDTO> currencyDTOs = currencies.getContent().stream().map(e -> mapper.map(e, CurrencyDTO.class)).collect(toList());
         return currencyDTOs;
     }
