@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import ua.agwebs.root.entity.Transaction;
 import ua.agwebs.root.entity.TransactionDetail;
+import ua.agwebs.root.entity.TransactionType;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -30,4 +31,6 @@ public interface BusinessTransactionService {
     public List<Transaction> findAllTransactionByBookId(long bookId);
 
     public List<TransactionDetail> findAllTransactionDetail(long transactionId);
+
+    public Page<Transaction> findAllBookTransactionByType(long bookId, TransactionType type, Pageable pageable);
 }

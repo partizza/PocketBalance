@@ -395,7 +395,7 @@ public class BusinessTransactionServiceTests {
 
     }
 
-    // Select  transactions by nook id
+    // Select  transactions by book id
     @Test
     public void test_selectTransaction_byBookId(){
         Transaction first = businessTransactionService.createTransaction(new Transaction("first", book));
@@ -407,5 +407,19 @@ public class BusinessTransactionServiceTests {
         List<Transaction> result = businessTransactionService.findAllTransactionByBookId(book.getId());
         assertTrue("Incorrect select - value is missed.", result.contains(first));
         assertFalse("Incorrect select - deleted values received.", result.contains(second));
+    }
+
+    // select transaction by type and book
+    @Test
+    public void test_selectTransaction_byTypeAndBook(){
+        Transaction first = businessTransactionService.createTransaction(new Transaction("first", book, TransactionType.FOOD));
+        Transaction second = businessTransactionService.createTransaction(new Transaction("second", book, TransactionType.FOOD));
+
+        second.setDeleted(true);
+        businessTransactionService.deleteTransaction(second.getId());
+
+        Page<Transaction> result = businessTransactionService.findAllBookTransactionByType(book.getId(), TransactionType.FOOD, new PageRequest(0, 999999999));
+        assertTrue("Incorrect select - value is missed.", result.getContent().contains(first));
+        assertFalse("Incorrect select - deleted values received.", result.getContent().contains(second));
     }
 }

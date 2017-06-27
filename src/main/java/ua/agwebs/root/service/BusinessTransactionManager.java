@@ -141,7 +141,7 @@ public class BusinessTransactionManager implements BusinessTransactionService {
 
         Page<Transaction> page = tranRepo.findAll(specification, pageable);
 
-        logger.debug("Balance accounts selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
+        logger.debug("Transactions selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
                 page.getNumber(), page.getTotalPages(), page.getNumberOfElements(), page.getTotalElements());
         return page;
     }
@@ -182,5 +182,27 @@ public class BusinessTransactionManager implements BusinessTransactionService {
 
         logger.debug("Selected transactions by book id: count = {}", transactionList.size());
         return transactionList;
+    }
+
+    @Override
+    public Page<Transaction> findAllBookTransactionByType(long bookId, TransactionType type, Pageable pageable) {
+        logger.info("Select transactions by book and type.");
+        logger.debug("Passed parameters: bookId = {}, type = {}, pageable = {}", bookId, type, pageable);
+
+        Specification<Transaction> specification = new Specification<Transaction>() {
+            @Override
+            public Predicate toPredicate(Root<Transaction> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
+                Predicate predicate = cb.equal(root.get("deleted"), false);
+                predicate = cb.and(predicate, cb.equal(root.get("book").get("id"), bookId));
+                predicate = cb.and(predicate, cb.equal(root.get("type"), type));
+                return predicate;
+            }
+        };
+
+        Page<Transaction> pageResult = tranRepo.findAll(specification, pageable);
+
+        logger.debug("Transactions selected. Page {} from {}. Elements on this page {}. Total number of elements {}. ",
+                pageResult.getNumber(), pageResult.getTotalPages(), pageResult.getNumberOfElements(), pageResult.getTotalElements());
+        return pageResult;
     }
 }
