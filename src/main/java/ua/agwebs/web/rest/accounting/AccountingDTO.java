@@ -1,6 +1,8 @@
 package ua.agwebs.web.rest.accounting;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 
 public class AccountingDTO {
@@ -9,6 +11,8 @@ public class AccountingDTO {
     private String desc;
     private Long amount;
     private Long currencyId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate valueDate;
 
     public Long getTranId() {

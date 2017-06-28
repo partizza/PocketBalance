@@ -69,7 +69,8 @@ class ValueDatePicker extends React.Component {
     render() {
         return (
             <div className='input-group date'>
-                <input type='text' className="form-control" id='value-datepicker'/>
+                <input type='text' className="form-control" id='value-datepicker'
+                       required="required"/>
                 <label className="input-group-addon btn" htmlFor="value-datepicker">
                     <span className="glyphicon glyphicon-calendar open-value-datepicker"></span>
                 </label>
@@ -94,7 +95,7 @@ class TransactionForm extends React.Component {
                     <br/>
                     <hr/>
                     <div className="panel-body">
-                        <form action="">
+                        <form id="form-tran-commit">
                             <fieldset>
                                 <div className="form-group">
                                     <label>Transaction</label>
@@ -112,18 +113,21 @@ class TransactionForm extends React.Component {
                                 </div>
                                 <div className="form-group">
                                     <label>Amount</label>
-                                    <input className="form-control" type="text" id="tran-amount"
-                                           required="required" maxLength="10"/>
+                                    <input className="form-control" type="text" id="tran-amount" placeholder="0.00"
+                                           required="required" maxLength="14"
+                                           data-parsley-pattern = "\d{1,11}(?:.\d{1,2})?" data-parsley-pattern-message = "Incorrect number format (0.00)"/>
                                 </div>
 
                                 <div className="form-group">
                                     <label>Comment</label>
-                                    <textarea className="form-control" placeholder="Textarea" rows="3"
+                                    <textarea className="form-control" id="tran-desc"
+                                              placeholder="Textarea" rows="3"
                                               maxLength="60" style={{resize: 'none'}}></textarea>
                                 </div>
                             </fieldset>
                             <div>
-                                <div className="btn btn-primary pull-right">
+                                <div className="form-message"></div>
+                                <div className="btn btn-primary pull-right" onClick={() => this.onCommitTransaction()}>
                                     Commit
                                 </div>
                             </div>
@@ -132,6 +136,56 @@ class TransactionForm extends React.Component {
                 </div>
             </div>
         );
+    }
+
+    onCommitTransaction(){
+        if ($('#form-tran-commit').parsley().validate()) {
+            var tranId = $("#tran-select").val();
+            var valueDate = $("#value-datepicker").data("DateTimePicker").date().format('YYYY-MM-DD');
+            var currency = $("#currency-select").val();
+            var amount = $("#tran-amount").val();
+            var desc = $("#tran-desc").val();
+
+            var bookNumber = sessionStorage.getItem("bookId");
+
+            var dataObject = {
+                'tranId': tranId,
+                'bookId': bookNumber,
+                'desc': desc,
+                'amount': amount,
+                'currencyId': currency,
+                'valueDate': valueDate
+            };
+
+            $.ajax({
+                url: '/data/accounting/entity/book/' + bookNumber,
+                type: 'POST',
+                data: JSON.stringify(dataObject),
+                contentType: 'application/json',
+                success: function () {
+
+                    $('.form-message').html("");
+                    $('.form-message').append('' +
+                        '<div class="alert alert-success alert-dismissable">' +
+                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
+                        '<strong>Success!</strong>' +
+                        '</div>' +
+                        '');
+
+                },
+                error: function () {
+
+                    $('.form-message').html("");
+                    $('.form-message').append('' +
+                        '<div class="alert alert-danger alert-dismissable">' +
+                        '<a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>' +
+                        '<strong>Error!</strong> Can not commit.' +
+                        '</div>' +
+                        '');
+                }
+            });
+
+        }
     }
 }
 
@@ -239,7 +293,6 @@ class AccountingPanel extends React.Component {
     }
 
     componentDidMount() {
-        alert("yep");
     }
 
     render() {

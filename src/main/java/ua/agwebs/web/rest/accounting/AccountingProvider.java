@@ -11,10 +11,7 @@ import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import ua.agwebs.root.entity.Currency;
-import ua.agwebs.root.entity.EntryLine;
-import ua.agwebs.root.entity.Transaction;
-import ua.agwebs.root.entity.TransactionType;
+import ua.agwebs.root.entity.*;
 import ua.agwebs.root.service.BusinessTransactionService;
 import ua.agwebs.root.service.EntryService;
 import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
@@ -22,6 +19,7 @@ import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.transactions.AccountingTransactionProvider;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,13 +62,13 @@ public class AccountingProvider implements AccountingService {
             Transaction tran = transactionService.findTransactionById(dto.getTranId());
             Currency currency = entryService.findCurrencyById(dto.getCurrencyId());
 
-            Set<EntryLine> entryLines = tran.getDetails().stream().map(e -> {
-                return new EntryLine(-1, e.getAccount(), dto.getAmount(), e.getEntrySide(), currency);
-            }).collect(toSet());
-
             long ln = 1;
-            for (EntryLine e : entryLines) {
-                e.setLineId(ln++);
+            Set<EntryLine> entryLines = new HashSet<>();
+            for (TransactionDetail e : tran.getDetails()) {
+                long amt = e.getEntrySide() == EntrySide.D ? dto.getAmount() : -1 * dto.getAmount();
+                EntryLine line = new EntryLine(ln, e.getAccount(), amt, e.getEntrySide(), currency);
+                ln++;
+                entryLines.add(line);
             }
 
             entryService.createEntry(tran.getBook(), entryLines, dto.getDesc(), dto.getValueDate());
@@ -98,9 +96,9 @@ public class AccountingProvider implements AccountingService {
 
             List<AccountingTransactionDTO> transactionDTOs
                     = transactions.getContent()
-                                    .stream()
-                                    .map(e -> mapper.map(e, AccountingTransactionDTO.class))
-                                    .collect(toList());
+                    .stream()
+                    .map(e -> mapper.map(e, AccountingTransactionDTO.class))
+                    .collect(toList());
             return transactionDTOs;
         } else {
             throw new PocketBalanceIllegalAccessException("Creating entry - permission denied: bookId = " + bookId + ", userId = " + userId);
