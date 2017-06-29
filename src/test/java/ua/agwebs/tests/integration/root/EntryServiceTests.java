@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.agwebs.root.entity.*;
 import ua.agwebs.root.repo.EntryLineRepository;
+import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.service.AppUserService;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
@@ -17,10 +18,12 @@ import ua.agwebs.root.service.EntryService;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -67,6 +70,29 @@ public class EntryServiceTests {
 
             setUpIsDone = true;
         }
+    }
+
+    // calculate book balance
+    @Test
+    public void calc_BookBalance(){
+        BalanceBook book2 = coaService.createBalanceBook(new BalanceBook("t-book", "balance book test", appUser));
+        BalanceAccount dt2 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book2, "Cash"));
+        BalanceAccount ct2 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book2, "Income"));
+
+        Set<EntryLine> lines = new HashSet<>();
+        lines.add(new EntryLine(1, dt2, 1000L, EntrySide.D, uah));
+        lines.add(new EntryLine(2, ct2, -1000L, EntrySide.C, uah));
+        lines.add(new EntryLine(3, dt2, 2000L, EntrySide.D, usd));
+        lines.add(new EntryLine(4, ct2, -2000L, EntrySide.C, usd));
+
+        EntryHeader header = entryService.createEntry(book2, lines, "book balance test", LocalDate.parse("2020-12-31"));
+
+        List<ShortBalanceLine> result = entryService.getBookBalance(book2.getId(), LocalDate.parse("2020-12-31"));
+
+        assertTrue("Incorrect result in UAH on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), uah.getCode(), 1_000L)));
+        assertTrue("Incorrect result in UAH on Cr", result.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), uah.getCode(), -1_000L)));
+        assertTrue("Incorrect result in USD on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), usd.getCode(), 2_000L)));
+        assertTrue("Incorrect result in USD on Cr", result.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), usd.getCode(), -2_000L)));
     }
 
     // Create Entry

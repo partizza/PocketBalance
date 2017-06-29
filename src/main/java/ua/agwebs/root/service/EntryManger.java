@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -15,12 +16,14 @@ import ua.agwebs.root.entity.EntryHeader;
 import ua.agwebs.root.entity.EntryLine;
 import ua.agwebs.root.repo.CurrencyRepository;
 import ua.agwebs.root.repo.EntryHeaderRepository;
-import ua.agwebs.root.repo.EntryLineRepository;
+import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.validator.EnabledBalanceBook;
 import ua.agwebs.root.validator.EntryAmountBalancing;
 
+import javax.persistence.criteria.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -110,5 +113,15 @@ public class EntryManger implements EntryService {
         logger.debug("Passed parameters: pageable = {}", pageable);
 
         return currencyRepo.findAll(pageable);
+    }
+
+    @Override
+    public List<ShortBalanceLine> getBookBalance(long bookId, LocalDate reportDate) {
+        logger.info("Calculate book balance");
+        logger.debug("Passed parameters: bookId = {}, reportDate = {}", bookId, reportDate);
+
+        Assert.notNull(reportDate);
+
+        return headerRepo.calcBookBalance(bookId, reportDate);
     }
 }
