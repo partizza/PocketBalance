@@ -20,7 +20,8 @@ public interface EntryHeaderRepository extends JpaRepository<EntryHeader, Long>,
             "INNER JOIN ln.currency cur " +
             "WHERE bk.id = :bookId " +
             "AND hdr.valueDate <= :reportDate " +
-            "GROUP BY bk.id, acc.bsCategory, cur.code")
+            "GROUP BY bk.id, acc.bsCategory, cur.code " +
+            "HAVING SUM(ln.trnAmount) <> 0")
     public List<ShortBalanceLine> calcBookBalance(@Param("bookId") long bookId, @Param("reportDate") LocalDate reportDate);
 
 

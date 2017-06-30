@@ -21,9 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -79,20 +77,27 @@ public class EntryServiceTests {
         BalanceAccount dt2 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book2, "Cash"));
         BalanceAccount ct2 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book2, "Income"));
 
+        BalanceAccount dt3 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.LIABILITY, 3001L, book2, "Other"));
+
         Set<EntryLine> lines = new HashSet<>();
         lines.add(new EntryLine(1, dt2, 1000L, EntrySide.D, uah));
         lines.add(new EntryLine(2, ct2, -1000L, EntrySide.C, uah));
+
         lines.add(new EntryLine(3, dt2, 2000L, EntrySide.D, usd));
         lines.add(new EntryLine(4, ct2, -2000L, EntrySide.C, usd));
+
+        lines.add(new EntryLine(5, dt3, 1000L, EntrySide.D, uah));
+        lines.add(new EntryLine(6, dt2, -1000L, EntrySide.C, uah));
 
         EntryHeader header = entryService.createEntry(book2, lines, "book balance test", LocalDate.parse("2020-12-31"));
 
         List<ShortBalanceLine> result = entryService.getBookBalance(book2.getId(), LocalDate.parse("2020-12-31"));
 
-        assertTrue("Incorrect result in UAH on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), uah.getCode(), 1_000L)));
+        assertFalse("Incorrect result: only non-zero amount should be selected", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), uah.getCode(), 0L)));
         assertTrue("Incorrect result in UAH on Cr", result.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), uah.getCode(), -1_000L)));
         assertTrue("Incorrect result in USD on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), usd.getCode(), 2_000L)));
         assertTrue("Incorrect result in USD on Cr", result.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), usd.getCode(), -2_000L)));
+        assertTrue("Incorrect result in UAH on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt3.getBsCategory(), uah.getCode(), 1_000L)));
     }
 
     // Create Entry
