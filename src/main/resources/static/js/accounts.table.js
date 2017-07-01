@@ -90,7 +90,12 @@ function initAccountsDataTable() {
                     "dataSrc": ""
                 },
                 "columns": [
-                    {"data": "bsCategory"},
+                    {
+                        "data": "bsCategory",
+                        "render": function (data, type, row) {
+                            return getAccountCategoryText(data);
+                        }
+                    },
                     {"data": "name"},
                     {"data": "desc"},
                     {"data": "accId"},

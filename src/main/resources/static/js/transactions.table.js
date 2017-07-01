@@ -131,7 +131,12 @@ function initDetailsDataTable() {
             {"data": "accountDesc"},
             {"data": "accountAccId"},
             {"data": "accountEnable"},
-            {"data": "accountBsCategory"}
+            {
+                "data": "accountBsCategory",
+                "render": function (data, type, row) {
+                    return getAccountCategoryText(data);
+                }
+            }
         ]
     });
 }

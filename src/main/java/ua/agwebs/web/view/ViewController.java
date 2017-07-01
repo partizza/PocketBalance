@@ -21,6 +21,11 @@ public class ViewController {
         return "accounting";
     }
 
+    @RequestMapping(value = {"/balance"})
+    public String getBalancePage() {
+        return "balance";
+    }
+
     @RequestMapping(value = "/setting/account")
     public String getSettingAccountView(){
         return "accounts";
