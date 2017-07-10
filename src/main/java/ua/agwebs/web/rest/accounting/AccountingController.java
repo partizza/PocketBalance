@@ -38,8 +38,7 @@ public class AccountingController {
     @PostMapping("/entity/book/{bookId}")
     public ResponseEntity<String> createEntry(@PathVariable("bookId") long bookId,
                                               @AuthenticationPrincipal AppUserDetails appUserDetails,
-                                              @RequestBody AccountingDTO dto
-    ) {
+                                              @RequestBody AccountingDTO dto) {
 
         dto.setBookId(bookId);
         accountingService.createEntry(dto, appUserDetails.getId());

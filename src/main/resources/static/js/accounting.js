@@ -152,7 +152,7 @@ class TransactionForm extends React.Component {
                 'tranId': tranId,
                 'bookId': bookNumber,
                 'desc': desc,
-                'amount': amount,
+                'amount': amount * 100,
                 'currencyId': currency,
                 'valueDate': valueDate
             };
