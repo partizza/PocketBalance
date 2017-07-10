@@ -21,7 +21,7 @@ public class BookBalanceProvider implements BookBalanceService {
 
     private static Logger logger = LoggerFactory.getLogger(BookBalanceProvider.class);
 
-    private static DecimalFormat decimalFormat = new DecimalFormat("#,##0.00");
+    private static DecimalFormat decimalFormat = new DecimalFormat("0.00");
 
     private EntryService entryService;
     private PermissionService permissionService;
