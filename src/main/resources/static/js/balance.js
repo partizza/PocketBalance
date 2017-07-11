@@ -33,7 +33,7 @@ $(document).ready(function () {
     showBalance();
 });
 
-function showBalance(){
+function showBalance() {
     var bookNumber = sessionStorage.getItem("bookId");
 
     $.ajax({
@@ -41,6 +41,22 @@ function showBalance(){
         type: 'GET',
         dataType: 'json',
         success: function (data) {
+
+            data.columns.forEach(function (entry) {
+                if (entry.number) {
+                    entry.render = function (data, type, row) {
+                        return accounting.formatMoney(Number(data), {
+                            symbol: "",
+                            precision: 2,
+                            format: {
+                                pos: "%s %v",
+                                neg: "%s (%v)",
+                                zero: "%s  --"
+                            }
+                        });
+                    };
+                }
+            });
 
             $('.table.balance').DataTable({
                 paging: false,

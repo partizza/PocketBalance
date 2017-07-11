@@ -72,9 +72,9 @@ public class BookBalanceProvider implements BookBalanceService {
             });
 
             List<ColumnDefinition> columns = new ArrayList<>(Arrays.asList(
-                    new ColumnDefinition("#"),
-                    new ColumnDefinition("Article")));
-            currencySet.stream().forEach(e -> columns.add(new ColumnDefinition(e)));
+                    new ColumnDefinition("#", false),
+                    new ColumnDefinition("Article", false)));
+            currencySet.stream().forEach(e -> columns.add(new ColumnDefinition(e, true)));
             shortBal.setColumns(columns);
 
             return shortBal;

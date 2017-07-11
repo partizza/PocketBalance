@@ -75,10 +75,10 @@ public class MockBookBalanceProviderTest {
 
 
         List<ColumnDefinition> columns = new ArrayList<>(Arrays.asList(
-                new ColumnDefinition("#"),
-                new ColumnDefinition("Article"),
-                new ColumnDefinition("UAH"),
-                new ColumnDefinition("USD")
+                new ColumnDefinition("#", false),
+                new ColumnDefinition("Article", false),
+                new ColumnDefinition("UAH", true),
+                new ColumnDefinition("USD", true)
         ));
         Assert.assertTrue("Incorrect columns.", columns.equals(resultDTO.getColumns()));
 
