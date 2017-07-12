@@ -1,36 +1,66 @@
-var dataSet = [
-    ["1", "Assets", 107000.2, 20],
-    ["2", "Liabilities", 0, -20.05],
-    ["3", "Equity", 0, 0],
-    ["5", "Incomes", 8060, 0],
-    ["6", "Expenses", -7060.25, 0.0],
-];
 
-var columnMap = [
-    {title: "#"},
-    {title: "Article"},
-    {
-        title: "UAH",
-        render: $.fn.dataTable.render.number(',', '.', 2)
-    },
-    {
-        title: "USD",
-        render: $.fn.dataTable.render.number(',', '.', 2)
+class ButtonsPanel extends React.Component {
+    render() {
+        return (
+            <div className="navbar">
+                <div className="navbar-inner">
+                    <div className="container">
+                        <ul className="nav nav-pills">
+                            <li className={this.props.isShort ? "active" : ""}><a href="#">Short Balance</a></li>
+                            <li className={this.props.isShort ? "" : "active"}><a href="#">Balance</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
     }
-];
 
+}
+
+class BalanceSheet extends React.Component {
+
+    componentDidMount() {
+        showBalance();
+    }
+
+    render(){
+        return(
+            <div className="panel-body">
+                <table className="table table-striped balance"></table>
+            </div>
+        );
+    }
+}
+
+class BalancePanel extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            isShort: true
+        };
+    }
+
+    render() {
+        return (
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="content-box-large">
+                        <div className="row">
+                            <ButtonsPanel isShort={this.state.isShort}/>
+                        </div>
+                        <div className="row">
+                            <BalanceSheet/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+// ====================================================================
 $(document).ready(function () {
-    // $('.table.balance').DataTable({
-    //     paging: false,
-    //     info: false,
-    //     ordering: true,
-    //     searching: false,
-    //     select: true,
-    //     data: dataSet,
-    //     columns: columnMap
-    // });
-
-    showBalance();
+    ReactDOM.render(<BalancePanel />, document.getElementById("root"));
 });
 
 function showBalance() {
@@ -55,6 +85,13 @@ function showBalance() {
                             }
                         });
                     };
+                }
+
+                if (entry.title === 'Article') {
+                    entry.render = function (data, type, row) {
+                        return getAccountCategoryText(data);
+                    };
+
                 }
             });
 
