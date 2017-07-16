@@ -1,13 +1,19 @@
-
 class ButtonsPanel extends React.Component {
+    componentDidMount() {
+    }
+
     render() {
         return (
             <div className="navbar">
                 <div className="navbar-inner">
                     <div className="container">
                         <ul className="nav nav-pills">
-                            <li className={this.props.isShort ? "active" : ""}><a href="#">Short Balance</a></li>
-                            <li className={this.props.isShort ? "" : "active"}><a href="#">Balance</a></li>
+                            <li className={this.props.isShort ? "active" : ""}>
+                                <a href="#" onClick={() => this.props.onBalanceTypeClick(true)}>Short Balance</a>
+                            </li>
+                            <li className={this.props.isShort ? "" : "active"}>
+                                <a href="#" onClick={() => this.props.onBalanceTypeClick(false)}>Balance</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -20,11 +26,11 @@ class ButtonsPanel extends React.Component {
 class BalanceSheet extends React.Component {
 
     componentDidMount() {
-        showBalance();
+        initShortBalanceTbale();
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div className="panel-body">
                 <table className="table table-striped balance"></table>
             </div>
@@ -38,6 +44,11 @@ class BalancePanel extends React.Component {
         this.state = {
             isShort: true
         };
+
+        this.handleBalanceTypeClick = this.handleBalanceTypeClick.bind(this);
+    }
+
+    componentDidMount() {
     }
 
     render() {
@@ -46,7 +57,8 @@ class BalancePanel extends React.Component {
                 <div className="col-md-12">
                     <div className="content-box-large">
                         <div className="row">
-                            <ButtonsPanel isShort={this.state.isShort}/>
+                            <ButtonsPanel isShort={this.state.isShort}
+                                          onBalanceTypeClick={this.handleBalanceTypeClick}/>
                         </div>
                         <div className="row">
                             <BalanceSheet/>
@@ -56,6 +68,22 @@ class BalancePanel extends React.Component {
             </div>
         );
     }
+
+
+    handleBalanceTypeClick(setShort) {
+
+        this.setState({
+            isShort: setShort
+        });
+
+        if (setShort === true) {
+            initShortBalanceTbale();
+        } else {
+            $('.table.balance').dataTable().fnDestroy();
+            $('.table.balance').empty();
+            // add showFullBalance method
+        }
+    }
 }
 
 // ====================================================================
@@ -63,7 +91,7 @@ $(document).ready(function () {
     ReactDOM.render(<BalancePanel />, document.getElementById("root"));
 });
 
-function showBalance() {
+function initShortBalanceTbale() {
     var bookNumber = sessionStorage.getItem("bookId");
 
     $.ajax({
@@ -94,6 +122,12 @@ function showBalance() {
 
                 }
             });
+
+            // destroy and empty previous dataTable
+            if ($.fn.DataTable.isDataTable('.table.balance')) {
+                $('.table.balance').dataTable().fnDestroy();
+                $('.table.balance').empty();
+            }
 
             $('.table.balance').DataTable({
                 paging: false,
