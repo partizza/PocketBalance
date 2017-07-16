@@ -12,6 +12,7 @@ import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
+import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
 import ua.agwebs.web.rest.PermissionProvider;
 import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.balance.BalanceSheetDTO;
@@ -94,6 +95,20 @@ public class MockBookBalanceProviderTest {
             Assert.assertTrue("Incorrect balance line.", Arrays.equals(data.get(i), resultDTO.getData().get(i)));
         }
 
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_getShortBalance_AccessDenied() {
+        LocalDate reportDate = LocalDate.now();
+        when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
+
+        BalanceSheetDTO resultDTO = balanceService.getShortBookBalance(book.getId(), reportDate, book.getAppUser().getId() + 1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_getShortBalance_NullReportDate() {
+        when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
+        BalanceSheetDTO resultDTO = balanceService.getShortBookBalance(book.getId(), null, book.getAppUser().getId());
     }
 
 }
