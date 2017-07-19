@@ -8,6 +8,7 @@ import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.entity.Currency;
 import ua.agwebs.root.entity.EntryHeader;
 import ua.agwebs.root.entity.EntryLine;
+import ua.agwebs.root.repo.BalanceLine;
 import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.validator.EnabledBalanceBook;
 import ua.agwebs.root.validator.EntryAmountBalancing;
@@ -36,6 +37,8 @@ public interface EntryService {
 
     public Page<Currency> findAllCurrency(Pageable pageable);
 
-    public List<ShortBalanceLine> getBookBalance(long bookId, LocalDate reportDate);
+    public List<ShortBalanceLine> getShortBookBalance(long bookId, LocalDate reportDate);
+
+    public List<BalanceLine> getBookBalance(long bookId, LocalDate reportDate);
 
 }

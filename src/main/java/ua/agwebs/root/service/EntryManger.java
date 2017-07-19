@@ -14,6 +14,7 @@ import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.entity.Currency;
 import ua.agwebs.root.entity.EntryHeader;
 import ua.agwebs.root.entity.EntryLine;
+import ua.agwebs.root.repo.BalanceLine;
 import ua.agwebs.root.repo.CurrencyRepository;
 import ua.agwebs.root.repo.EntryHeaderRepository;
 import ua.agwebs.root.repo.ShortBalanceLine;
@@ -116,7 +117,17 @@ public class EntryManger implements EntryService {
     }
 
     @Override
-    public List<ShortBalanceLine> getBookBalance(long bookId, LocalDate reportDate) {
+    public List<ShortBalanceLine> getShortBookBalance(long bookId, LocalDate reportDate) {
+        logger.info("Calculate book balance");
+        logger.debug("Passed parameters: bookId = {}, reportDate = {}", bookId, reportDate);
+
+        Assert.notNull(reportDate);
+
+        return headerRepo.calcShortBookBalance(bookId, reportDate);
+    }
+
+    @Override
+    public List<BalanceLine> getBookBalance(long bookId, LocalDate reportDate) {
         logger.info("Calculate book balance");
         logger.debug("Passed parameters: bookId = {}, reportDate = {}", bookId, reportDate);
 

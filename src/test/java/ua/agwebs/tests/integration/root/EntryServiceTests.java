@@ -9,6 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.agwebs.root.entity.*;
+import ua.agwebs.root.repo.BalanceLine;
 import ua.agwebs.root.repo.EntryLineRepository;
 import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.service.AppUserService;
@@ -91,13 +92,22 @@ public class EntryServiceTests {
 
         EntryHeader header = entryService.createEntry(book2, lines, "book balance test", LocalDate.parse("2020-12-31"));
 
-        List<ShortBalanceLine> result = entryService.getBookBalance(book2.getId(), LocalDate.parse("2020-12-31"));
+        // short balance check
+        List<ShortBalanceLine> shBalance = entryService.getShortBookBalance(book2.getId(), LocalDate.parse("2020-12-31"));
 
-        assertFalse("Incorrect result: only non-zero amount should be selected", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), uah.getCode(), 0L)));
-        assertTrue("Incorrect result in UAH on Cr", result.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), uah.getCode(), -1_000L)));
-        assertTrue("Incorrect result in USD on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), usd.getCode(), 2_000L)));
-        assertTrue("Incorrect result in USD on Cr", result.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), usd.getCode(), -2_000L)));
-        assertTrue("Incorrect result in UAH on Dt", result.contains(new ShortBalanceLine(book2.getId(), dt3.getBsCategory(), uah.getCode(), 1_000L)));
+        assertFalse("Incorrect short balance: only non-zero amount should be selected", shBalance.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), uah.getCode(), 0L)));
+        assertTrue("Incorrect short balance in UAH on Cr", shBalance.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), uah.getCode(), -1_000L)));
+        assertTrue("Incorrect short balance in USD on Dt", shBalance.contains(new ShortBalanceLine(book2.getId(), dt2.getBsCategory(), usd.getCode(), 2_000L)));
+        assertTrue("Incorrect short balance in USD on Cr", shBalance.contains(new ShortBalanceLine(book2.getId(), ct2.getBsCategory(), usd.getCode(), -2_000L)));
+        assertTrue("Incorrect short balance in UAH on Dt", shBalance.contains(new ShortBalanceLine(book2.getId(), dt3.getBsCategory(), uah.getCode(), 1_000L)));
+
+        // balance check
+        List<BalanceLine> fBalance = entryService.getBookBalance(book2.getId(), LocalDate.parse("2020-12-31"));
+        assertFalse("Incorrect balance: only non-zero amount should be selected", fBalance.contains(new BalanceLine(book2.getId(), dt2.getBsCategory(), dt2.getName(), dt2.getAccId(), uah.getCode(), 0L)));
+        assertTrue("Incorrect balance in UAH on Cr", fBalance.contains(new BalanceLine(book2.getId(), ct2.getBsCategory(), ct2.getName(), ct2.getAccId(), uah.getCode(), -1_000L)));
+        assertTrue("Incorrect balance in USD on Dt", fBalance.contains(new BalanceLine(book2.getId(), dt2.getBsCategory(), dt2.getName(), dt2.getAccId(), usd.getCode(), 2_000L)));
+        assertTrue("Incorrect balance in USD on Cr", fBalance.contains(new BalanceLine(book2.getId(), ct2.getBsCategory(), ct2.getName(), ct2.getAccId(), usd.getCode(), -2_000L)));
+        assertTrue("Incorrect balance in UAH on Dt", fBalance.contains(new BalanceLine(book2.getId(), dt3.getBsCategory(), dt3.getName(), dt3.getAccId(), uah.getCode(), 1_000L)));
     }
 
     // Create Entry

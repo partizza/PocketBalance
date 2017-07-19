@@ -9,6 +9,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import ua.agwebs.root.entity.AppUser;
 import ua.agwebs.root.entity.BSCategory;
 import ua.agwebs.root.entity.BalanceBook;
+import ua.agwebs.root.repo.BalanceLine;
 import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
@@ -53,6 +54,7 @@ public class MockBookBalanceProviderTest {
         balanceService = new BookBalanceProvider(entryService, permissionService);
     }
 
+    // Short book balance
     @Test
     public void test_getShortBookBalance() {
         List<ShortBalanceLine> lines = new ArrayList<>(Arrays.asList(
@@ -65,7 +67,7 @@ public class MockBookBalanceProviderTest {
         LocalDate reportDate = LocalDate.now();
 
         when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
-        when(entryService.getBookBalance(book.getId(), reportDate)).thenReturn(lines);
+        when(entryService.getShortBookBalance(book.getId(), reportDate)).thenReturn(lines);
 
 
         BalanceSheetDTO resultDTO = balanceService.getShortBookBalance(book.getId(), reportDate, book.getAppUser().getId());
@@ -109,6 +111,63 @@ public class MockBookBalanceProviderTest {
     public void test_getShortBalance_NullReportDate() {
         when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
         BalanceSheetDTO resultDTO = balanceService.getShortBookBalance(book.getId(), null, book.getAppUser().getId());
+    }
+
+    // Book balance
+    @Test
+    public void test_getBookBalance() {
+        List<BalanceLine> lines = new ArrayList<>(Arrays.asList(
+                new BalanceLine(book.getId(), BSCategory.ASSET, "Cash", 1001L, "UAH", 10_000L),
+                new BalanceLine(book.getId(), BSCategory.ASSET, "Cash", 1001L, "USD", 1_000L),
+                new BalanceLine(book.getId(), BSCategory.EQUITY, "Equity", 5001L, "UAH", -10_000L),
+                new BalanceLine(book.getId(), BSCategory.EQUITY, "Equity", 5001L, "USD", -1_000L)
+        ));
+
+        LocalDate reportDate = LocalDate.now();
+
+        when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
+        when(entryService.getBookBalance(book.getId(), reportDate)).thenReturn(lines);
+
+
+        BalanceSheetDTO resultDTO = balanceService.getBookBalance(book.getId(), reportDate, book.getAppUser().getId());
+
+
+        Assert.assertEquals("Incorrect book.", book.getId(), resultDTO.getBookId());
+        Assert.assertEquals("Incorrect date.", reportDate, resultDTO.getReportDate());
+
+
+        List<ColumnDefinition> columns = new ArrayList<>(Arrays.asList(
+                new ColumnDefinition("Category", false),
+                new ColumnDefinition("AccountId", true),
+                new ColumnDefinition("AccountName", false),
+                new ColumnDefinition("UAH", true),
+                new ColumnDefinition("USD", true)
+        ));
+        Assert.assertTrue("Incorrect columns.", columns.equals(resultDTO.getColumns()));
+
+        List<String[]> data = new ArrayList<>(Arrays.asList(
+                new String[]{"ASSET", "1001", "Cash", "100.00", "10.00"},
+                new String[]{"EQUITY", "5001", "Equity", "-100.00", "-10.00"}
+        ));
+        Assert.assertEquals("Incorrect size of result array.", data.size(), resultDTO.getData().size());
+        for (int i = 0; i < data.size(); i++) {
+            Assert.assertTrue("Incorrect balance line.", Arrays.equals(data.get(i), resultDTO.getData().get(i)));
+        }
+
+    }
+
+    @Test(expected = PocketBalanceIllegalAccessException.class)
+    public void test_getBalance_AccessDenied() {
+        LocalDate reportDate = LocalDate.now();
+        when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
+
+        BalanceSheetDTO resultDTO = balanceService.getBookBalance(book.getId(), reportDate, book.getAppUser().getId() + 1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_getBalance_NullReportDate() {
+        when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
+        BalanceSheetDTO resultDTO = balanceService.getBookBalance(book.getId(), null, book.getAppUser().getId());
     }
 
 }

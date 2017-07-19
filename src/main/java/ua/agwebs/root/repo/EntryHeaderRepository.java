@@ -22,7 +22,18 @@ public interface EntryHeaderRepository extends JpaRepository<EntryHeader, Long>,
             "AND hdr.valueDate <= :reportDate " +
             "GROUP BY bk.id, acc.bsCategory, cur.code " +
             "HAVING SUM(ln.trnAmount) <> 0")
-    public List<ShortBalanceLine> calcBookBalance(@Param("bookId") long bookId, @Param("reportDate") LocalDate reportDate);
+    public List<ShortBalanceLine> calcShortBookBalance(@Param("bookId") long bookId, @Param("reportDate") LocalDate reportDate);
 
 
+    @Query("SELECT new ua.agwebs.root.repo.BalanceLine(bk.id, acc.bsCategory, acc.name, acc.accId, cur.code, SUM(ln.trnAmount)) " +
+            "FROM ua.agwebs.root.entity.EntryHeader hdr " +
+            "INNER JOIN hdr.lines ln " +
+            "INNER JOIN hdr.book bk " +
+            "INNER JOIN ln.account acc " +
+            "INNER JOIN ln.currency cur " +
+            "WHERE bk.id = :bookId " +
+            "AND hdr.valueDate <= :reportDate " +
+            "GROUP BY bk.id, acc.bsCategory, acc.name, acc.accId, cur.code " +
+            "HAVING SUM(ln.trnAmount) <> 0")
+    public List<BalanceLine> calcBookBalance(@Param("bookId") long bookId, @Param("reportDate") LocalDate reportDate);
 }

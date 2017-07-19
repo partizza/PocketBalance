@@ -33,4 +33,14 @@ public class BalanceController {
         BalanceSheetDTO balanceSheetDTO = balanceService.getShortBookBalance(bookId, reportDate, appUserDetails.getId());
         return new ResponseEntity<BalanceSheetDTO>(balanceSheetDTO, HttpStatus.OK);
     }
+
+    @RequestMapping("/book/{bookId}")
+    public ResponseEntity<BalanceSheetDTO> getBalance(@PathVariable("bookId") long bookId,
+                                                      @RequestParam(value = "date", required = false, defaultValue = "9999-12-31")
+                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate reportDate,
+                                                      @AuthenticationPrincipal AppUserDetails appUserDetails) {
+
+        BalanceSheetDTO balanceSheetDTO = balanceService.getBookBalance(bookId, reportDate, appUserDetails.getId());
+        return new ResponseEntity<BalanceSheetDTO>(balanceSheetDTO, HttpStatus.OK);
+    }
 }
