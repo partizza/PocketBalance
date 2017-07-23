@@ -130,8 +130,8 @@ public class BookBalanceProvider implements BookBalanceService {
 
             List<ColumnDefinition> columns = new ArrayList<>(Arrays.asList(
                     new ColumnDefinition("Category", false),
-                    new ColumnDefinition("AccountId", true),
-                    new ColumnDefinition("AccountName", false)));
+                    new ColumnDefinition("AccountId", true, false),
+                    new ColumnDefinition("Account", false)));
             currencySet.stream().forEach(e -> columns.add(new ColumnDefinition(e, true)));
             balanceDTO.setColumns(columns);
 

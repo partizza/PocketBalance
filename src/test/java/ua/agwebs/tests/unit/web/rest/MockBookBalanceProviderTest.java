@@ -138,8 +138,8 @@ public class MockBookBalanceProviderTest {
 
         List<ColumnDefinition> columns = new ArrayList<>(Arrays.asList(
                 new ColumnDefinition("Category", false),
-                new ColumnDefinition("AccountId", true),
-                new ColumnDefinition("AccountName", false),
+                new ColumnDefinition("AccountId", true, false),
+                new ColumnDefinition("Account", false),
                 new ColumnDefinition("UAH", true),
                 new ColumnDefinition("USD", true)
         ));

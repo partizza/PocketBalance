@@ -7,9 +7,16 @@ public class ColumnDefinition {
 
     private boolean isNumber;
 
+    private boolean isVisible = true;
+
     public ColumnDefinition(String title, boolean isNumber) {
         this.title = title;
         this.isNumber = isNumber;
+    }
+
+    public ColumnDefinition(String title, boolean isNumber, boolean isHidden) {
+        this(title, isNumber);
+        this.isVisible = isHidden;
     }
 
     public String getTitle() {
@@ -28,11 +35,20 @@ public class ColumnDefinition {
         isNumber = number;
     }
 
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
+
     @Override
     public String toString() {
         return "ColumnDefinition{" +
                 "title='" + title + '\'' +
                 ", isNumber=" + isNumber +
+                ", isHidden=" + isVisible +
                 '}';
     }
 
@@ -44,6 +60,7 @@ public class ColumnDefinition {
         ColumnDefinition that = (ColumnDefinition) o;
 
         if (isNumber != that.isNumber) return false;
+        if (isVisible != that.isVisible) return false;
         return title != null ? title.equals(that.title) : that.title == null;
 
     }
@@ -52,6 +69,7 @@ public class ColumnDefinition {
     public int hashCode() {
         int result = title != null ? title.hashCode() : 0;
         result = 31 * result + (isNumber ? 1 : 0);
+        result = 31 * result + (isVisible ? 1 : 0);
         return result;
     }
 }
