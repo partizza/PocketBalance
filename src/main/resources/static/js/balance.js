@@ -26,7 +26,8 @@ class ButtonsPanel extends React.Component {
 class BalanceSheet extends React.Component {
 
     componentDidMount() {
-        initShortBalanceTable();
+        var valueDate = new Date();
+        initShortBalanceTable(moment(valueDate).format('YYYY-MM-DD'));
     }
 
     render() {
@@ -46,9 +47,21 @@ class BalancePanel extends React.Component {
         };
 
         this.handleBalanceTypeClick = this.handleBalanceTypeClick.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
     }
 
     componentDidMount() {
+        $('#value-datepicker').datetimepicker({
+            format: 'll',
+            defaultDate: new Date()
+        });
+
+        $('#value-datepicker').on("dp.change", this.handleDateChange);
+
+        $('.open-value-datepicker').click(function (event) {
+            event.preventDefault();
+            $('#value-datepicker').click();
+        });
     }
 
     render() {
@@ -57,8 +70,20 @@ class BalancePanel extends React.Component {
                 <div className="col-md-12">
                     <div className="content-box-large">
                         <div className="row">
-                            <ButtonsPanel isShort={this.state.isShort}
-                                          onBalanceTypeClick={this.handleBalanceTypeClick}/>
+                            <div className="col-md-9">
+                                <ButtonsPanel isShort={this.state.isShort}
+                                              onBalanceTypeClick={this.handleBalanceTypeClick}/>
+                            </div>
+                            <label className="col-md-1 control-label"><b>Reporting date</b></label>
+                            <div className="col-md-2">
+                                <div className='input-group date'>
+                                    <input type='text' className="form-control" id='value-datepicker'
+                                           required="required"/>
+                                    <label className="input-group-addon btn" htmlFor="value-datepicker">
+                                        <span className="glyphicon glyphicon-calendar open-value-datepicker"></span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <div className="row">
                             <BalanceSheet/>
@@ -75,11 +100,23 @@ class BalancePanel extends React.Component {
         this.setState({
             isShort: setShort
         });
+        var valueDate = $("#value-datepicker").data("DateTimePicker").date().format('YYYY-MM-DD');
 
         if (setShort === true) {
-            initShortBalanceTable();
+            initShortBalanceTable(valueDate);
         } else {
-            initBalanceTable();
+            initBalanceTable(valueDate);
+        }
+    }
+
+    handleDateChange(event){
+        var valueDate = event.date.format('YYYY-MM-DD');
+
+        const isShort = this.state.isShort;
+        if(isShort) {
+            initShortBalanceTable(valueDate);
+        }else {
+            initBalanceTable(valueDate);
         }
     }
 }
@@ -89,11 +126,11 @@ $(document).ready(function () {
     ReactDOM.render(<BalancePanel />, document.getElementById("root"));
 });
 
-function initShortBalanceTable() {
+function initShortBalanceTable(valueDate) {
     var bookNumber = sessionStorage.getItem("bookId");
 
     $.ajax({
-        url: '/data/balance/book/' + bookNumber + '/short',
+        url: '/data/balance/book/' + bookNumber + '/short?date=' + valueDate,
         type: 'GET',
         dataType: 'json',
         success: function (data) {
@@ -144,11 +181,11 @@ function initShortBalanceTable() {
 }
 
 
-function initBalanceTable() {
+function initBalanceTable(valueDate) {
     var bookNumber = sessionStorage.getItem("bookId");
 
     $.ajax({
-        url: '/data/balance/book/' + bookNumber,
+        url: '/data/balance/book/' + bookNumber + '?date=' + valueDate,
         type: 'GET',
         dataType: 'json',
         success: function (data) {
@@ -168,7 +205,7 @@ function initBalanceTable() {
                     };
                 }
 
-                if(entry.hidden){
+                if (entry.hidden) {
                     entry.visible = false;
                 }
 
