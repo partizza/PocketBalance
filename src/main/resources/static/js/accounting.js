@@ -3,6 +3,9 @@ class CurrencySelect extends React.Component {
     componentDidMount() {
         $('#currency-select').selectpicker();
         this.setOptions();
+        $('#currency-select').change(function () {
+            $('.form-message').html("");
+        });
     }
 
 
@@ -37,6 +40,9 @@ class TransactionSelect extends React.Component {
 
     componentDidMount() {
         $('#tran-select').selectpicker();
+        $('#tran-select').change(function () {
+            $('.form-message').html("");
+        });
     }
 
 
@@ -64,6 +70,10 @@ class ValueDatePicker extends React.Component {
             event.preventDefault();
             $('#value-datepicker').click();
         });
+
+        $('#value-datepicker').on('dp.change', function (e) {
+            $('.form-message').html("");
+        });
     }
 
     render() {
@@ -82,6 +92,14 @@ class ValueDatePicker extends React.Component {
 class TransactionForm extends React.Component {
     componentDidMount() {
         $('#value-date').datetimepicker();
+
+        $('#tran-amount').on('input', function () {
+            $('.form-message').html("");
+        });
+
+        $('#tran-desc').on('input', function () {
+            $('.form-message').html("");
+        });
     }
 
     render() {
@@ -188,6 +206,7 @@ class TransactionForm extends React.Component {
         }
     }
 }
+
 
 class Category extends React.Component {
     render() {
