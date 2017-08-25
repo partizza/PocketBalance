@@ -14,14 +14,13 @@ import ua.agwebs.root.entity.BalanceBook;
 import ua.agwebs.root.entity.Currency;
 import ua.agwebs.root.entity.EntryHeader;
 import ua.agwebs.root.entity.EntryLine;
-import ua.agwebs.root.repo.BalanceLine;
-import ua.agwebs.root.repo.CurrencyRepository;
-import ua.agwebs.root.repo.EntryHeaderRepository;
-import ua.agwebs.root.repo.ShortBalanceLine;
+import ua.agwebs.root.repo.*;
+import ua.agwebs.root.service.specifications.PocketBalanceSpecification;
+import ua.agwebs.root.service.specifications.SearchCriteria;
+import ua.agwebs.root.service.specifications.SpecificationBuilder;
 import ua.agwebs.root.validator.EnabledBalanceBook;
 import ua.agwebs.root.validator.EntryAmountBalancing;
 
-import javax.persistence.criteria.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,10 +35,13 @@ public class EntryManger implements EntryService {
 
     private CurrencyRepository currencyRepo;
 
+    private EntryLineRepository lineRepository;
+
     @Autowired
-    public EntryManger(EntryHeaderRepository entryHeaderRepository, CurrencyRepository currencyRepository) {
+    public EntryManger(EntryHeaderRepository entryHeaderRepository, CurrencyRepository currencyRepository, EntryLineRepository entryLineRepository) {
         this.headerRepo = entryHeaderRepository;
         this.currencyRepo = currencyRepository;
+        this.lineRepository = entryLineRepository;
     }
 
     @Transactional
@@ -54,15 +56,11 @@ public class EntryManger implements EntryService {
                                    @EntryAmountBalancing @Valid Set<EntryLine> entryLines,
                                    String desc,
                                    LocalDate valueDate) {
-        logger.info("Create new entry.");
-        logger.debug("Passed parameters: book = {}, entry lines = {}, desc = {}", book, entryLines, desc);
+        logger.trace("Creating new entry: book = {}, entry lines = {}, desc = {}", book, entryLines, desc);
 
         Assert.isTrue(desc == null || desc.length() <= 60, "Entry description cannot have more than 60 characters.");
-
         Assert.notNull(valueDate, "Entry value date required.");
-
         Assert.notNull(book, "Balance book can't be null.");
-
         Assert.notNull(entryLines, "Entry lines can't be null.");
         Assert.notEmpty(entryLines, "Can't create entry without lines.");
 
@@ -77,14 +75,14 @@ public class EntryManger implements EntryService {
         }
         entryHeader = headerRepo.save(entryHeader);
 
+        logger.info("New entry has been added into book: {}", book);
         logger.debug("Created entry: {}", entryHeader);
         return entryHeader;
     }
 
     @Override
     public EntryHeader setStorno(long entryHeaderId, boolean value) {
-        logger.info("Change storno flag.");
-        logger.debug("Passed parameters: entry header id = {}, new storno flag = {}", entryHeaderId, value);
+        logger.trace("Change storno flag: entry header id = {}, new storno flag = {}", entryHeaderId, value);
 
         EntryHeader header = headerRepo.findOne(entryHeaderId);
         Assert.notNull(header, "Entry doesn't exist.");
@@ -92,47 +90,79 @@ public class EntryManger implements EntryService {
         header.setStorno(value);
         EntryHeader updatedEntry = headerRepo.save(header);
 
+        logger.info("Storno flag has been changed: entry header id = {}", entryHeaderId);
         logger.debug("Changed storno flag: {}", updatedEntry);
+
         return updatedEntry;
     }
 
     @Override
     public EntryHeader findEntryHeaderById(long id) {
-        logger.info("Select entry by id: {}", id);
+        logger.trace("Selecting entry by id: {}", id);
         return headerRepo.findOne(id);
     }
 
     @Override
     public Currency findCurrencyById(long id) {
-        logger.info("Select currency by id: {}", id);
+        logger.trace("Selecting currency by id: {}", id);
         return currencyRepo.findOne(id);
     }
 
     @Override
     public Page<Currency> findAllCurrency(Pageable pageable) {
-        logger.info("Select currency");
-        logger.debug("Passed parameters: pageable = {}", pageable);
-
+        logger.trace("Selecting all currency: pageable = {}", pageable);
         return currencyRepo.findAll(pageable);
     }
 
     @Override
     public List<ShortBalanceLine> getShortBookBalance(long bookId, LocalDate reportDate) {
-        logger.info("Calculate book balance");
-        logger.debug("Passed parameters: bookId = {}, reportDate = {}", bookId, reportDate);
+        logger.trace("Calculating short book balance: bookId = {}, reportDate = {}", bookId, reportDate);
 
         Assert.notNull(reportDate);
 
-        return headerRepo.calcShortBookBalance(bookId, reportDate);
+        List<ShortBalanceLine> balanceLines = headerRepo.calcShortBookBalance(bookId, reportDate);
+
+        logger.info("Short book balance has been calculated: bookId = {}, reportDate = {}", bookId, reportDate);
+        logger.debug("Short book balance lines: {}", balanceLines);
+
+        return balanceLines;
     }
 
     @Override
     public List<BalanceLine> getBookBalance(long bookId, LocalDate reportDate) {
-        logger.info("Calculate book balance");
-        logger.debug("Passed parameters: bookId = {}, reportDate = {}", bookId, reportDate);
+        logger.trace("Calculating book balance: bookId = {}, reportDate = {}", bookId, reportDate);
 
         Assert.notNull(reportDate);
 
-        return headerRepo.calcBookBalance(bookId, reportDate);
+        List<BalanceLine> balanceLines = headerRepo.calcBookBalance(bookId, reportDate);
+
+        logger.info("Book balance has been calculated: bookId = {}, reportDate = {}", bookId, reportDate);
+        logger.debug("Book balance lines: {}", balanceLines);
+
+        return balanceLines;
+    }
+
+    @Override
+    public Page<EntryLine> findEntryLines(List<SearchCriteria> criteria, Pageable pageable) {
+        logger.trace("Selecting entry lines with conditions: " +
+                "List<SearchCriteria> = {}, Pageable = {}", criteria, pageable);
+
+        Assert.notNull(criteria);
+        Assert.notNull(pageable);
+
+        SpecificationBuilder<EntryLine> specificationBuilder = new SpecificationBuilder<>();
+        criteria.stream()
+                .map(PocketBalanceSpecification<EntryLine>::new)
+                .forEach(e -> specificationBuilder.addSpecification(e, SpecificationBuilder.SpecificationCompositionType.AND));
+
+        Specification<EntryLine> spec = specificationBuilder.build();
+        Page<EntryLine> rslPage = lineRepository.findAll(spec, pageable);
+
+        logger.info("Entry lines have been selected: current page = {}, elements on current page = {}", rslPage.getNumber(), rslPage.getNumberOfElements());
+        logger.debug("Selected entry lines: " +
+                "total elements = {}, total pages = {}, page size = {}, current page = {}, elements on current page = {}",
+                rslPage.getTotalElements(), rslPage.getTotalPages(), rslPage.getSize(), rslPage.getNumber(), rslPage.getNumberOfElements());
+
+        return rslPage;
     }
 }

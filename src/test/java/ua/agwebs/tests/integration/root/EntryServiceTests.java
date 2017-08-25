@@ -5,22 +5,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import ua.agwebs.root.entity.*;
+import ua.agwebs.root.entity.Currency;
 import ua.agwebs.root.repo.BalanceLine;
 import ua.agwebs.root.repo.EntryLineRepository;
 import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.service.AppUserService;
 import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
+import ua.agwebs.root.service.specifications.SearchCriteria;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -73,7 +78,7 @@ public class EntryServiceTests {
 
     // calculate book balance
     @Test
-    public void calc_BookBalance(){
+    public void calc_BookBalance() {
         BalanceBook book2 = coaService.createBalanceBook(new BalanceBook("t-book", "balance book test", appUser));
         BalanceAccount dt2 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.ASSET, 1002L, book2, "Cash"));
         BalanceAccount ct2 = coaService.createBalanceAccount(new BalanceAccount(BSCategory.PROFIT, 6000L, book2, "Income"));
@@ -346,5 +351,55 @@ public class EntryServiceTests {
     @Test(expected = IllegalArgumentException.class)
     public void rejectStorno_NonExistingEntry() {
         entryService.setStorno(-1L, true);
+    }
+
+    // Find entry lines by specifications
+    // ** reject
+    @Test(expected = IllegalArgumentException.class)
+    public void test_findEntryLines_NullCriteria() {
+        entryService.findEntryLines(null, new PageRequest(0, 10));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_findEntityLines_NullPageable() {
+        entryService.findEntryLines(Arrays.asList(new SearchCriteria("id", SearchCriteria.CriteriaType.EQUALS, 1)), null);
+    }
+
+    // Find entry lines by specifications
+    // ** successfully
+    @Test
+    public void test_findEntityLynes() {
+        // preparing data
+        Set<EntryLine> entryLinesFstPack = new HashSet<>();
+        entryLinesFstPack.add(new EntryLine(1, dt, 1000L, EntrySide.D, uah));
+        entryLinesFstPack.add(new EntryLine(2, ct, -1000L, EntrySide.C, uah));
+        EntryHeader headerFst = entryService.createEntry(book, entryLinesFstPack, "entries for tests", LocalDate.parse("2013-12-31"));
+
+        Set<EntryLine> entryLinesSecPack = new HashSet<>();
+        entryLinesSecPack.add(new EntryLine(1, dt, 500L, EntrySide.D, uah));
+        entryLinesSecPack.add(new EntryLine(2, ct, -500L, EntrySide.C, uah));
+        entryLinesSecPack.add(new EntryLine(3, dt, 1000L, EntrySide.D, usd));
+        entryLinesSecPack.add(new EntryLine(4, ct, -1000L, EntrySide.C, usd));
+        EntryHeader headerSec = entryService.createEntry(book, entryLinesSecPack, "entries for tests", LocalDate.parse("2017-12-31"));
+
+        // criteria and select
+        List<SearchCriteria> criterias = new ArrayList<>();
+        criterias.add(new SearchCriteria("currency.code", SearchCriteria.CriteriaType.EQUALS, uah.getCode()));
+        criterias.add(new SearchCriteria("account.bsCategory", SearchCriteria.CriteriaType.EQUALS, BSCategory.ASSET));
+        criterias.add(new SearchCriteria("account.accId", SearchCriteria.CriteriaType.EQUALS, dt.getAccId()));
+        criterias.add(new SearchCriteria("account.book.id", SearchCriteria.CriteriaType.EQUALS, dt.getBook().getId()));
+        criterias.add(new SearchCriteria("header.valueDate", SearchCriteria.CriteriaType.LESS_OR_EQUAL, LocalDate.parse("2013-12-31")));
+        Page<EntryLine> rslPage = entryService.findEntryLines(criterias, new PageRequest(0, Integer.MAX_VALUE));
+
+        // check result
+        assertTrue(rslPage.hasContent());
+        rslPage.getContent().forEach(e -> {
+            assertEquals("Incorrect currency", uah.getCode(), e.getCurrency().getCode());
+            assertEquals("Incorrect BSCategory", BSCategory.ASSET, e.getAccount().getBsCategory());
+            assertEquals("Incorrect book", book.getId(), e.getAccount().getBook().getId());
+            assertEquals("Incorrect account", dt.getAccId(), e.getAccount().getAccId());
+            assertTrue("Incorrect date", LocalDate.parse("2013-12-31").isAfter(e.getHeader().getValueDate()) || LocalDate.parse("2013-12-31").isEqual(e.getHeader().getValueDate()));
+        });
+
     }
 }

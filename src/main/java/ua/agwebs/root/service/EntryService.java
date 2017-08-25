@@ -10,11 +10,13 @@ import ua.agwebs.root.entity.EntryHeader;
 import ua.agwebs.root.entity.EntryLine;
 import ua.agwebs.root.repo.BalanceLine;
 import ua.agwebs.root.repo.ShortBalanceLine;
+import ua.agwebs.root.service.specifications.SearchCriteria;
 import ua.agwebs.root.validator.EnabledBalanceBook;
 import ua.agwebs.root.validator.EntryAmountBalancing;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -40,5 +42,7 @@ public interface EntryService {
     public List<ShortBalanceLine> getShortBookBalance(long bookId, LocalDate reportDate);
 
     public List<BalanceLine> getBookBalance(long bookId, LocalDate reportDate);
+
+    public Page<EntryLine> findEntryLines(List<SearchCriteria> criteria, Pageable pageable);
 
 }
