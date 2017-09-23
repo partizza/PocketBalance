@@ -72,7 +72,7 @@ public class MockBookEntryProviderTest {
         Page pageRsl = new PageImpl(entryLines, new PageRequest(3, 25), totalRecords);
         when(entryService.findEntryLines(anyListOf(SearchCriteria.class), any(PageRequest.class))).thenReturn(pageRsl);
 
-      пш  DataTableResponse dataTableResponse = bookEntryService.findEntry(dataTableRequest);
+        DataTableResponse dataTableResponse = bookEntryService.findEntry(dataTableRequest);
 
         Assert.assertEquals("Incorrect draw", dataTableRequest.getDraw(), dataTableResponse.getDraw());
         Assert.assertEquals("Incorrect total records", totalRecords, dataTableResponse.getRecordsTotal());
