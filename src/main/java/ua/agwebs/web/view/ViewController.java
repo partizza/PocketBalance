@@ -26,6 +26,11 @@ public class ViewController {
         return "balance";
     }
 
+    @RequestMapping(value = {"/entry"})
+    public String getEntities() {
+        return "entry";
+    }
+
     @RequestMapping(value = "/setting/account")
     public String getSettingAccountView(){
         return "accounts";

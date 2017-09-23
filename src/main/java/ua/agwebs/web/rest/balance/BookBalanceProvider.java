@@ -11,7 +11,6 @@ import ua.agwebs.root.repo.ShortBalanceLine;
 import ua.agwebs.root.service.EntryService;
 import ua.agwebs.web.exceptions.PocketBalanceIllegalAccessException;
 import ua.agwebs.web.rest.PermissionService;
-import ua.agwebs.web.rest.accounting.AccountingProvider;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -35,14 +34,14 @@ public class BookBalanceProvider implements BookBalanceService {
 
     @Override
     public BalanceSheetDTO getShortBookBalance(long bookId, LocalDate reportDate, long userId) {
-        logger.info("Calculate short book balance.");
-        logger.debug("Passed parameters: bookId = {}, reportDate = {}, userId = {}", bookId, reportDate, userId);
+        logger.trace("Calculating short book balance: bookId = {}, reportDate = {}, userId = {}", bookId, reportDate, userId);
 
         Assert.notNull(reportDate);
 
         if (permissionService.checkPermission(bookId, userId)) {
             List<ShortBalanceLine> balanceLines = entryService.getShortBookBalance(bookId, reportDate);
 
+            logger.trace("Pivot balance lines: {}", balanceLines);
             Set<String> currencySet = new TreeSet<>();
             Map<String, Map<String, Long>> grpBal = new HashMap<>();
             balanceLines.stream()
@@ -54,6 +53,9 @@ public class BookBalanceProvider implements BookBalanceService {
                         grpBal.put(e.getBsCategory().toString(), cm);
                         currencySet.add(e.getCurrencyCode());
                     });
+
+            logger.trace("Currency list: {}", currencySet);
+            logger.trace("Balance articles: {}", grpBal);
 
             BalanceSheetDTO shortBal = new BalanceSheetDTO(bookId, reportDate);
 
@@ -78,6 +80,9 @@ public class BookBalanceProvider implements BookBalanceService {
             currencySet.stream().forEach(e -> columns.add(new ColumnDefinition(e, true)));
             shortBal.setColumns(columns);
 
+            logger.info("Short balance calculated: bookId = {}, reportDate = {}, userId = {}", bookId, reportDate, userId);
+            logger.debug("Short balance: {}", shortBal);
+
             return shortBal;
         } else {
             throw new PocketBalanceIllegalAccessException("Creating entry - permission denied: bookId = " + bookId + ", userId = " + userId);
@@ -86,13 +91,14 @@ public class BookBalanceProvider implements BookBalanceService {
 
     @Override
     public BalanceSheetDTO getBookBalance(long bookId, LocalDate reportDate, long userId) {
-        logger.info("Calculate book balance.");
-        logger.debug("Passed parameters: bookId = {}, reportDate = {}, userId = {}", bookId, reportDate, userId);
+        logger.trace("Calculate book balance: bookId = {}, reportDate = {}, userId = {}", bookId, reportDate, userId);
 
         Assert.notNull(reportDate);
 
         if (permissionService.checkPermission(bookId, userId)) {
             List<BalanceLine> balanceLines = entryService.getBookBalance(bookId, reportDate);
+
+            logger.trace("Pivot balance lines: {}", balanceLines);
 
             Set<String> currencySet = new TreeSet<>();
             Map<Long, Map<String, Long>> grpBal = new HashMap<>();
@@ -109,10 +115,13 @@ public class BookBalanceProvider implements BookBalanceService {
             Map<Long, BalanceLine> blMap = new TreeMap<>();
             balanceLines.stream().forEach(e -> blMap.put(e.getAccId(), e));
 
+            logger.trace("Currency list: {}", currencySet);
+            logger.trace("Balance articles: {}", grpBal);
+
             BalanceSheetDTO balanceDTO = new BalanceSheetDTO(bookId, reportDate);
 
             grpBal.keySet().stream().forEach(e -> {
-                String []row = new String[currencySet.size()+3];
+                String[] row = new String[currencySet.size() + 3];
                 row[0] = blMap.get(e).getBsCategory().toString();
                 row[1] = blMap.get(e).getAccId().toString();
                 row[2] = blMap.get(e).getAccount();
@@ -135,8 +144,11 @@ public class BookBalanceProvider implements BookBalanceService {
             currencySet.stream().forEach(e -> columns.add(new ColumnDefinition(e, true)));
             balanceDTO.setColumns(columns);
 
+            logger.info("Balance calculated: bookId = {}, reportDate = {}, userId = {}", bookId, reportDate, userId);
+            logger.debug("Balance sheet: {}", balanceDTO);
+
             return balanceDTO;
-        }else {
+        } else {
             throw new PocketBalanceIllegalAccessException("Creating entry - permission denied: bookId = " + bookId + ", userId = " + userId);
         }
 

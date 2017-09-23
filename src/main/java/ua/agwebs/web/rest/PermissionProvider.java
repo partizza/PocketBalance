@@ -21,13 +21,13 @@ public class PermissionProvider implements PermissionService {
 
     @Override
     public boolean checkPermission(long bookId, long userId) {
-        logger.debug("Check permission: bookId = {}, userId = {}", bookId, userId);
+        logger.trace("Check permission: bookId = {}, userId = {}", bookId, userId);
         BalanceBook book = coaService.findBalanceBookById(bookId);
         if (book != null && book.getAppUser().getId() == userId) {
-            logger.debug("Access allowed: bookId = {}, userId = {}", bookId, userId);
+            logger.info("Access allowed: bookId = {}, userId = {}", bookId, userId);
             return true;
         } else {
-            logger.debug("Access denied: bookId = {}, userId = {}", bookId, userId);
+            logger.info("Access denied: bookId = {}, userId = {}", bookId, userId);
             return false;
         }
     }
