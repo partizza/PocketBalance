@@ -10,7 +10,6 @@
     <link href="/css/custom.css" rel="stylesheet"/>
 
 
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -27,7 +26,18 @@
         <div data-th-include="menu :: content"></div>
 
         <div class="col-md-10" id="root">
-            <table class="table table-striped entries"></table>
+            <div class="content-box-large">
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="panel-heading">
+                            <div class="panel-title"><b>Entries</b></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped entries"></table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -44,7 +54,7 @@
 <script src="/vendors/moment/2-9-0/moment-with-locales.js"></script>
 
 <!--bootstrap-datetimepicker-->
-<link  href="/vendors/bootstrap-datetimepicker/4-15-35/bootstrap-datetimepicker.css" rel="stylesheet"/>
+<link href="/vendors/bootstrap-datetimepicker/4-15-35/bootstrap-datetimepicker.css" rel="stylesheet"/>
 <script src="/vendors/bootstrap-datetimepicker/4-15-35/bootstrap-datetimepicker.js"></script>
 <!--dataTables-->
 <link href="/vendors/datatables/dataTables.bootstrap.css" rel="stylesheet" media="screen"/>
@@ -57,7 +67,7 @@
 <script src="/react/react-dom.js"></script>
 <script src="/react/browser.min.js"></script>
 <!--Custom-->
-<script src="/js/accounts.category.mapping.js"></script>
+<script src="/js/commons/accounts.category.mapping.js"></script>
 <script src="/js/custom.js"></script>
 <script src="/js/entries.table.js"></script>
 
