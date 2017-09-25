@@ -24,12 +24,14 @@ public class SpecificationBuilder<T> {
         this((Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) -> cb.and());
     }
 
-    public void addSpecification(Specification<T> specification, SpecificationCompositionType compositionType) {
-        if (compositionType == SpecificationCompositionType.AND) {
-            compositeSpecification = compositeSpecification.and(specification);
-        } else if (compositionType == SpecificationCompositionType.OR) {
-            compositeSpecification = compositeSpecification.or(specification);
-        }
+    public SpecificationBuilder<T> and(Specification<T> specification) {
+        compositeSpecification = compositeSpecification.and(specification);
+        return this;
+    }
+
+    public SpecificationBuilder<T> or(Specification<T> specification) {
+        compositeSpecification = compositeSpecification.or(specification);
+        return this;
     }
 
     public Specification<T> build() {

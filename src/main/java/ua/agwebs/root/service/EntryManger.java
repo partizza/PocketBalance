@@ -15,7 +15,8 @@ import ua.agwebs.root.entity.Currency;
 import ua.agwebs.root.entity.EntryHeader;
 import ua.agwebs.root.entity.EntryLine;
 import ua.agwebs.root.repo.*;
-import ua.agwebs.root.service.specifications.PocketBalanceSpecification;
+import ua.agwebs.root.service.specifications.AbstractPocketBalanceSpecification;
+import ua.agwebs.root.service.specifications.PocketBalanceSpecificationFactory;
 import ua.agwebs.root.service.specifications.SearchCriteria;
 import ua.agwebs.root.service.specifications.SpecificationBuilder;
 import ua.agwebs.root.validator.EnabledBalanceBook;
@@ -152,8 +153,8 @@ public class EntryManger implements EntryService {
 
         SpecificationBuilder<EntryLine> specificationBuilder = new SpecificationBuilder<>();
         criteria.stream()
-                .map(PocketBalanceSpecification<EntryLine>::new)
-                .forEach(e -> specificationBuilder.addSpecification(e, SpecificationBuilder.SpecificationCompositionType.AND));
+                .map(PocketBalanceSpecificationFactory::<EntryLine>getSpecification)
+                .forEach(specificationBuilder::and);
 
         Specification<EntryLine> spec = specificationBuilder.build();
         Page<EntryLine> rslPage = lineRepository.findAll(spec, pageable);
