@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <!-- Bootstrap -->
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/vendors/select/bootstrap-select.min.css" rel="stylesheet"/>
     <!-- styles -->
     <link href="/css/styles.css" rel="stylesheet"/>
     <link href="/css/custom.css" rel="stylesheet"/>
@@ -25,20 +26,7 @@
     <div class="row">
         <div data-th-include="menu :: content"></div>
 
-        <div class="col-md-10" id="root">
-            <div class="content-box-large">
-                <div class="row">
-                    <div class="col-md-10">
-                        <div class="panel-heading">
-                            <div class="panel-title"><b>Entries</b></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <table class="table table-striped entries"></table>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-10" id="root"></div>
     </div>
 </div>
 
@@ -52,7 +40,8 @@
 <script src="/bootstrap/js/bootstrap.min.js"></script>
 
 <script src="/vendors/moment/2-9-0/moment-with-locales.js"></script>
-
+<!--bootstrap-select-->
+<script src="/vendors/select/bootstrap-select.min.js"></script>
 <!--bootstrap-datetimepicker-->
 <link href="/vendors/bootstrap-datetimepicker/4-15-35/bootstrap-datetimepicker.css" rel="stylesheet"/>
 <script src="/vendors/bootstrap-datetimepicker/4-15-35/bootstrap-datetimepicker.js"></script>
@@ -69,7 +58,7 @@
 <!--Custom-->
 <script src="/js/commons/accounts.category.mapping.js"></script>
 <script src="/js/custom.js"></script>
-<script src="/js/entries.table.js"></script>
+<script src="/js/entries.table.js" type="text/babel"></script>
 
 </body>
 </html>
