@@ -9,6 +9,8 @@ public class PocketBalanceSpecificationFactory {
                 return new EqualSpecification<T>(searchCriteria);
             case LESS_OR_EQUAL:
                 return new LessOrEqualSpecification<T>(searchCriteria);
+            case LESS:
+                return new LessSpecification<T>(searchCriteria);
             default:
                 throw new UnsupportableSearchCriteriaException("Search criteria is not supported yet: " + searchCriteria.getCriteria().toString());
         }

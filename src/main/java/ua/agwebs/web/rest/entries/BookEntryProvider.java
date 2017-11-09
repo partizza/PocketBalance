@@ -39,17 +39,11 @@ public class BookEntryProvider implements BookEntryService {
     public DataTableResponse findEntry(DataTableRequest dataTableRequest) {
         Assert.notNull(dataTableRequest, "dataTableRequest can not be null.");
 
-        List<SearchCriteria> searchCriteriaList = this.createSearchCriteria(dataTableRequest);
         PageRequest pageRequest = this.createPageRequest(dataTableRequest);
-        Page<EntryLine> entryLines = entryService.findEntryLines(searchCriteriaList, pageRequest);
+        Page<EntryLine> entryLines = entryService.findEntryLines(dataTableRequest.getFilters(), pageRequest);
         DataTableResponse dataTableResponse = this.createDataTableResponse(entryLines, dataTableRequest.getDraw());
 
         return dataTableResponse;
-    }
-
-    protected List<SearchCriteria> createSearchCriteria(DataTableRequest dataTableRequest) {
-        SearchCriteria searchCriteria = new SearchCriteria("header.valueDate", SearchCriteria.CriteriaType.LESS_OR_EQUAL, LocalDate.now());
-        return Arrays.asList(searchCriteria);
     }
 
     protected PageRequest createPageRequest(DataTableRequest dataTableRequest) {

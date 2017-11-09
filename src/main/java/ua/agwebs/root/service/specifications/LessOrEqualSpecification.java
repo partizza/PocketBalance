@@ -23,7 +23,9 @@ public class LessOrEqualSpecification<T> extends AbstractPocketBalanceSpecificat
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
         logger.trace("Creating a Predicate by the specification: {}", this);
+
         Predicate predicate = cb.lessThanOrEqualTo((Path<Comparable>) this.buildPath(root, criteria.getKey()), (Comparable) criteria.getValue());
+
         logger.debug("Created predicate: {} - by the specification: {}", predicate, this);
 
         return predicate;

@@ -6,12 +6,18 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import ua.agwebs.root.service.specifications.SearchCriteria;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class DataTableRequestResolver implements HandlerMethodArgumentResolver {
+
+    public enum DataTableRequestType {
+        INT, LONG, DOUBLE, STRING, DATE
+    }
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
@@ -28,8 +34,54 @@ public class DataTableRequestResolver implements HandlerMethodArgumentResolver {
         dataTableRequest = this.parseGlobalSearch(dataTableRequest, nativeWebRequest);
         dataTableRequest = this.parseColumns(dataTableRequest, nativeWebRequest);
         dataTableRequest = this.parseOrder(dataTableRequest, nativeWebRequest);
+        dataTableRequest = this.parseFilters(dataTableRequest, nativeWebRequest);
 
         return dataTableRequest;
+    }
+
+    private DataTableRequest parseFilters(DataTableRequest dataTableRequest, NativeWebRequest nativeWebRequest) {
+        Iterator<String> paramIterator = nativeWebRequest.getParameterNames();
+
+        int filterCnt = 0;
+        while (paramIterator.hasNext()) {
+            String paramName = paramIterator.next();
+            if (paramName.matches("filters\\[[0-9]+\\]\\[column\\]")) {
+                filterCnt++;
+            }
+        }
+
+        List<SearchCriteria> criterias = new ArrayList<>();
+        for (int i = 0; i < filterCnt; i++) {
+
+            String column = nativeWebRequest.getParameter("filters[" + i + "][column]");
+            SearchCriteria.CriteriaType criteriaType = SearchCriteria.CriteriaType.valueOf(nativeWebRequest.getParameter("filters[" + i + "][criteria]"));
+            String value = nativeWebRequest.getParameter("filters[" + i + "][value]");
+            String valueType = nativeWebRequest.getParameter("filters[" + i + "][valueType]");
+
+            SearchCriteria searchCriteria = new SearchCriteria(column, criteriaType, this.castFilterType(valueType, value));
+            criterias.add(searchCriteria);
+        }
+
+        dataTableRequest.setFilters(criterias);
+        return dataTableRequest;
+    }
+
+    private Object castFilterType(String typeName, String value) {
+        DataTableRequestType type = DataTableRequestType.valueOf(typeName.toUpperCase());
+        switch (type) {
+            case INT:
+                return Integer.valueOf(value);
+            case LONG:
+                return Long.valueOf(value);
+            case DOUBLE:
+                return Double.valueOf(value);
+            case STRING:
+                return value;
+            case DATE:
+                return LocalDate.parse(value);
+            default:
+                throw new IllegalArgumentException("Unsuported type name!");
+        }
     }
 
     private DataTableRequest parseDraw(DataTableRequest dataTableRequest, NativeWebRequest nativeWebRequest) {

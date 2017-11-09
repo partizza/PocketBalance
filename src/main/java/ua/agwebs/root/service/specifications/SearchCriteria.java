@@ -10,7 +10,7 @@ public class SearchCriteria {
     public static final Logger logger = LoggerFactory.getLogger(SearchCriteria.class);
 
     public static enum CriteriaType {
-        EQUALS("="), LESS_OR_EQUAL("<=");
+        EQUALS("EQUALS"), LESS_OR_EQUAL("LESS_OR_EQUAL"), LESS("LESS");
 
         private String criteriaType;
 

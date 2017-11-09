@@ -26,7 +26,9 @@ public class EqualSpecification<T> extends AbstractPocketBalanceSpecification<T>
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
         logger.trace("Creating a Predicate by the specification: {}", this);
+
         Predicate predicate = cb.equal(this.buildPath(root, criteria.getKey()), criteria.getValue());
+
         logger.debug("Created predicate: {} - by the specification: {}", predicate, this);
 
         return predicate;
