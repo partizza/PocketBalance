@@ -35,7 +35,14 @@ public class DataTableRequestResolver implements HandlerMethodArgumentResolver {
         dataTableRequest = this.parseColumns(dataTableRequest, nativeWebRequest);
         dataTableRequest = this.parseOrder(dataTableRequest, nativeWebRequest);
         dataTableRequest = this.parseFilters(dataTableRequest, nativeWebRequest);
+        dataTableRequest = this.parseBookId(dataTableRequest, nativeWebRequest);
 
+        return dataTableRequest;
+    }
+
+    private DataTableRequest parseBookId(DataTableRequest dataTableRequest, NativeWebRequest nativeWebRequest){
+        final String bookId = nativeWebRequest.getParameter("bookId");
+        dataTableRequest.setBookId(Long.valueOf(bookId));
         return dataTableRequest;
     }
 

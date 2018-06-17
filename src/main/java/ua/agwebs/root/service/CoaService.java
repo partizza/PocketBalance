@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.validation.annotation.Validated;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceBook;
+import ua.agwebs.root.service.specifications.SearchCriteria;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -34,4 +35,6 @@ public interface CoaService {
     public Page<BalanceAccount> findAllBalanceAccount(Pageable pageable);
 
     public BalanceAccount findBalanceAccountById(long bookId, long accId);
+
+    public List<BalanceAccount> findAll(List<SearchCriteria> criteria);
 }

@@ -11,8 +11,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import ua.agwebs.root.entity.*;
+import ua.agwebs.root.service.CoaService;
 import ua.agwebs.root.service.EntryService;
 import ua.agwebs.root.service.specifications.SearchCriteria;
+import ua.agwebs.web.rest.PermissionProvider;
+import ua.agwebs.web.rest.PermissionService;
 import ua.agwebs.web.rest.entries.BookEntryProvider;
 import ua.agwebs.web.rest.entries.BookEntryService;
 import ua.agwebs.web.rest.entries.datatables.*;
@@ -31,17 +34,27 @@ public class MockBookEntryProviderTest {
     @Mock
     private EntryService entryService;
 
+    @Mock
+    private CoaService coaService;
+
     private ModelMapper mapper = new ModelMapper();
 
     private final List<EntryLine> entryLines = new ArrayList<>();
 
     private BookEntryService bookEntryService;
 
+    private PermissionService permissionService;
+
+    private AppUser appUser;
+
+    private BalanceBook book;
+
     @Before
     public void setUpMock() {
-        AppUser appUser = new AppUser("bf@u.com", "An", "Xe");
+        appUser = new AppUser("bf@u.com", "An", "Xe");
+        appUser.setId(123L);
 
-        BalanceBook book = new BalanceBook("t-book", "for testing", appUser);
+        book = new BalanceBook("t-book", "for testing", appUser);
         book.setId(7L);
 
         BalanceAccount account = new BalanceAccount(BSCategory.ASSET, 1002L, book, "Cash");
@@ -49,13 +62,16 @@ public class MockBookEntryProviderTest {
 
         entryLines.add(new EntryLine(101L, account, 205L, EntrySide.D, new Currency(840, "USD", "US Dollar")));
 
-        bookEntryService = new BookEntryProvider(entryService, mapper);
+        permissionService = new PermissionProvider(coaService);
+
+        bookEntryService = new BookEntryProvider(entryService, mapper, permissionService,coaService);
     }
 
     // successful
     @Test
     public void test_findEntry() {
         DataTableRequest dataTableRequest = new DataTableRequest();
+        dataTableRequest.setBookId(book.getId());
         dataTableRequest.setDraw(11);
         dataTableRequest.setStart(50);
         dataTableRequest.setLength(25);
@@ -71,8 +87,9 @@ public class MockBookEntryProviderTest {
         Long filteredRecords = 250L;
         Page pageRsl = new PageImpl(entryLines, new PageRequest(3, 25), totalRecords);
         when(entryService.findEntryLines(anyListOf(SearchCriteria.class), any(PageRequest.class))).thenReturn(pageRsl);
+        when(coaService.findBalanceBookById(book.getId())).thenReturn(book);
 
-        DataTableResponse dataTableResponse = bookEntryService.findEntry(dataTableRequest);
+        DataTableResponse dataTableResponse = bookEntryService.findEntry(dataTableRequest, appUser.getId());
 
         Assert.assertEquals("Incorrect draw", dataTableRequest.getDraw(), dataTableResponse.getDraw());
         Assert.assertEquals("Incorrect total records", totalRecords, dataTableResponse.getRecordsTotal());
@@ -84,7 +101,7 @@ public class MockBookEntryProviderTest {
     // rejected
     @Test(expected = IllegalArgumentException.class)
     public void test_findEntry_NullAgrument() {
-        bookEntryService.findEntry(null);
+        bookEntryService.findEntry(null, appUser.getId());
     }
 
 

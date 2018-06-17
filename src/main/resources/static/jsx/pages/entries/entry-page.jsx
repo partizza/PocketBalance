@@ -34,7 +34,7 @@ class EntryValueDatePicker extends React.Component {
                         <option value="LESS">&lt;</option>
                     </PbSelect>
                 </div>
-                <div className="col-md-2">
+                <div className="col-md-3">
                     <PbDatePicker id="entry-value-datepicker" defaultDate={this.state.valueDate}
                                   onChange={this.handleDateChange}/>
                 </div>
@@ -66,6 +66,23 @@ class EntryValueDatePicker extends React.Component {
     }
 }
 
+class CategorySelect extends React.Component {
+    render() {
+        return (
+            <div>
+                <div className="col-md-1">Category</div>
+                <div className="col-md-1">
+                    <PbSelect dataWidth="fit" multiple>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </PbSelect>
+                </div>
+            </div>
+        )
+    }
+}
+
 class EntryPageContent extends React.Component {
 
     constructor(props) {
@@ -77,16 +94,18 @@ class EntryPageContent extends React.Component {
         };
 
         this.handleValueDatePickerChange = this.handleValueDatePickerChange.bind(this);
+        this.handleValueDatePickerChange = this.handleValueDatePickerChange.bind(this);
     }
 
     componentDidMount() {
-        initEntryDataTable(this.getEntriesTableId());
+        this.initEntryDataTable();
+        this.initFilterOptions();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        $('#' + this.getEntriesTableId()).data('valueDateCriteria', this.state.valueDateCriteria);
-        $('#' + this.getEntriesTableId()).data('valueDate', moment(this.state.valueDate).format('YYYY-MM-DD'));
-        $('#' + this.getEntriesTableId()).DataTable().draw();
+        $(this.table).data('valueDateCriteria', this.state.valueDateCriteria);
+        $(this.table).data('valueDate', moment(this.state.valueDate).format('YYYY-MM-DD'));
+        $(this.table).DataTable().draw();
     }
 
     render() {
@@ -106,10 +125,16 @@ class EntryPageContent extends React.Component {
                                               onChange={this.handleValueDatePickerChange}/>
                     </div>
                     <div className="row">
+                        <CategorySelect/>
+                    </div>
+                    <div className="row">
                         <table className="table table-striped entries" id={this.getEntriesTableId()}
                                data-value-date-criteria={this.state.valueDateCriteria}
                                data-value-date={moment(this.state.valueDate).format('YYYY-MM-DD')}
-                               width="100%"></table>
+                               width="100%"
+                               ref={(table) => {
+                                   this.table = table;
+                               }}></table>
                     </div>
                 </div>
             </div>
@@ -127,65 +152,76 @@ class EntryPageContent extends React.Component {
         });
     }
 
+    initFilterOptions() {
+        $.ajax({
+            url: '/data/entry/options/' + sessionStorage.getItem("bookId"),
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+            },
+            error: function () {
+            }
+        });
+    }
+
+    initEntryDataTable() {
+        var table = this.table;
+        $(table).DataTable({
+            searching: false,
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '/data/entry',
+                data: function (params) {
+                    params.bookId = sessionStorage.getItem("bookId");
+
+                    params.filters = [];
+                    var dateFilter = {
+                        column: "header.valueDate",
+                        criteria: $(table).data('valueDateCriteria'),
+                        value: $(table).data('valueDate'),
+                        valueType: 'date'
+                    };
+                    params.filters.push(dateFilter);
+                }
+            },
+            columns: [
+                {title: "Value date", name: "header.valueDate", data: "headerValueDate"},
+                {
+                    title: "Category",
+                    name: "account.bsCategory",
+                    data: "accountBsCategory",
+                    render: function (data, type, row) {
+                        return getAccountCategoryText(data);
+                    }
+                },
+                {title: "accId", name: "account.accId", data: "accountAccId", visible: false},
+                {title: "Account", name: "account.name", data: "accountName"},
+                {
+                    title: "Amount",
+                    name: "trnAmount",
+                    data: "trnAmount",
+                    render: function (data, type, row) {
+                        return accounting.formatMoney(Number(data), {
+                            symbol: "",
+                            precision: 2,
+                            format: {
+                                pos: "%s %v",
+                                neg: "%s (%v)",
+                                zero: "%s  --"
+                            }
+                        });
+                    }
+                },
+                {title: "curId", name: "currency.id", data: "currencyId", visible: false},
+                {title: "Currency", name: "currency.code", data: "currencyCode"},
+                {title: "Comment", name: "header.desc", data: "headerDesc"}
+            ]
+        });
+    }
+
 }
 
 
-ReactDom.render(<EntryPageContent />, document.getElementById("root"));
+ReactDom.render(<EntryPageContent/>, document.getElementById("root"));
 
-
-// ========== functions ==================
-
-
-function initEntryDataTable(elementId) {
-
-    $('#' + elementId).DataTable({
-        searching: false,
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '/data/entry',
-            data: function (params) {
-                params.filters = [];
-                var dateFilter = {
-                    column: "header.valueDate",
-                    criteria: $('#' + elementId).data('valueDateCriteria'),
-                    value: $('#' + elementId).data('valueDate'),
-                    valueType: 'date'
-                };
-                params.filters.push(dateFilter);
-            }
-        },
-        columns: [
-            {title: "Value date", name: "header.valueDate", data: "headerValueDate"},
-            {
-                title: "Category",
-                name: "account.bsCategory",
-                data: "accountBsCategory",
-                render: function (data, type, row) {
-                    return getAccountCategoryText(data);
-                }
-            },
-            {title: "accId", name: "account.accId", data: "accountAccId", visible: false},
-            {title: "Account", name: "account.name", data: "accountName"},
-            {
-                title: "Amount",
-                name: "trnAmount",
-                data: "trnAmount",
-                render: function (data, type, row) {
-                    return accounting.formatMoney(Number(data), {
-                        symbol: "",
-                        precision: 2,
-                        format: {
-                            pos: "%s %v",
-                            neg: "%s (%v)",
-                            zero: "%s  --"
-                        }
-                    });
-                }
-            },
-            {title: "curId", name: "currency.id", data: "currencyId", visible: false},
-            {title: "Currency", name: "currency.code", data: "currencyCode"},
-            {title: "Comment", name: "header.desc", data: "headerDesc"}
-        ]
-    });
-};

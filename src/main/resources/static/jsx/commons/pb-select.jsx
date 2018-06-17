@@ -11,9 +11,21 @@ export default class PbSelect extends React.Component {
         this.handleChange = this.handleChange.bind(this);
     }
 
+    componentDidMount() {
+        $(this.select).selectpicker(this.state.value);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        $(this.select).selectpicker(this.state.value);
+    }
+
     render() {
         return (
-            <select className="selectpicker" data-width={this.props.dataWidth} value={this.state.value}
+            <select className="selectpicker" data-width={this.props.dataWidth}
+                    multiple={this.props.multiple}
+                    ref={(select) => {
+                        this.select = select;
+                    }}
                     onChange={this.handleChange}>
                 {this.props.children}
             </select>

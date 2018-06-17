@@ -14,9 +14,13 @@ import org.springframework.util.Assert;
 import ua.agwebs.root.entity.BalanceAccount;
 import ua.agwebs.root.entity.BalanceAccountId;
 import ua.agwebs.root.entity.BalanceBook;
+import ua.agwebs.root.entity.EntryLine;
 import ua.agwebs.root.events.BookCreatedEvent;
 import ua.agwebs.root.repo.BalanceAccountRepository;
 import ua.agwebs.root.repo.BalanceBookRepository;
+import ua.agwebs.root.service.specifications.PocketBalanceSpecificationFactory;
+import ua.agwebs.root.service.specifications.SearchCriteria;
+import ua.agwebs.root.service.specifications.SpecificationBuilder;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -217,4 +221,21 @@ public class CoaManager implements CoaService {
         return account;
     }
 
+    @Override
+    public List<BalanceAccount> findAll(List<SearchCriteria> criteria) {
+        logger.info("Find balance account by specification.");
+        Assert.notNull(criteria);
+
+        SpecificationBuilder<BalanceAccount> specificationBuilder = new SpecificationBuilder<>();
+        criteria.stream()
+                .map(PocketBalanceSpecificationFactory::<BalanceAccount>getSpecification)
+                .forEach(specificationBuilder::and);
+        Specification<BalanceAccount> spec = specificationBuilder.build();
+
+        List<BalanceAccount> accounts = new ArrayList<>();
+        accounts.add(accountRepo.findOne(spec));
+
+        logger.debug("Number of selected balance accounts: {}", accounts.size());
+        return accounts;
+    }
 }

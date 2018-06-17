@@ -15,6 +15,7 @@ public class DataTableRequest {
     private List<DataTableColumnsOrder> orders = new ArrayList<>();
     private List<DataTableColumn> columns = new ArrayList<>();
     private List<SearchCriteria> filters = new ArrayList<>();
+    private Long bookId;
 
     public Integer getDraw() {
         return draw;
@@ -72,6 +73,14 @@ public class DataTableRequest {
         this.filters = filters;
     }
 
+    public Long getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
+    }
+
     @Override
     public String toString() {
         return "DataTableRequest{" +
@@ -82,6 +91,7 @@ public class DataTableRequest {
                 ", orders=" + orders +
                 ", columns=" + columns +
                 ", filters=" + filters +
+                ", bookId=" + bookId +
                 '}';
     }
 
@@ -98,8 +108,8 @@ public class DataTableRequest {
         if (search != null ? !search.equals(that.search) : that.search != null) return false;
         if (orders != null ? !orders.equals(that.orders) : that.orders != null) return false;
         if (columns != null ? !columns.equals(that.columns) : that.columns != null) return false;
-        return filters != null ? filters.equals(that.filters) : that.filters == null;
-
+        if (filters != null ? !filters.equals(that.filters) : that.filters != null) return false;
+        return bookId != null ? bookId.equals(that.bookId) : that.bookId == null;
     }
 
     @Override
@@ -111,6 +121,7 @@ public class DataTableRequest {
         result = 31 * result + (orders != null ? orders.hashCode() : 0);
         result = 31 * result + (columns != null ? columns.hashCode() : 0);
         result = 31 * result + (filters != null ? filters.hashCode() : 0);
+        result = 31 * result + (bookId != null ? bookId.hashCode() : 0);
         return result;
     }
 }

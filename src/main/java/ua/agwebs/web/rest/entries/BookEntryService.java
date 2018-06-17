@@ -5,6 +5,8 @@ import ua.agwebs.web.rest.entries.datatables.DataTableResponse;
 
 public interface BookEntryService {
 
-    public DataTableResponse findEntry(DataTableRequest dataTableRequest);
+    public DataTableResponse findEntry(DataTableRequest dataTableRequest, long userId);
+
+    public FilterOptionsDto getFilterOptions(long bookId, long userId);
 
 }
